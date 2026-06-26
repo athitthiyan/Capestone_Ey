@@ -1,0 +1,18 @@
+export const routes = {
+  dashboard: "/dashboard",
+  intake: "/intake",
+  investigations: "/investigations",
+  caseWorkspace: (caseId: string) => `/investigations/${caseId}`,
+  debate: "/debate",
+  evidence: "/evidence",
+  verification: "/verification",
+  review: "/review",
+  humanReview: "/review",
+  auditLogs: "/audit-logs",
+  replay: "/replay",
+  reports: "/reports",
+  analytics: "/analytics",
+  evaluation: "/evaluation",
+  knowledgeBase: "/knowledge-base",
+  settings: "/settings",
+} as const;
