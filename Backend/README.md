@@ -97,7 +97,7 @@ backend/
 5. **Start Celery (in another terminal)**
 
    ```bash
-   celery -A celery_config worker --loglevel=info
+   celery -A app.tasks.celery_app worker --loglevel=info --pool=solo 
    ```
 
 ---
