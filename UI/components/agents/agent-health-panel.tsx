@@ -12,16 +12,20 @@ export function AgentHealthPanel({ agents }: { agents: AgentHealth[] }) {
         <Activity className="h-4 w-4 text-primary" aria-hidden="true" />
       </CardHeader>
       <CardContent className="space-y-4">
-        {agents.map((agent) => (
-          <div key={agent.label} className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground">{agent.label}</span>
-              <span className="ml-auto font-mono text-xs text-muted-foreground">{agent.latency}</span>
-              <StatusBadge state={agent.state} />
+        {agents.length > 0 ? (
+          agents.map((agent) => (
+            <div key={agent.label} className="space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-foreground">{agent.label}</span>
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{agent.latency}</span>
+                <StatusBadge state={agent.state} />
+              </div>
+              <Progress value={agent.load} tone={agent.state === "running" ? "warning" : "success"} />
             </div>
-            <Progress value={agent.load} tone={agent.state === "running" ? "warning" : "success"} />
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-sm text-muted-foreground">No live agent health endpoint is connected yet.</p>
+        )}
       </CardContent>
     </Card>
   );

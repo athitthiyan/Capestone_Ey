@@ -29,7 +29,8 @@ export type InvestigationStatus =
   | "verification"
   | "human_review"
   | "report_ready"
-  | "closed";
+  | "closed"
+  | "failed";
 
 export type Investigation = {
   id: string;
@@ -122,7 +123,7 @@ export type DebateArgument = {
   footer: string;
   scoreLabel: string;
   citations: string[];
-  confidence: number;
+  confidence?: number;
   details: string;
 };
 
@@ -137,6 +138,32 @@ export type VerificationClaim = {
   notes: string;
   pass: "first_pass" | "second_pass" | "failed";
   action: "proceed" | "retry" | "revise";
+};
+
+export type EvidenceVerificationStatus =
+  | "VERIFIED"
+  | "FLAGGED"
+  | "API_UNAVAILABLE"
+  | "NEEDS_MANUAL_REVIEW";
+
+export type EvidenceVerification = {
+  id?: string;
+  claimId?: string;
+  category: string;
+  claimedAmount: number;
+  fetchedAmount?: number | null;
+  minAcceptableAmount?: number | null;
+  maxAcceptableAmount?: number | null;
+  differenceAmount?: number | null;
+  differencePercentage?: number | null;
+  tolerancePercentage: number;
+  providerName: string;
+  providerReferenceId?: string | null;
+  verificationStatus: EvidenceVerificationStatus;
+  confidenceScore: number;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ReplayStep = {
@@ -209,6 +236,10 @@ export type ReviewQueueItem = {
   confidence: number;
   dueAt: string;
   queue: "reviewer" | "partner";
+  assignedTo?: string;
+  priority: number;
+  status: string;
+  notes?: string;
 };
 
 export type ReviewHistoryItem = {
@@ -277,34 +308,28 @@ export type IntakeSummary = {
   flaggedRows: FlaggedRow[];
 };
 
-// --- A/B evaluation: multi-agent crew vs single-prompt baseline ---
-export type EvaluationKpi = {
-  label: string;
-  value: string;
-  helper: string;
-  target: string;
-  pass: boolean;
-};
+// --- RAGAS evaluation: retrieval, generation, and agentic quality ---
+export type RagasCategory = "retrieval" | "generation" | "agentic";
 
-export type EvaluationComparisonRow = {
+export type RagasMetric = {
+  /** RAGAS metric name, e.g. "Faithfulness". */
   metric: string;
-  singlePrompt: string;
-  crew: string;
-  delta: string;
-  better: boolean;
-};
-
-export type HallucinationResult = {
-  label: string;
-  count: number;
-  total: number;
-  tone: "success" | "danger";
+  /** Which part of the pipeline the metric scores. */
+  category: RagasCategory;
+  /** Score in the 0..1 range. */
+  score: number;
+  /** Minimum passing threshold in the 0..1 range. */
+  target: number;
+  /** Whether the metric meets its target. */
+  pass: boolean;
+  /** Short description of what the metric measures here. */
+  helper: string;
 };
 
 export type EvaluationSummary = {
+  /** Number of labelled golden-set cases scored. */
   cases: number;
-  kpis: EvaluationKpi[];
-  comparison: EvaluationComparisonRow[];
-  hallucination: HallucinationResult[];
+  /** RAGAS metric scores across all categories. */
+  metrics: RagasMetric[];
   conclusion: string;
 };

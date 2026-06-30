@@ -1,5 +1,13 @@
 import { ReplayView } from "@/features/replay/replay-view";
 
-export default function ReplayPage() {
-  return <ReplayView caseId="CASE-0007" />;
+export default async function ReplayPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    caseId?: string;
+  }>;
+}) {
+  const { caseId } = (await searchParams) ?? {};
+
+  return <ReplayView caseId={caseId} />;
 }

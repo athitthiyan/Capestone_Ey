@@ -3,19 +3,25 @@
 import { LockKeyhole } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AuditTimeline } from "@/components/audit/audit-timeline";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useActiveInvestigationId } from "@/hooks/use-active-investigation-id";
 import { useAuditEvents } from "@/hooks/use-audit-events";
 import type { AuditEvent } from "@/types/domain";
 
 const emptyEvents: AuditEvent[] = [];
 
-export function AuditLogsView({ caseId }: { caseId?: string }) {
-  const { data, error, isLoading, refetch } = useAuditEvents(caseId);
+export function AuditLogsView({ caseId: explicitCaseId }: { caseId?: string }) {
+  const activeCase = useActiveInvestigationId(explicitCaseId);
+  const caseId = activeCase.caseId;
+  // Show case-scoped events when a case is active, otherwise fall back to the
+  // global recent audit feed so the page is never blank.
+  const { data, error, isLoading, refetch } = useAuditEvents(caseId, { enabled: true });
   const [query, setQuery] = useState("");
   const [eventType, setEventType] = useState<AuditEvent["eventType"] | "all">("all");
   const events = data ?? emptyEvents;
@@ -34,8 +40,12 @@ export function AuditLogsView({ caseId }: { caseId?: string }) {
     });
   }, [eventType, events, query]);
 
-  if (isLoading) {
+  if (activeCase.isLoading || isLoading) {
     return <LoadingState label="Loading audit log" />;
+  }
+
+  if (activeCase.error) {
+    return <ErrorState onRetry={() => void activeCase.refetch()} />;
   }
 
   if (error || !data) {
@@ -102,6 +112,14 @@ export function AuditLogsView({ caseId }: { caseId?: string }) {
       </section>
 
       <AuditTimeline events={filtered} />
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No audit events match"
+          description="Adjust the search or event type filter to inspect other recorded actions."
+          icon={LockKeyhole}
+        />
+      ) : null}
     </div>
   );
 }

@@ -67,6 +67,15 @@ React is installed as part of the project dependencies. You do not need to insta
 
 ## Run Locally
 
+Configure the backend API:
+
+```powershell
+copy .env.example .env.local
+```
+
+`NEXT_PUBLIC_API_BASE_URL` must point at the FastAPI backend, for example
+`http://localhost:8000/api/v1`.
+
 Start the development server:
 
 ```powershell
@@ -120,12 +129,11 @@ UI/
   app/                  Next.js App Router routes
   components/           Reusable UI, layout, charts, tables, workflow, and domain components
   constants/            Route and navigation constants
-  data/                 Mock data fixtures
   features/             Feature-level page implementations
   hooks/                React Query hooks
   lib/                  Utility and status helpers
   providers/            App-level providers
-  services/             Data access layer, ready to swap for real APIs
+  services/             Backend API data access layer
   store/                Client UI state
   tests/                Test setup
   types/                Domain, form, and feature types
@@ -157,13 +165,18 @@ Legacy routes:
 
 ## Development Notes
 
-- Keep mock data in `data/`, not inside components.
 - Use `services/` for data access functions.
 - Use `hooks/` for React Query integration.
 - Keep page files thin and delegate UI to `features/`.
 - Add reusable UI to `components/`.
 - Avoid `any`; extend the domain types in `types/`.
 - Prefer existing design tokens in `app/globals.css` and `tailwind.config.ts`.
+
+Third-party evidence verification is exposed through:
+
+- `services/evidence-verification.service.ts` for `/claims/{claimId}/verification` and `/claims/{claimId}/verify-evidence`.
+- `hooks/use-evidence-verification.ts` for React Query loading, re-run, and cache invalidation.
+- `components/evidence/evidence-verification-card.tsx` in the investigation workspace and human review panel.
 
 ## Verification Checklist
 

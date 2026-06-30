@@ -5,11 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { commandItems, healthItems, navigationSections } from "@/constants/navigation";
+import { commandItems, navigationSections } from "@/constants/navigation";
+import { routes } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 import { useUiState } from "@/store/ui-state";
 
 function getActiveHref(pathname: string) {
+  if (pathname.startsWith(`${routes.investigations}/`)) {
+    return routes.workspace;
+  }
+
   const hrefs = navigationSections.flatMap((section) => section.items.map((item) => item.href));
   const matches = hrefs.filter((href) => pathname === href || pathname.startsWith(`${href}/`)).sort((a, b) => b.length - a.length);
 
@@ -79,17 +84,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="rounded-lg border border-border bg-background/60 p-3">
           <p className="text-xs font-medium text-foreground">Platform health</p>
           <div className="mt-3 space-y-2">
-            {healthItems.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <div key={item.label} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Icon className="h-3.5 w-3.5 text-success" aria-hidden="true" />
-                  <span>{item.label}</span>
-                  <span className="ml-auto font-mono text-success-foreground">{item.status}</span>
-                </div>
-              );
-            })}
+            <p className="text-xs text-muted-foreground">Live service checks are not exposed by the UI API yet.</p>
           </div>
         </div>
       </div>
@@ -114,8 +109,8 @@ function AppHeader() {
         </Button>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-foreground">ACME Holdings / FY26 Q2 close</p>
-          <p className="truncate text-xs text-muted-foreground">Professional skepticism workflow active</p>
+          <p className="truncate text-sm font-medium text-foreground">Skeptic Engine</p>
+          <p className="truncate text-xs text-muted-foreground">Live backend workspace</p>
         </div>
 
         <Button

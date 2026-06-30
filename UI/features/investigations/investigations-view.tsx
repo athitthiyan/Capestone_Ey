@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { routes } from "@/constants/routes";
 import { useInvestigations } from "@/hooks/use-cases";
 import type { Investigation, InvestigationStatus, RiskLevel } from "@/types/domain";
 
@@ -51,6 +52,7 @@ export function InvestigationsView() {
 
   const highRiskCount = investigations.filter((item) => item.risk === "critical" || item.risk === "high").length;
   const reviewCount = investigations.filter((item) => item.status === "human_review").length;
+  const firstInvestigationHref = investigations[0] ? routes.caseWorkspace(investigations[0].id) : routes.investigations;
   const pageCount = Math.max(Math.ceil(filtered.length / pageSize), 1);
   const currentPage = Math.min(page, pageCount);
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -77,7 +79,7 @@ export function InvestigationsView() {
               Clear filters
             </Button>
             <Button asChild>
-              <Link href="/investigations/CASE-0007">
+              <Link href={firstInvestigationHref}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
                 Open case workspace
               </Link>

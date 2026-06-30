@@ -89,22 +89,12 @@ export function DashboardView() {
         <CaseTrendChart trend={trendQuery.data ?? []} />
         <Card>
           <CardHeader>
-            <CardTitle>API health and cost</CardTitle>
+            <CardTitle>Backend data source</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {[
-              ["Claude Sonnet", "operational", "2.4M tokens"],
-              ["Claude Haiku", "operational", "1.7M tokens"],
-              ["FX API", "credential pending", "$0.00"],
-              ["Registry API", "cached", "84 lookups"],
-            ].map(([label, status, usage]) => (
-              <div key={label} className="flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2">
-                <span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />
-                <span className="text-sm font-medium text-foreground">{label}</span>
-                <span className="ml-auto text-xs text-muted-foreground">{status}</span>
-                <span className="font-mono text-xs text-foreground">{usage}</span>
-              </div>
-            ))}
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Dashboard statistics and investigations are loaded from the configured backend API.
+            </p>
           </CardContent>
         </Card>
       </section>

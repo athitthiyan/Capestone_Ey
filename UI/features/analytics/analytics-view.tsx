@@ -3,6 +3,7 @@
 import { BarChart3 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ChartSkeleton } from "@/components/shared/chart-skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
@@ -30,8 +31,10 @@ export function AnalyticsView() {
 
   const trend = trendQuery.data ?? [];
   const accuracy = accuracyQuery.data ?? [];
+  const kpis = kpiQuery.data ?? [];
   const latestConfidence = trend.at(-1)?.confidence ?? 0;
   const latestVerifierRate = trend.at(-1)?.verifierRate ?? 0;
+  const hasAnalytics = trend.length > 0 || accuracy.length > 0 || kpis.length > 0;
 
   return (
     <div className="space-y-6">
@@ -47,40 +50,36 @@ export function AnalyticsView() {
         }
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {(kpiQuery.data ?? []).map((metric) => (
-          <Card key={metric.label}>
-            <CardContent className="p-4">
-              <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{metric.label}</p>
-              <p className="mt-2 font-mono text-2xl text-foreground">{metric.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{metric.helper}</p>
-            </CardContent>
-          </Card>
-        ))}
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Latest confidence</p>
-            <p className="mt-2 font-mono text-2xl text-foreground">{Math.round(latestConfidence * 100)}%</p>
-            <p className="mt-1 text-xs text-muted-foreground">Verifier {Math.round(latestVerifierRate * 100)}%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Agent latency</p>
-            <p className="mt-2 font-mono text-2xl text-primary">1.1s</p>
-            <p className="mt-1 text-xs text-muted-foreground">median reasoning step</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">API usage</p>
-            <p className="mt-2 font-mono text-2xl text-success-foreground">{accuracy.length}</p>
-            <p className="mt-1 text-xs text-muted-foreground">active agent services</p>
-          </CardContent>
-        </Card>
-      </section>
+      {hasAnalytics ? (
+        <>
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {kpis.map((metric) => (
+              <Card key={metric.label}>
+                <CardContent className="p-4">
+                  <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{metric.label}</p>
+                  <p className="mt-2 font-mono text-2xl text-foreground">{metric.value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{metric.helper}</p>
+                </CardContent>
+              </Card>
+            ))}
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Latest confidence</p>
+                <p className="mt-2 font-mono text-2xl text-foreground">{Math.round(latestConfidence * 100)}%</p>
+                <p className="mt-1 text-xs text-muted-foreground">Verifier {Math.round(latestVerifierRate * 100)}%</p>
+              </CardContent>
+            </Card>
+          </section>
 
-      <AnalyticsCharts trend={trend} accuracy={accuracy} />
+          <AnalyticsCharts trend={trend} accuracy={accuracy} />
+        </>
+      ) : (
+        <EmptyState
+          title="No analytics data"
+          description="Analytics will appear after the backend exposes evaluation or telemetry records."
+          icon={BarChart3}
+        />
+      )}
     </div>
   );
 }

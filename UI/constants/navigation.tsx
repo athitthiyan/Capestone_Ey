@@ -7,7 +7,6 @@ import {
   FileSearch,
   FileText,
   FolderKanban,
-  Gauge,
   LayoutDashboard,
   MessagesSquare,
   Play,
@@ -25,7 +24,7 @@ export const navigationSections = [
       { label: "Dashboard", href: routes.dashboard, icon: LayoutDashboard },
       { label: "Case intake", href: routes.intake, icon: FileUp },
       { label: "Investigations", href: routes.investigations, icon: FolderKanban },
-      { label: "Workspace", href: routes.caseWorkspace("CASE-0007"), icon: Target },
+      { label: "Workspace", href: routes.workspace, icon: Target },
     ],
   },
   {
@@ -44,7 +43,7 @@ export const navigationSections = [
       { label: "Reports", href: routes.reports, icon: FileText },
       { label: "Audit logs", href: routes.auditLogs, icon: ShieldCheck },
       { label: "Analytics", href: routes.analytics, icon: BarChart3 },
-      { label: "A/B evaluation", href: routes.evaluation, icon: FlaskConical },
+      { label: "RAGAS evaluation", href: routes.evaluation, icon: FlaskConical },
       { label: "Knowledge base", href: routes.knowledgeBase, icon: BookOpen },
       { label: "Settings", href: routes.settings, icon: Settings },
     ],
@@ -58,7 +57,3 @@ export const commandItems = navigationSections.flatMap((section) =>
   })),
 );
 
-export const healthItems = [
-  { label: "Claude API", status: "operational", icon: ShieldCheck },
-  { label: "FX API", status: "operational", icon: Gauge },
-] as const;

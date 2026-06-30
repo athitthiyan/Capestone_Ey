@@ -18,29 +18,29 @@ export function AuditTimeline({ events }: { events: AuditEvent[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground">{event.title}</h2>
+                  <div className="min-w-0">
+                    <h2 className="break-words text-sm font-semibold text-foreground">{event.title}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {event.timestamp} / {event.actor}
                     </p>
                   </div>
                   <StatusBadge state={event.state} />
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{event.detail}</p>
+                <p className="mt-3 break-words text-sm leading-6 text-muted-foreground">{event.detail}</p>
                 <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
-                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-                    Type <span className="font-mono text-foreground">{event.eventType}</span>
+                  <div className="min-w-0 rounded-md border border-border bg-muted/40 px-3 py-2">
+                    Type <span className="break-all font-mono text-foreground">{event.eventType}</span>
                   </div>
-                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-                    Case <span className="font-mono text-foreground">{event.caseId}</span>
+                  <div className="min-w-0 rounded-md border border-border bg-muted/40 px-3 py-2">
+                    Case <span className="break-all font-mono text-foreground">{event.caseId}</span>
                   </div>
-                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-                    Source <span className="font-mono text-foreground">{event.sourceRef}</span>
+                  <div className="min-w-0 rounded-md border border-border bg-muted/40 px-3 py-2">
+                    Source <span className="break-all font-mono text-foreground">{event.sourceRef}</span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                <div className="mt-3 flex min-w-0 items-center gap-2 font-mono text-xs text-muted-foreground">
                   <Hash className="h-3.5 w-3.5" aria-hidden="true" />
-                  {event.hash}
+                  <span className="break-all">{event.hash}</span>
                 </div>
               </div>
             </div>

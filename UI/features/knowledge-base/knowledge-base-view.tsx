@@ -3,6 +3,7 @@
 import { BookOpen } from "lucide-react";
 import { useMemo, useState } from "react";
 import { KnowledgeSourceCard } from "@/components/knowledge-base/knowledge-source-card";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
@@ -71,6 +72,14 @@ export function KnowledgeBaseView() {
           <KnowledgeSourceCard key={source.id} source={source} />
         ))}
       </section>
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No knowledge sources"
+          description="Knowledge sources will appear after policy or connector records are available from the backend."
+          icon={BookOpen}
+        />
+      ) : null}
     </div>
   );
 }

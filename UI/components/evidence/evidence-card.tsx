@@ -21,32 +21,32 @@ export function EvidenceCard({ evidence }: { evidence: EvidenceSource }) {
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-sm font-semibold text-foreground">{evidence.title}</h2>
+              <h2 className="break-words text-sm font-semibold text-foreground">{evidence.title}</h2>
               <Badge variant="info">{evidence.type}</Badge>
               <Badge variant={qualityTone[evidence.quality]}>{evidence.quality}</Badge>
             </div>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">{evidence.summary}</p>
-            <div className="mt-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs leading-5 text-muted-foreground">
+            <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">{evidence.summary}</p>
+            <div className="mt-3 break-words rounded-md border border-border bg-muted/40 px-3 py-2 text-xs leading-5 text-muted-foreground">
               <span className="font-medium text-foreground">Document preview:</span> {evidence.preview}
             </div>
           </div>
         </div>
         <div className="mt-4 grid gap-3 text-xs text-muted-foreground sm:grid-cols-2">
-          <div>
+          <div className="min-w-0">
             <span className="block text-muted-foreground">Citation</span>
-            <span className="font-mono text-foreground">{evidence.citation}</span>
+            <span className="break-all font-mono text-foreground">{evidence.citation}</span>
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="block text-muted-foreground">Last verified</span>
-            <span className="text-foreground">{evidence.lastVerified}</span>
+            <span className="break-all text-foreground">{evidence.lastVerified}</span>
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="block text-muted-foreground">Version</span>
-            <span className="font-mono text-foreground">{evidence.version}</span>
+            <span className="break-all font-mono text-foreground">{evidence.version}</span>
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="block text-muted-foreground">Owner</span>
-            <span className="text-foreground">{evidence.owner}</span>
+            <span className="break-words text-foreground">{evidence.owner}</span>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">

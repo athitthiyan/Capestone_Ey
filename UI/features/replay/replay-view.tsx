@@ -1,30 +1,90 @@
 "use client";
 
 import { LockKeyhole } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ReplayControls } from "@/components/replay/replay-controls";
+import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useActiveInvestigationId } from "@/hooks/use-active-investigation-id";
 import { useReplayFrames } from "@/hooks/use-replay";
 
-export function ReplayView({ caseId }: { caseId: string }) {
-  const { data, error, isLoading, refetch } = useReplayFrames(caseId);
+export function ReplayView({ caseId: explicitCaseId }: { caseId?: string }) {
+  const activeCase = useActiveInvestigationId(explicitCaseId);
+  const caseId = activeCase.caseId;
+  const { data, error, isLoading, refetch } = useReplayFrames(caseId, { enabled: Boolean(caseId) });
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(2);
   const [activeIndex, setActiveIndex] = useState(0);
   const frames = data ?? [];
   const activeFrame = frames[activeIndex];
 
-  if (isLoading) {
+  useEffect(() => {
+    setActiveIndex((value) => Math.min(value, Math.max(frames.length - 1, 0)));
+    if (frames.length === 0) {
+      setPlaying(false);
+    }
+  }, [frames.length]);
+
+  useEffect(() => {
+    if (!playing || frames.length <= 1) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((value) => {
+        if (value >= frames.length - 1) {
+          setPlaying(false);
+          return value;
+        }
+        return value + 1;
+      });
+    }, Math.max(350, 1600 / speed));
+
+    return () => window.clearInterval(timer);
+  }, [frames.length, playing, speed]);
+
+  function handlePlayingChange(nextPlaying: boolean) {
+    if (nextPlaying && activeIndex >= frames.length - 1) {
+      setActiveIndex(0);
+    }
+    setPlaying(nextPlaying);
+  }
+
+  if (activeCase.isLoading || isLoading) {
     return <LoadingState label="Loading replay" />;
   }
 
-  if (error || !data || !activeFrame) {
+  if (activeCase.error) {
+    return <ErrorState onRetry={() => void activeCase.refetch()} />;
+  }
+
+  if (!caseId) {
+    return (
+      <EmptyState
+        title="No investigation selected"
+        description="Create or import an investigation before opening the replay timeline."
+        icon={LockKeyhole}
+      />
+    );
+  }
+
+  if (error || !data) {
     return <ErrorState onRetry={() => void refetch()} />;
+  }
+
+  if (!activeFrame) {
+    return (
+      <EmptyState
+        title="No replay frames"
+        description="This investigation does not have any recorded agent actions yet."
+        icon={LockKeyhole}
+      />
+    );
   }
 
   return (
@@ -44,7 +104,7 @@ export function ReplayView({ caseId }: { caseId: string }) {
       <ReplayControls
         playing={playing}
         speed={speed}
-        onPlayingChange={setPlaying}
+        onPlayingChange={handlePlayingChange}
         onSpeedChange={setSpeed}
         onStepBack={() => setActiveIndex((value) => Math.max(value - 1, 0))}
         onStepForward={() => setActiveIndex((value) => Math.min(value + 1, frames.length - 1))}
@@ -94,7 +154,7 @@ export function ReplayView({ caseId }: { caseId: string }) {
             ].map(([label, value]) => (
               <div key={label}>
                 <h2 className="text-sm font-semibold text-foreground">{label}</h2>
-                <p className="mt-2 rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 whitespace-pre-wrap break-words rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground">
                   {value}
                 </p>
               </div>

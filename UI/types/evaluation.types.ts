@@ -1,6 +1,1 @@
-export type {
-  EvaluationSummary,
-  EvaluationKpi,
-  EvaluationComparisonRow,
-  HallucinationResult,
-} from "@/types/domain";
+export type { EvaluationSummary, RagasMetric, RagasCategory } from "@/types/domain";

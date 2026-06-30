@@ -1,5 +1,13 @@
 import { ReportsView } from "@/features/reports/reports-view";
 
-export default function ReportsPage() {
-  return <ReportsView caseId="CASE-0007" />;
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    caseId?: string;
+  }>;
+}) {
+  const { caseId } = (await searchParams) ?? {};
+
+  return <ReportsView caseId={caseId} />;
 }

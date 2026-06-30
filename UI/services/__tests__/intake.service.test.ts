@@ -2,26 +2,10 @@ import { describe, expect, it } from "vitest";
 import { getIntakeSummary, parseLedgerFile } from "@/services/intake.service";
 
 describe("intake service", () => {
-  it("returns a GL intake summary", async () => {
+  it("starts without a preloaded intake summary", async () => {
     const summary = await getIntakeSummary();
 
-    expect(summary.fileName).toBe("sample_gl_1000.csv");
-    expect(summary.rowsIngested).toBe(1000);
-  });
-
-  it("keeps flagged + cleared consistent with rows ingested", async () => {
-    const summary = await getIntakeSummary();
-
-    expect(summary.flagged + summary.cleared).toBe(summary.rowsIngested);
-    expect(summary.flagged).toBeGreaterThan(0);
-  });
-
-  it("exposes deterministic rule statistics and flagged rows", async () => {
-    const summary = await getIntakeSummary();
-
-    expect(summary.ruleStats.length).toBeGreaterThan(0);
-    expect(summary.ruleStats.every((rule) => rule.count >= 0)).toBe(true);
-    expect(summary.flaggedRows.every((row) => row.rules.length > 0)).toBe(true);
+    expect(summary).toBeNull();
   });
 
   it("parses uploaded CSV files and creates flagged rows", async () => {

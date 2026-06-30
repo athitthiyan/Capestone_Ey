@@ -2,6 +2,7 @@
 
 import { Settings } from "lucide-react";
 import { SettingsForm } from "@/components/forms/settings-form";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
@@ -15,7 +16,7 @@ export function SettingsView() {
     return <LoadingState label="Loading settings" />;
   }
 
-  if (error || !data) {
+  if (error) {
     return <ErrorState onRetry={() => void refetch()} />;
   }
 
@@ -33,7 +34,15 @@ export function SettingsView() {
         }
       />
 
-      <SettingsForm settings={data} />
+      {data ? (
+        <SettingsForm settings={data} />
+      ) : (
+        <EmptyState
+          title="Settings endpoint unavailable"
+          description="Governance settings will be editable after the backend exposes persisted configuration."
+          icon={Settings}
+        />
+      )}
     </div>
   );
 }

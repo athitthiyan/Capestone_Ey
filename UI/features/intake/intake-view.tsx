@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowRight, FileSpreadsheet, History, Info, Play, UploadCloud } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, FileSpreadsheet, History, Info, Play, Trash2, UploadCloud } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { FlaggedRowsTable } from "@/components/intake/flagged-rows-table";
 import { RulePrefilter } from "@/components/intake/rule-prefilter";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
@@ -12,18 +13,46 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { routes } from "@/constants/routes";
+import { useCreateInvestigations, useDeleteImportedInvestigations, useExecuteInvestigations } from "@/hooks/use-cases";
 import { useIntakeSummary } from "@/hooks/use-intake";
 import { parseLedgerFile } from "@/services/intake.service";
-import type { IntakeSummary } from "@/types/domain";
+import type { FlaggedRow, IntakeSummary } from "@/types/domain";
+
+function parseCurrencyAmount(value: string) {
+  const parsed = Number(value.replace(/[^0-9.-]/g, ""));
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0.01;
+}
+
+function toInvestigationInput(row: FlaggedRow, summary: IntakeSummary) {
+  return {
+    transactionId: row.txnId,
+    vendor: row.vendor,
+    category: row.account,
+    amount: parseCurrencyAmount(row.amount),
+    materiality: 25_000,
+    owner: "intake",
+    description: [
+      `Created from intake file ${summary.fileName}.`,
+      `Rules fired: ${row.rules.join(", ")}.`,
+      `Source account: ${row.account}.`,
+    ].join(" "),
+  };
+}
 
 export function IntakeView() {
+  const router = useRouter();
   const { data, error, isLoading, refetch } = useIntakeSummary();
+  const createCases = useCreateInvestigations();
+  const deleteImportedCases = useDeleteImportedInvestigations();
+  const runCases = useExecuteInvestigations();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploadedSummary, setUploadedSummary] = useState<IntakeSummary | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [showPastRuns, setShowPastRuns] = useState(false);
-  const [runStatus, setRunStatus] = useState("Sample pre-filter run loaded.");
+  const [runStatus, setRunStatus] = useState("Upload a CSV or TSV ledger extract to run the pre-filter.");
 
   async function handleFile(file?: File) {
     if (!file) {
@@ -37,6 +66,7 @@ export function IntakeView() {
 
     setIsParsing(true);
     setUploadError(null);
+    setCreateError(null);
 
     try {
       const parsed = await parseLedgerFile(file);
@@ -52,37 +82,105 @@ export function IntakeView() {
     }
   }
 
+  async function handleDeleteImportedCases() {
+    const confirmed = window.confirm(
+      "Delete all cases created from intake uploads? This removes their evidence, debate, verification, audit, and review data from the database.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setCreateError(null);
+    setRunStatus("Deleting imported intake cases from the backend...");
+
+    try {
+      const result = await deleteImportedCases.mutateAsync();
+      setRunStatus(result.message);
+    } catch (deleteError) {
+      setCreateError(deleteError instanceof Error ? deleteError.message : "Unable to delete imported intake data.");
+      setRunStatus("Imported data deletion failed. Check the backend connection and try again.");
+    }
+  }
+
+  async function handleCreateCases(summary: IntakeSummary, options: { replaceExisting?: boolean } = {}) {
+    const rowsToCreate = summary.flaggedRows;
+
+    if (rowsToCreate.length === 0) {
+      setRunStatus("No flagged rows are available for case creation.");
+      return;
+    }
+
+    setCreateError(null);
+    setRunStatus(
+      options.replaceExisting
+        ? "Deleting existing imported cases before replacement..."
+        : `Creating ${rowsToCreate.length} cases in the backend...`,
+    );
+
+    try {
+      if (options.replaceExisting) {
+        const confirmed = window.confirm(
+          "Replace imported backend data with this upload? Existing intake-created cases and their generated data will be deleted first.",
+        );
+
+        if (!confirmed) {
+          setRunStatus("Replacement cancelled.");
+          return;
+        }
+
+        const deleted = await deleteImportedCases.mutateAsync();
+        setRunStatus(`${deleted.message} Creating ${rowsToCreate.length} replacement cases...`);
+      }
+
+      const created = await createCases.mutateAsync(rowsToCreate.map((row) => toInvestigationInput(row, summary)));
+      setRunStatus(`Created ${created.length} cases. Starting the agent crew...`);
+      await runCases.mutateAsync(created.map((item) => item.id));
+      setRunStatus(`Started the crew for ${created.length} cases. Opening the first workspace...`);
+      router.push(routes.caseWorkspace(created[0].id));
+    } catch (creationError) {
+      setCreateError(
+        creationError instanceof Error
+          ? creationError.message
+          : "Unable to create cases or start the agent crew in the backend.",
+      );
+      setRunStatus("Case creation or crew execution failed. Check the backend connection and try again.");
+    }
+  }
+
   if (isLoading) {
     return <LoadingState label="Loading intake run" />;
   }
 
-  if (error || !data) {
+  if (error) {
     return <ErrorState onRetry={() => void refetch()} />;
   }
 
   const summary = uploadedSummary ?? data;
-  const intakeRuns = uploadedSummary ? [data, uploadedSummary] : [data];
-  const stats = [
-    {
-      label: "Rows ingested",
-      value: summary.rowsIngested.toLocaleString(),
-      helper: `${summary.parseErrors} parse errors`,
-      tone: "text-foreground",
-    },
-    { label: "Flagged -> cases", value: summary.flagged.toLocaleString(), helper: "enter the crew", tone: "text-primary" },
-    {
-      label: "Cleared at intake",
-      value: summary.cleared.toLocaleString(),
-      helper: "dropped - no case",
-      tone: "text-success-foreground",
-    },
-    {
-      label: "Est. crew cost",
-      value: `$${summary.estCostUsd}`,
-      helper: `${summary.flagged} x $0.21`,
-      tone: "text-foreground",
-    },
-  ];
+  const intakeRuns = uploadedSummary ? [uploadedSummary] : [];
+  const stats = summary
+    ? [
+        {
+          label: "Rows ingested",
+          value: summary.rowsIngested.toLocaleString(),
+          helper: `${summary.parseErrors} parse errors`,
+          tone: "text-foreground",
+        },
+        { label: "Flagged -> cases", value: summary.flagged.toLocaleString(), helper: "enter the crew", tone: "text-primary" },
+        {
+          label: "Cleared at intake",
+          value: summary.cleared.toLocaleString(),
+          helper: "dropped - no case",
+          tone: "text-success-foreground",
+        },
+        {
+          label: "Est. crew cost",
+          value: `$${summary.estCostUsd}`,
+          helper: `${summary.flagged} x $0.21`,
+          tone: "text-foreground",
+        },
+      ]
+    : [];
 
   return (
     <div className="space-y-6">
@@ -96,11 +194,24 @@ export function IntakeView() {
               <History className="h-4 w-4" aria-hidden="true" />
               Past runs
             </Button>
-            <Button asChild>
-              <Link href={routes.investigations}>
-                <Play className="h-4 w-4" aria-hidden="true" />
-                Create cases &amp; run crew
-              </Link>
+            <Button
+              disabled={!summary || createCases.isPending || runCases.isPending || deleteImportedCases.isPending}
+              onClick={() => {
+                if (summary) {
+                  void handleCreateCases(summary);
+                }
+              }}
+            >
+              <Play className="h-4 w-4" aria-hidden="true" />
+              {createCases.isPending ? "Creating cases..." : runCases.isPending ? "Starting crew..." : "Create cases & run crew"}
+            </Button>
+            <Button
+              variant="danger"
+              disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending}
+              onClick={() => void handleDeleteImportedCases()}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              {deleteImportedCases.isPending ? "Deleting..." : "Delete imported data"}
             </Button>
           </>
         }
@@ -134,23 +245,29 @@ export function IntakeView() {
                 <FileSpreadsheet className="h-5 w-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{summary.fileName}</p>
+                <p className="truncate text-sm font-medium text-foreground">{summary?.fileName ?? "Upload GL extract"}</p>
                 <p className="font-mono text-xs text-muted-foreground">
-                  {summary.rowsIngested.toLocaleString()} rows - {summary.columns.length} columns
+                  {summary ? `${summary.rowsIngested.toLocaleString()} rows - ${summary.columns.length} columns` : "CSV or TSV"}
                 </p>
               </div>
-              <Badge variant={uploadedSummary ? "primary" : "success"}>{uploadedSummary ? "uploaded" : "sample"}</Badge>
+              {uploadedSummary ? <Badge variant="primary">uploaded</Badge> : null}
             </button>
             {uploadError ? <p className="text-xs text-danger-foreground">{uploadError}</p> : null}
-            <p className="font-mono text-xs text-muted-foreground">{summary.columns.join(" - ")}</p>
+            {summary ? <p className="font-mono text-xs text-muted-foreground">{summary.columns.join(" - ")}</p> : null}
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" size="sm" onClick={() => inputRef.current?.click()} disabled={isParsing}>
                 <UploadCloud className="h-4 w-4" aria-hidden="true" />
-                {isParsing ? "Parsing..." : "Replace file"}
+                {isParsing ? "Parsing..." : summary ? "Replace file" : "Upload file"}
               </Button>
               <Button
                 size="sm"
-                onClick={() => setRunStatus(`Pre-filter completed for ${summary.fileName}; ${summary.flagged} cases ready.`)}
+                disabled={!summary}
+                onClick={() => {
+                  if (!summary) {
+                    return;
+                  }
+                  setRunStatus(`Pre-filter completed for ${summary.fileName}; ${summary.flagged} cases ready.`);
+                }}
               >
                 Run pre-filter
               </Button>
@@ -160,31 +277,41 @@ export function IntakeView() {
                   size="sm"
                   onClick={() => {
                     setUploadedSummary(null);
-                    setRunStatus("Sample pre-filter run loaded.");
+                    setCreateError(null);
+                    setRunStatus("Upload a CSV or TSV ledger extract to run the pre-filter.");
                   }}
                 >
-                  Reset sample
+                  Clear upload
                 </Button>
               ) : null}
             </div>
             <p className="rounded-md border border-info-border bg-info-soft px-3 py-2 text-xs text-info-foreground">{runStatus}</p>
+            {createError ? <p className="text-xs text-danger-foreground">{createError}</p> : null}
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{stat.label}</p>
-                <p className={`mt-2 font-mono text-2xl ${stat.tone}`}>{stat.value}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{stat.helper}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {summary ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {stats.map((stat) => (
+              <Card key={stat.label}>
+                <CardContent className="p-4">
+                  <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{stat.label}</p>
+                  <p className={`mt-2 font-mono text-2xl ${stat.tone}`}>{stat.value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{stat.helper}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No ledger uploaded"
+            description="Upload a CSV or TSV extract to preview deterministic pre-filter results."
+            icon={FileSpreadsheet}
+          />
+        )}
       </div>
 
-      {showPastRuns ? (
+      {showPastRuns && intakeRuns.length > 0 ? (
         <Card>
           <CardContent className="space-y-3 p-4">
             <p className="text-sm font-semibold text-foreground">Past intake runs</p>
@@ -203,25 +330,47 @@ export function IntakeView() {
         </Card>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr]">
-        <RulePrefilter rules={summary.ruleStats} />
-        <FlaggedRowsTable rows={summary.flaggedRows} />
-      </div>
+      {summary ? (
+        <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr]">
+          <RulePrefilter rules={summary.ruleStats} />
+          <FlaggedRowsTable rows={summary.flaggedRows} />
+        </div>
+      ) : null}
 
-      <Card>
-        <CardContent className="flex flex-col gap-3 p-4 text-sm text-muted-foreground md:flex-row md:items-center">
-          <Info className="h-4 w-4 shrink-0 text-info-foreground" aria-hidden="true" />
-          <span className="flex-1">
-            {summary.cleared.toLocaleString()} clean rows were recorded as cleared-at-intake and never reach the agent
-            crew - keeping the expensive debate off ~90% of the ledger.
-          </span>
-          <Button asChild className="shrink-0">
-            <Link href={routes.investigations}>
-              Create {summary.flagged} cases <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
+      {summary ? (
+        <Card>
+          <CardContent className="flex flex-col gap-3 p-4 text-sm text-muted-foreground md:flex-row md:items-center">
+            <Info className="h-4 w-4 shrink-0 text-info-foreground" aria-hidden="true" />
+            <span className="flex-1">
+              {summary.cleared.toLocaleString()} clean rows were recorded as cleared-at-intake and never reach the agent
+              crew.
+            </span>
+            <Button
+              className="shrink-0"
+              variant="secondary"
+              disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending || summary.flaggedRows.length === 0}
+              onClick={() => void handleCreateCases(summary, { replaceExisting: true })}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              {deleteImportedCases.isPending
+                ? "Deleting..."
+                : createCases.isPending
+                  ? "Creating..."
+                  : runCases.isPending
+                    ? "Starting crew..."
+                    : "Replace imported data"}
+            </Button>
+            <Button
+              className="shrink-0"
+              disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending || summary.flaggedRows.length === 0}
+              onClick={() => void handleCreateCases(summary)}
+            >
+              {createCases.isPending ? "Creating..." : runCases.isPending ? "Starting crew..." : `Create ${summary.flaggedRows.length} cases`}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

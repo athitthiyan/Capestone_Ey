@@ -1,8 +1,7 @@
-import { mockIntakeSummary } from "@/data/mock-intake";
 import type { FlaggedRow, IntakeRuleStat, IntakeSummary } from "@/types/domain";
 
-export async function getIntakeSummary(): Promise<IntakeSummary> {
-  return mockIntakeSummary;
+export async function getIntakeSummary(): Promise<IntakeSummary | null> {
+  return null;
 }
 
 type LedgerRow = Record<string, string>;

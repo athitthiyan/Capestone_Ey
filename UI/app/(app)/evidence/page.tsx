@@ -1,5 +1,13 @@
 import { EvidenceView } from "@/features/evidence/evidence-view";
 
-export default function EvidencePage() {
-  return <EvidenceView caseId="CASE-0007" />;
+export default async function EvidencePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    caseId?: string;
+  }>;
+}) {
+  const { caseId } = (await searchParams) ?? {};
+
+  return <EvidenceView caseId={caseId} />;
 }

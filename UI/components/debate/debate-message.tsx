@@ -11,7 +11,15 @@ export function DebateMessage({ argument }: { argument: DebateArgument }) {
   const Icon = challenger ? ShieldAlert : adjudicator ? Gavel : ShieldCheck;
 
   return (
-    <Card className={cn(challenger ? "border-danger-border" : "border-success-border")}>
+    <Card
+      className={cn(
+        challenger
+          ? "border-danger-border"
+          : adjudicator
+            ? "border-primary-border"
+            : "border-success-border",
+      )}
+    >
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <span
@@ -33,7 +41,13 @@ export function DebateMessage({ argument }: { argument: DebateArgument }) {
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{argument.timestamp}</p>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">{argument.summary}</p>
-            <ConfidenceMeter value={argument.confidence} className="mt-4" />
+            {typeof argument.confidence === "number" ? (
+              <ConfidenceMeter
+                value={argument.confidence}
+                label={adjudicator ? "Verdict confidence" : "Confidence"}
+                className="mt-4"
+              />
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-2">
               {argument.tags.map((tag) => (
                 <Badge key={tag}>{tag}</Badge>
