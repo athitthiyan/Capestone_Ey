@@ -7,6 +7,7 @@ from app.db.models import (
     EvidenceArtifact,
     Investigation,
     InvestigationState,
+    InvestigationStatus,
     ReviewQueueItem,
     ThirdPartyEvidenceVerification,
     VerificationClaim,
@@ -38,6 +39,80 @@ def test_subresources_empty_for_new_case(client):
         r = client.get(f"/api/v1/investigations/{inv_id}/{sub}")
         assert r.status_code == 200, (sub, r.text)
         assert isinstance(r.json(), list)
+
+
+def test_runtime_settings_endpoint_exposes_no_secrets(client):
+    r = client.get("/api/v1/settings")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["materiality"] == settings.DEFAULT_MATERIALITY_THRESHOLD
+    assert body["estimated_agent_run_cost_usd"] == settings.ESTIMATED_AGENT_RUN_COST_USD
+    assert "secret_key" not in body
+    assert "default_admin_password" not in body
+
+
+def test_agent_health_and_workflow_routes_use_persisted_state(client, db):
+    inv_id = _create(client, txn="TXN-AGENTS")
+    investigation = db.get(Investigation, inv_id)
+    investigation.status = InvestigationStatus.AGENT_DEBATE
+    investigation.confidence = 0.84
+    db.add_all(
+        [
+            EvidenceArtifact(investigation_id=inv_id, source="ledger", content="ledger fact"),
+            DebateTranscript(
+                investigation_id=inv_id,
+                round=1,
+                speaker="challenger",
+                message="challenge",
+                token_count=5,
+            ),
+            DebateTranscript(
+                investigation_id=inv_id,
+                round=1,
+                speaker="defender",
+                message="defense",
+                token_count=7,
+            ),
+        ]
+    )
+    db.commit()
+
+    health = client.get("/api/v1/agents/health")
+    assert health.status_code == 200, health.text
+    assert any(item["label"] == "Supervisor" for item in health.json())
+    assert any(item["state"] == "running" for item in health.json())
+
+    workflow = client.get(f"/api/v1/agents/workflow/{inv_id}")
+    assert workflow.status_code == 200, workflow.text
+    body = workflow.json()
+    challenger = next(item for item in body if item["id"] == "challenger")
+    adjudicator = next(item for item in body if item["id"] == "adjudicator")
+    assert challenger["token_usage"] == 5
+    assert adjudicator["confidence"] == 0.84
+
+
+def test_intake_summary_route_uses_imported_cases(client, db):
+    inv_id = _create(client, txn="TXN-INTAKE-SUMMARY")
+    investigation = db.get(Investigation, inv_id)
+    investigation.owner = "intake"
+    investigation.description = (
+        "Created from intake file ledger.csv. "
+        "Rules fired: materiality, unknown vendor. "
+        "Source account: consulting."
+    )
+    investigation.flags = ["materiality", "unknown vendor"]
+    db.commit()
+
+    r = client.get("/api/v1/intake/summary")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["file_name"] == "ledger.csv"
+    assert body["rows_ingested"] >= 1
+    assert body["flagged_rows"][0]["txn_id"] == "TXN-INTAKE-SUMMARY"
+    assert any(item["rule"].startswith("Materiality >=") for item in body["rule_stats"])
+
+    investigation.owner = "summary_test"
+    db.commit()
 
 
 def test_delete_imported_investigations_removes_cases_and_generated_data(client, db):

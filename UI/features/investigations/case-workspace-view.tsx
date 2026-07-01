@@ -169,7 +169,7 @@ function InlineEmpty({ title, description, icon: Icon = FileSearch }: { title: s
 
 export function CaseWorkspaceView({ caseId }: { caseId: string }) {
   const investigationQuery = useInvestigation(caseId);
-  const workflowQuery = useAgentWorkflow();
+  const workflowQuery = useAgentWorkflow(caseId);
   const evidenceQuery = useEvidence(caseId);
   const evidenceVerificationQuery = useEvidenceVerification(caseId);
   const debateQuery = useDebateArguments(caseId);

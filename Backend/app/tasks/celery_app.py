@@ -59,8 +59,8 @@ def execute_investigation_task(self, investigation_id: str) -> dict:
     """Execute the full investigation workflow asynchronously."""
     logger.info(f"Starting investigation execution task: {investigation_id}")
     try:
-        from app.db.session import SessionLocal
         from app.agents.executor import InvestigationExecutor
+        from app.db.session import SessionLocal
 
         db = SessionLocal()
         try:
@@ -79,24 +79,109 @@ def execute_investigation_task(self, investigation_id: str) -> dict:
 
 @app.task(bind=True, max_retries=3, default_retry_delay=30, name="tasks.collect_evidence")
 def collect_evidence_task(self, investigation_id: str) -> dict:
-    """Collect evidence from external sources."""
+    """Collect evidence from persisted case facts and configured knowledge sources."""
     logger.info(f"Collecting evidence for investigation: {investigation_id}")
     try:
-        from app.db.models import Investigation
+        from app.db.models import EvidenceArtifact, Investigation
         from app.db.session import SessionLocal
+        from app.knowledge.retriever import (
+            format_context,
+            retrieve_knowledge_context,
+            retrieve_knowledge_context_from_db,
+        )
 
         db = SessionLocal()
         try:
             investigation = db.get(Investigation, investigation_id)
             if not investigation:
                 raise ValueError(f"Investigation {investigation_id} not found")
-            evidence = {
-                "policy_kb": "Sample policy context",
-                "registry": "Sample vendor data",
-                "fx_rates": "Sample FX data",
-            }
+
+            query = " ".join(
+                [
+                    investigation.vendor,
+                    investigation.category,
+                    investigation.description or "",
+                    " ".join(investigation.flags or []),
+                ]
+            )
+            try:
+                policy_chunks = retrieve_knowledge_context_from_db(db, query, limit=3)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("DB knowledge retrieval failed for %s: %s", investigation_id, exc)
+                policy_chunks = retrieve_knowledge_context(query, limit=3)
+
+            flags = [str(flag) for flag in (investigation.flags or [])]
+            task_sources = ["ledger_row", "intake_prefilter", "policy_kb"]
+            evidence_specs = [
+                {
+                    "source": "ledger_row",
+                    "content": (
+                        f"Transaction {investigation.transaction_id} for {investigation.vendor} "
+                        f"in {investigation.category} was recorded for "
+                        f"{float(investigation.amount or 0):.2f}. Materiality threshold: "
+                        f"{float(investigation.materiality or 0):.2f}. "
+                        f"Description: {investigation.description or 'No description recorded.'}"
+                    ),
+                    "citations": [
+                        f"investigation:{investigation.id}",
+                        f"ledger:{investigation.transaction_id}",
+                    ],
+                    "relevance_score": 1.0,
+                },
+                {
+                    "source": "intake_prefilter",
+                    "content": (
+                        "Intake flags recorded for this case: "
+                        f"{', '.join(flags) if flags else 'none'}."
+                    ),
+                    "citations": [f"investigation:{investigation.id}:flags"],
+                    "relevance_score": 0.75 if flags else 0.35,
+                },
+            ]
+
+            if policy_chunks:
+                evidence_specs.append(
+                    {
+                        "source": "policy_kb",
+                        "content": format_context(policy_chunks),
+                        "citations": [chunk["id"] for chunk in policy_chunks],
+                        "relevance_score": max(
+                            float(chunk.get("score") or 0) for chunk in policy_chunks
+                        ),
+                    }
+                )
+
+            db.query(EvidenceArtifact).filter(
+                EvidenceArtifact.investigation_id == investigation_id,
+                EvidenceArtifact.source.in_(task_sources),
+            ).delete(synchronize_session=False)
+
+            rows = [
+                EvidenceArtifact(
+                    investigation_id=investigation_id,
+                    source=spec["source"],
+                    content=spec["content"],
+                    citations=spec["citations"],
+                    relevance_score=spec["relevance_score"],
+                )
+                for spec in evidence_specs
+            ]
+            db.add_all(rows)
+            db.commit()
             logger.info(f"Evidence collected for {investigation_id}")
-            return {"status": "success", "investigation_id": investigation_id, "evidence": evidence}
+            return {
+                "status": "success",
+                "investigation_id": investigation_id,
+                "evidence": [
+                    {
+                        "source": row.source,
+                        "content": row.content,
+                        "citations": row.citations,
+                        "relevance_score": row.relevance_score,
+                    }
+                    for row in rows
+                ],
+            }
         finally:
             db.close()
     except Exception as exc:

@@ -88,6 +88,28 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
             {errors.materiality ? <p className="mt-1 text-xs text-danger-foreground">{errors.materiality.message}</p> : null}
           </div>
           <div>
+            <label htmlFor="displayCurrency" className="text-sm font-medium text-foreground">
+              Display currency
+            </label>
+            <Input id="displayCurrency" className="mt-2 uppercase" maxLength={3} {...register("displayCurrency")} />
+            {errors.displayCurrency ? <p className="mt-1 text-xs text-danger-foreground">{errors.displayCurrency.message}</p> : null}
+          </div>
+          <div>
+            <label htmlFor="estimatedAgentRunCostUsd" className="text-sm font-medium text-foreground">
+              Estimated crew cost
+            </label>
+            <Input
+              id="estimatedAgentRunCostUsd"
+              className="mt-2"
+              step="0.01"
+              type="number"
+              {...register("estimatedAgentRunCostUsd", { valueAsNumber: true })}
+            />
+            {errors.estimatedAgentRunCostUsd ? (
+              <p className="mt-1 text-xs text-danger-foreground">{errors.estimatedAgentRunCostUsd.message}</p>
+            ) : null}
+          </div>
+          <div>
             <label htmlFor="debateRoundCap" className="text-sm font-medium text-foreground">
               Debate round cap
             </label>
@@ -101,7 +123,7 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
           </div>
           <div>
             <label htmlFor="apiKeyVault" className="text-sm font-medium text-foreground">
-              API keys placeholder
+              API key vault
             </label>
             <Input id="apiKeyVault" className="mt-2" {...register("apiKeyVault")} />
             {errors.apiKeyVault ? <p className="mt-1 text-xs text-danger-foreground">{errors.apiKeyVault.message}</p> : null}

@@ -3,8 +3,8 @@ Authentication: password hashing and JWT issuance/verification.
 Uses OAuth2 password bearer flow.
 """
 
-import logging
 import hashlib
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -56,6 +56,9 @@ def seed_default_user() -> None:
     SEED_DEFAULT_USER and the DEFAULT_ADMIN_* settings.
     """
     if not settings.SEED_DEFAULT_USER:
+        return
+    if not settings.DEFAULT_ADMIN_PASSWORD.strip():
+        logger.info("Default user seeding skipped; DEFAULT_ADMIN_PASSWORD is not configured")
         return
     from app.db.session import SessionLocal
 

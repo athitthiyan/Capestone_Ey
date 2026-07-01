@@ -289,9 +289,11 @@ export type AppSettings = {
   debateRoundCap: number;
   apiKeyVault: string;
   theme: "system" | "light" | "dark";
+  displayCurrency: string;
   notifications: boolean;
   auditRetentionYears: number;
   ipAllowlist: boolean;
+  estimatedAgentRunCostUsd: number;
 };
 
 // --- Case intake (Phase 0): CSV ingestion + rule pre-filter ---

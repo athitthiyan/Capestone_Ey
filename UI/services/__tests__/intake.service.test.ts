@@ -21,7 +21,7 @@ describe("intake service", () => {
       { type: "text/csv" },
     );
 
-    const summary = await parseLedgerFile(file);
+    const summary = await parseLedgerFile(file, { materialityThreshold: 25_000 });
 
     expect(summary.fileName).toBe("ledger.csv");
     expect(summary.rowsIngested).toBe(2);

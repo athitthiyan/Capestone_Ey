@@ -59,24 +59,18 @@ function mapEvidenceVerification(row: ApiEvidenceVerification): EvidenceVerifica
 }
 
 export function normalizeProviderName(value: string) {
-  if (!value.startsWith("mock_")) {
-    return value;
-  }
-
-  return value
-    .replace(/^mock_/, "")
-    .replace("_manual_review_provider", "_third_party_provider")
-    .replace("_provider", "_third_party_provider");
+  return value;
 }
 
 export function normalizeVerificationReason(value: string) {
-  if (!value.toLowerCase().includes("mock") && !value.includes("No reliable third-party benchmark provider")) {
+  if (!value.includes("No reliable third-party benchmark provider")) {
     return value;
   }
 
-  return value
-    .replace("No reliable third-party benchmark provider is configured for this claim category; reviewer assessment is required.", "No real-time third-party provider response is available for this claim category; reviewer assessment is required.")
-    .replace(/\bmock\b/gi, "third-party");
+  return value.replace(
+    "No reliable third-party benchmark provider is configured for this claim category; reviewer assessment is required.",
+    "No real-time third-party provider response is available for this claim category; reviewer assessment is required.",
+  );
 }
 
 function toApiPayload(input?: EvidenceVerificationRequest) {

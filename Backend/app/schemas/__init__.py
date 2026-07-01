@@ -96,6 +96,76 @@ class StatsSummary(BaseModel):
     manual: int
 
 
+class AgentHealthOut(BaseModel):
+    """Workload-derived agent health for the dashboard."""
+
+    label: str
+    state: str
+    latency: str
+    load: float = Field(..., ge=0.0, le=1.0)
+
+
+class PipelineStepOut(BaseModel):
+    """Case-specific agent workflow step."""
+
+    id: str
+    role: str
+    state: str
+    detail: str
+    latency: Optional[str] = None
+    confidence: Optional[float] = None
+    token_usage: int = 0
+    cost: float = 0.0
+    attempt: int = 1
+    expanded_detail: str
+
+
+class AppSettingsOut(BaseModel):
+    """Runtime governance settings exposed to the UI."""
+
+    reasoning_model: str
+    report_model: str
+    auto_clear_threshold: float
+    reviewer_threshold: float
+    materiality: float
+    segregation_of_duties: bool
+    immutable_audit_log: bool
+    debate_round_cap: int
+    api_key_vault: str
+    theme: Literal["system", "light", "dark"]
+    display_currency: str
+    notifications: bool
+    audit_retention_years: int
+    ip_allowlist: bool
+    estimated_agent_run_cost_usd: float
+
+
+class IntakeRuleStatOut(BaseModel):
+    rule: str
+    count: int
+    tone: Literal["danger", "warning", "info"]
+
+
+class FlaggedRowOut(BaseModel):
+    txn_id: str
+    vendor: str
+    account: str
+    amount: str
+    rules: list[str] = Field(default_factory=list)
+
+
+class IntakeSummaryOut(BaseModel):
+    file_name: str
+    rows_ingested: int
+    flagged: int
+    cleared: int
+    parse_errors: int
+    est_cost_usd: float
+    columns: list[str] = Field(default_factory=list)
+    rule_stats: list[IntakeRuleStatOut] = Field(default_factory=list)
+    flagged_rows: list[FlaggedRowOut] = Field(default_factory=list)
+
+
 class DebateMessageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

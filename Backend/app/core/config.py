@@ -65,15 +65,15 @@ class Settings(BaseSettings):
     USE_REAL_AGENTS: bool = False
 
     # Authentication
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str = ""
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    AUTH_REQUIRED: bool = True
+    AUTH_REQUIRED: bool = False
     # Seed a default user on startup so the API is usable out of the box.
     SEED_DEFAULT_USER: bool = True
     DEFAULT_ADMIN_USERNAME: str = "admin"
-    DEFAULT_ADMIN_PASSWORD: str = "admin12345"
+    DEFAULT_ADMIN_PASSWORD: str = ""
     DEFAULT_ADMIN_ROLE: str = "partner"
 
     # Investigation defaults
@@ -85,10 +85,21 @@ class Settings(BaseSettings):
     # the verdict as ungrounded, before escalating to human review.
     MAX_VERIFICATION_RETRIES: int = 1
     INVESTIGATION_TIMEOUT_MINUTES: int = 30
+    ESTIMATED_AGENT_RUN_COST_USD: float = 0.21
+
+    # Governance/UI defaults
+    ENFORCE_SEGREGATION_OF_DUTIES: bool = True
+    IMMUTABLE_AUDIT_LOG_REQUIRED: bool = True
+    API_KEY_VAULT_NAME: str = "environment"
+    UI_THEME: Literal["system", "light", "dark"] = "system"
+    DISPLAY_CURRENCY: str = "USD"
+    NOTIFICATIONS_ENABLED: bool = False
+    AUDIT_RETENTION_YEARS: int = 7
+    IP_ALLOWLIST_ENABLED: bool = False
 
     # External APIs
     FX_API_BASE_URL: str = "https://api.frankfurter.app"
-    REGISTRY_API_BASE_URL: str = "https://api.example.com"
+    REGISTRY_API_BASE_URL: str = ""
     EVIDENCE_VERIFICATION_PROVIDER_TIMEOUT_SECONDS: float = 3.0
     EVIDENCE_VERIFICATION_DEFAULT_TOLERANCE: float = 0.30
     EVIDENCE_VERIFICATION_FLIGHT_TOLERANCE: float = 0.25
@@ -132,20 +143,27 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _production_safety_checks(self):
+        if self.AUTH_REQUIRED and not self.SECRET_KEY.strip():
+            raise ValueError("SECRET_KEY is required when AUTH_REQUIRED=true")
+
         if self.USE_REAL_AGENTS and not self.ANTHROPIC_API_KEY.strip():
             raise ValueError("ANTHROPIC_API_KEY is required when USE_REAL_AGENTS=true")
 
         if self.ENV != "production":
             return self
 
-        if self.SECRET_KEY == "your-secret-key-change-in-production":
-            raise ValueError("SECRET_KEY must be changed when ENV=production")
+        if not self.AUTH_REQUIRED:
+            raise ValueError("AUTH_REQUIRED must be true when ENV=production")
+        if len(self.SECRET_KEY.strip()) < 32:
+            raise ValueError("SECRET_KEY must be at least 32 characters when ENV=production")
         if "*" in self.CORS_ORIGINS:
             raise ValueError("CORS_ORIGINS must be explicit when ENV=production")
         if "*" in self.ALLOWED_HOSTS:
             raise ValueError("ALLOWED_HOSTS must be explicit when ENV=production")
-        if self.SEED_DEFAULT_USER and self.DEFAULT_ADMIN_PASSWORD == "admin12345":
-            raise ValueError("DEFAULT_ADMIN_PASSWORD must be changed when ENV=production")
+        if self.SEED_DEFAULT_USER and not self.DEFAULT_ADMIN_PASSWORD.strip():
+            raise ValueError("DEFAULT_ADMIN_PASSWORD is required when seeding a production user")
+        if self.SEED_DEFAULT_USER and len(self.DEFAULT_ADMIN_PASSWORD) < 12:
+            raise ValueError("DEFAULT_ADMIN_PASSWORD must be at least 12 characters")
 
         return self
 

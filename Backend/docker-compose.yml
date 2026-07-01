@@ -41,9 +41,11 @@ services:
   pgadmin:
     image: dpage/pgadmin4:8
     container_name: skeptic_pgadmin
+    profiles:
+      - tools
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@skeptic.local
-      PGADMIN_DEFAULT_PASSWORD: admin12345
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@skeptic.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-}
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:80"
@@ -95,7 +97,11 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/2
       USE_CELERY: "true"
       EVENTSTORE_URL: "esdb://eventstore:2113?tls=false"
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      SECRET_KEY: ${SECRET_KEY:-}
+      SEED_DEFAULT_USER: ${SEED_DEFAULT_USER:-false}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-}
       CORS_ORIGINS: '["http://localhost:3000", "http://localhost:8000"]'
     ports:
       - "8000:8000"
@@ -132,7 +138,11 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
       EVENTSTORE_URL: "esdb://eventstore:2113?tls=false"
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      SECRET_KEY: ${SECRET_KEY:-}
+      SEED_DEFAULT_USER: ${SEED_DEFAULT_USER:-false}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-}
     depends_on:
       - postgres
       - redis
@@ -159,7 +169,11 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
       EVENTSTORE_URL: "esdb://eventstore:2113?tls=false"
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      SECRET_KEY: ${SECRET_KEY:-}
+      SEED_DEFAULT_USER: ${SEED_DEFAULT_USER:-false}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-}
     depends_on:
       - postgres
       - redis

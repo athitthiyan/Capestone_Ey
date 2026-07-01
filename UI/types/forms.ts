@@ -19,9 +19,11 @@ export const settingsSchema = z.object({
   debateRoundCap: z.number().min(1).max(5),
   apiKeyVault: z.string().min(1),
   theme: z.enum(["system", "light", "dark"]),
+  displayCurrency: z.string().length(3),
   notifications: z.boolean(),
   auditRetentionYears: z.number().min(1).max(10),
   ipAllowlist: z.boolean(),
+  estimatedAgentRunCostUsd: z.number().min(0).max(100),
 });
 
 export type SettingsForm = z.infer<typeof settingsSchema>;

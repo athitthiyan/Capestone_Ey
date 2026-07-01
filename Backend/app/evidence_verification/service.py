@@ -259,7 +259,7 @@ class ConfiguredHttpBenchmarkProvider:
 
 
 class UnconfiguredBenchmarkProvider:
-    """Provider placeholder that fails closed when real API config is missing."""
+    """Provider adapter that fails closed when real API config is missing."""
 
     def __init__(self, category: str):
         self.category = category
@@ -563,10 +563,16 @@ class EvidenceVerificationService:
         providers = {
             "flight": (settings.FLIGHT_PRICE_PROVIDER_URL, settings.FLIGHT_PRICE_PROVIDER_API_KEY),
             "hotel": (settings.HOTEL_PRICE_PROVIDER_URL, settings.HOTEL_PRICE_PROVIDER_API_KEY),
-            "food": (settings.FOOD_BENCHMARK_PROVIDER_URL, settings.FOOD_BENCHMARK_PROVIDER_API_KEY),
+            "food": (
+                settings.FOOD_BENCHMARK_PROVIDER_URL,
+                settings.FOOD_BENCHMARK_PROVIDER_API_KEY,
+            ),
             "cab": (settings.CAB_FARE_PROVIDER_URL, settings.CAB_FARE_PROVIDER_API_KEY),
             "fuel": (settings.FUEL_PRICE_PROVIDER_URL, settings.FUEL_PRICE_PROVIDER_API_KEY),
-            "gst": (settings.GST_VERIFICATION_PROVIDER_URL, settings.GST_VERIFICATION_PROVIDER_API_KEY),
+            "gst": (
+                settings.GST_VERIFICATION_PROVIDER_URL,
+                settings.GST_VERIFICATION_PROVIDER_API_KEY,
+            ),
         }
         return providers.get(category, ("", ""))
 

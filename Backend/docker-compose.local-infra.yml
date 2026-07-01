@@ -1,4 +1,21 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: skeptic_local_postgres
+    environment:
+      POSTGRES_USER: skeptic
+      POSTGRES_PASSWORD: skeptic_dev_password
+      POSTGRES_DB: skeptic_engine
+    ports:
+      - "5432:5432"
+    volumes:
+      - skeptic_local_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skeptic -d skeptic_engine"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: skeptic_local_redis
@@ -28,5 +45,6 @@ services:
       - skeptic_local_eventstore_data:/var/lib/eventstore
 
 volumes:
+  skeptic_local_postgres_data:
   skeptic_local_redis_data:
   skeptic_local_eventstore_data:

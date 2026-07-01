@@ -11,17 +11,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api.routes import (
+    agents,
     analytics,
     audit,
     auth,
     claims,
     evaluation,
     health,
+    intake,
     investigations,
     knowledge,
     reports,
     reviews,
     websocket,
+)
+from app.api.routes import (
+    settings as settings_routes,
 )
 from app.core.config import settings
 from app.core.security import seed_default_user
@@ -88,10 +93,13 @@ def create_app() -> FastAPI:
     app.include_router(investigations.router, prefix=settings.API_ROOT_PATH)
     app.include_router(reviews.router, prefix=settings.API_ROOT_PATH)
     app.include_router(evaluation.router, prefix=settings.API_ROOT_PATH)
+    app.include_router(agents.router, prefix=settings.API_ROOT_PATH)
     app.include_router(analytics.router, prefix=settings.API_ROOT_PATH)
     app.include_router(reports.router, prefix=settings.API_ROOT_PATH)
     app.include_router(knowledge.router, prefix=settings.API_ROOT_PATH)
     app.include_router(audit.router, prefix=settings.API_ROOT_PATH)
+    app.include_router(intake.router, prefix=settings.API_ROOT_PATH)
+    app.include_router(settings_routes.router, prefix=settings.API_ROOT_PATH)
     app.include_router(websocket.router, prefix=settings.API_ROOT_PATH)
 
     @app.get(f"{settings.API_ROOT_PATH}/")

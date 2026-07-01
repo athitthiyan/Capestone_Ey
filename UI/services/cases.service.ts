@@ -1,5 +1,7 @@
 import { apiRequest } from "@/services/api";
+import { getAgentHealth } from "@/services/agents.service";
 import type {
+  AgentHealth,
   DashboardSummary,
   Investigation,
   InvestigationStatus,
@@ -213,7 +215,11 @@ function metricsFromStats(stats: ApiStatsSummary): Metric[] {
   ];
 }
 
-function mapDashboard(stats: ApiStatsSummary, investigations: Investigation[]): DashboardSummary {
+function mapDashboard(
+  stats: ApiStatsSummary,
+  investigations: Investigation[],
+  agentHealth: AgentHealth[],
+): DashboardSummary {
   return {
     engagement: "Skeptic Engine",
     period: "Live backend",
@@ -224,18 +230,19 @@ function mapDashboard(stats: ApiStatsSummary, investigations: Investigation[]): 
       inReview: stats.in_review,
       manual: stats.manual,
     },
-    agentHealth: [],
+    agentHealth,
     recentInvestigations: investigations.slice(0, 4),
   };
 }
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
-  const [stats, list] = await Promise.all([
+  const [stats, list, agentHealth] = await Promise.all([
     apiRequest<ApiStatsSummary>("/investigations/stats/summary"),
     apiRequest<ApiInvestigationList>("/investigations?limit=10"),
+    getAgentHealth(),
   ]);
 
-  return mapDashboard(stats, list.investigations.map(mapInvestigation));
+  return mapDashboard(stats, list.investigations.map(mapInvestigation), agentHealth);
 }
 
 export async function getInvestigations(options: { hasDebate?: boolean } = {}): Promise<Investigation[]> {

@@ -58,6 +58,58 @@ globalThis.fetch = async (input, init) => {
     });
   }
 
+  if (path === "/agents/health") {
+    return jsonResponse([
+      {
+        label: "Supervisor",
+        state: "review",
+        latency: "1 in review",
+        load: 1,
+      },
+    ]);
+  }
+
+  if (path === `/agents/workflow/${investigation.id}`) {
+    return jsonResponse([
+      {
+        id: "intake",
+        role: "Supervisor",
+        state: "done",
+        detail: "Case TXN-001 is registered for Live Vendor Ltd.",
+        latency: "updated 2026-06-21T10:00:00",
+        confidence: null,
+        token_usage: 0,
+        cost: 0,
+        attempt: 1,
+        expanded_detail: "Fixture investigation loaded through the API service layer.",
+      },
+    ]);
+  }
+
+  if (path === "/settings") {
+    return jsonResponse({
+      reasoning_model: "claude-3-5-sonnet-20241022",
+      report_model: "claude-3-5-haiku-20241022",
+      auto_clear_threshold: 0.7,
+      reviewer_threshold: 0.5,
+      materiality: 50000,
+      segregation_of_duties: true,
+      immutable_audit_log: true,
+      debate_round_cap: 2,
+      api_key_vault: "environment",
+      theme: "system",
+      display_currency: "USD",
+      notifications: false,
+      audit_retention_years: 7,
+      ip_allowlist: false,
+      estimated_agent_run_cost_usd: 0.21,
+    });
+  }
+
+  if (path === "/intake/summary") {
+    return jsonResponse(null);
+  }
+
   if (path === "/investigations" && method === "POST") {
     const body =
       input instanceof Request

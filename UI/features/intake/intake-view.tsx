@@ -2,7 +2,7 @@
 
 import { ArrowRight, FileSpreadsheet, History, Info, Play, Trash2, UploadCloud } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { FlaggedRowsTable } from "@/components/intake/flagged-rows-table";
 import { RulePrefilter } from "@/components/intake/rule-prefilter";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -15,7 +15,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { routes } from "@/constants/routes";
 import { useCreateInvestigations, useDeleteImportedInvestigations, useExecuteInvestigations } from "@/hooks/use-cases";
 import { useIntakeSummary } from "@/hooks/use-intake";
-import { parseLedgerFile } from "@/services/intake.service";
+import { useSettings } from "@/hooks/use-settings";
+import { defaultIntakeParseOptions, parseLedgerFile } from "@/services/intake.service";
 import type { FlaggedRow, IntakeSummary } from "@/types/domain";
 
 function parseCurrencyAmount(value: string) {
@@ -24,13 +25,13 @@ function parseCurrencyAmount(value: string) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0.01;
 }
 
-function toInvestigationInput(row: FlaggedRow, summary: IntakeSummary) {
+function toInvestigationInput(row: FlaggedRow, summary: IntakeSummary, materiality: number) {
   return {
     transactionId: row.txnId,
     vendor: row.vendor,
     category: row.account,
     amount: parseCurrencyAmount(row.amount),
-    materiality: 25_000,
+    materiality,
     owner: "intake",
     description: [
       `Created from intake file ${summary.fileName}.`,
@@ -43,6 +44,7 @@ function toInvestigationInput(row: FlaggedRow, summary: IntakeSummary) {
 export function IntakeView() {
   const router = useRouter();
   const { data, error, isLoading, refetch } = useIntakeSummary();
+  const settingsQuery = useSettings();
   const createCases = useCreateInvestigations();
   const deleteImportedCases = useDeleteImportedInvestigations();
   const runCases = useExecuteInvestigations();
@@ -53,6 +55,16 @@ export function IntakeView() {
   const [isParsing, setIsParsing] = useState(false);
   const [showPastRuns, setShowPastRuns] = useState(false);
   const [runStatus, setRunStatus] = useState("Upload a CSV or TSV ledger extract to run the pre-filter.");
+  const parserOptions = useMemo(
+    () => ({
+      materialityThreshold: settingsQuery.data?.materiality ?? defaultIntakeParseOptions.materialityThreshold,
+      estimatedAgentRunCostUsd:
+        settingsQuery.data?.estimatedAgentRunCostUsd ?? defaultIntakeParseOptions.estimatedAgentRunCostUsd,
+      displayCurrency: settingsQuery.data?.displayCurrency ?? defaultIntakeParseOptions.displayCurrency,
+      segregationOfDutiesTokens: defaultIntakeParseOptions.segregationOfDutiesTokens,
+    }),
+    [settingsQuery.data],
+  );
 
   async function handleFile(file?: File) {
     if (!file) {
@@ -69,7 +81,7 @@ export function IntakeView() {
     setCreateError(null);
 
     try {
-      const parsed = await parseLedgerFile(file);
+      const parsed = await parseLedgerFile(file, parserOptions);
       setUploadedSummary(parsed);
       setRunStatus(`Parsed ${parsed.fileName}; ${parsed.flagged} rows flagged for case creation.`);
     } catch (parseError) {
@@ -133,7 +145,9 @@ export function IntakeView() {
         setRunStatus(`${deleted.message} Creating ${rowsToCreate.length} replacement cases...`);
       }
 
-      const created = await createCases.mutateAsync(rowsToCreate.map((row) => toInvestigationInput(row, summary)));
+      const created = await createCases.mutateAsync(
+        rowsToCreate.map((row) => toInvestigationInput(row, summary, parserOptions.materialityThreshold)),
+      );
       setRunStatus(`Created ${created.length} cases. Starting the agent crew...`);
       await runCases.mutateAsync(created.map((item) => item.id));
       setRunStatus(`Started the crew for ${created.length} cases. Opening the first workspace...`);
@@ -148,12 +162,12 @@ export function IntakeView() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || settingsQuery.isLoading) {
     return <LoadingState label="Loading intake run" />;
   }
 
-  if (error) {
-    return <ErrorState onRetry={() => void refetch()} />;
+  if (error || settingsQuery.error) {
+    return <ErrorState onRetry={() => void Promise.all([refetch(), settingsQuery.refetch()])} />;
   }
 
   const summary = uploadedSummary ?? data;
@@ -176,7 +190,7 @@ export function IntakeView() {
         {
           label: "Est. crew cost",
           value: `$${summary.estCostUsd}`,
-          helper: `${summary.flagged} x $0.21`,
+          helper: `${summary.flagged} x $${parserOptions.estimatedAgentRunCostUsd.toFixed(2)}`,
           tone: "text-foreground",
         },
       ]

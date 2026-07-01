@@ -3,10 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAgentHealth, getAgentWorkflow } from "@/services/agents.service";
 
-export function useAgentWorkflow() {
+export function useAgentWorkflow(caseId?: string) {
   return useQuery({
-    queryKey: ["agent-workflow"],
-    queryFn: getAgentWorkflow,
+    queryKey: ["agent-workflow", caseId],
+    queryFn: () => getAgentWorkflow(caseId),
+    enabled: Boolean(caseId),
   });
 }
 

@@ -1,20 +1,107 @@
+import { apiRequest } from "@/services/api";
 import type { FlaggedRow, IntakeRuleStat, IntakeSummary } from "@/types/domain";
 
-export async function getIntakeSummary(): Promise<IntakeSummary | null> {
-  return null;
-}
+type ApiIntakeRuleStat = {
+  rule: string;
+  count: number;
+  tone: IntakeRuleStat["tone"];
+};
+
+type ApiFlaggedRow = {
+  txn_id: string;
+  vendor: string;
+  account: string;
+  amount: string;
+  rules: string[];
+};
+
+type ApiIntakeSummary = {
+  file_name: string;
+  rows_ingested: number;
+  flagged: number;
+  cleared: number;
+  parse_errors: number;
+  est_cost_usd: number;
+  columns: string[];
+  rule_stats: ApiIntakeRuleStat[];
+  flagged_rows: ApiFlaggedRow[];
+};
+
+export type IntakeParseOptions = {
+  materialityThreshold: number;
+  estimatedAgentRunCostUsd: number;
+  displayCurrency: string;
+  segregationOfDutiesTokens: string[];
+};
+
+export const defaultIntakeParseOptions: IntakeParseOptions = {
+  materialityThreshold: 50_000,
+  estimatedAgentRunCostUsd: 0.21,
+  displayCurrency: "USD",
+  segregationOfDutiesTokens: ["admin", "system", "rkumar"],
+};
 
 type LedgerRow = Record<string, string>;
 
-const ruleOrder: Array<{ rule: string; tone: IntakeRuleStat["tone"] }> = [
-  { rule: "Materiality >= $25k", tone: "danger" },
-  { rule: "FX outlier", tone: "warning" },
-  { rule: "Round-number", tone: "warning" },
-  { rule: "Segregation of duties", tone: "danger" },
-  { rule: "Duplicate", tone: "info" },
-  { rule: "Unknown vendor", tone: "danger" },
-  { rule: "Off-hours posting", tone: "info" },
-];
+function mapIntakeSummary(payload: ApiIntakeSummary): IntakeSummary {
+  return {
+    fileName: payload.file_name,
+    rowsIngested: payload.rows_ingested,
+    flagged: payload.flagged,
+    cleared: payload.cleared,
+    parseErrors: payload.parse_errors,
+    estCostUsd: payload.est_cost_usd,
+    columns: payload.columns,
+    ruleStats: payload.rule_stats,
+    flaggedRows: payload.flagged_rows.map((row) => ({
+      txnId: row.txn_id,
+      vendor: row.vendor,
+      account: row.account,
+      amount: row.amount,
+      rules: row.rules,
+    })),
+  };
+}
+
+export async function getIntakeSummary(): Promise<IntakeSummary | null> {
+  const summary = await apiRequest<ApiIntakeSummary | null>("/intake/summary");
+  return summary ? mapIntakeSummary(summary) : null;
+}
+
+function normalizeOptions(options: Partial<IntakeParseOptions>): IntakeParseOptions {
+  const materialityThreshold =
+    Number.isFinite(options.materialityThreshold) && Number(options.materialityThreshold) > 0
+      ? Number(options.materialityThreshold)
+      : defaultIntakeParseOptions.materialityThreshold;
+  const estimatedAgentRunCostUsd =
+    Number.isFinite(options.estimatedAgentRunCostUsd) && Number(options.estimatedAgentRunCostUsd) >= 0
+      ? Number(options.estimatedAgentRunCostUsd)
+      : defaultIntakeParseOptions.estimatedAgentRunCostUsd;
+  const displayCurrency =
+    options.displayCurrency?.trim().toUpperCase() || defaultIntakeParseOptions.displayCurrency;
+  const segregationOfDutiesTokens =
+    options.segregationOfDutiesTokens?.filter(Boolean).map((token) => token.toLowerCase()) ??
+    defaultIntakeParseOptions.segregationOfDutiesTokens;
+
+  return {
+    materialityThreshold,
+    estimatedAgentRunCostUsd,
+    displayCurrency,
+    segregationOfDutiesTokens,
+  };
+}
+
+function ruleDefinitions(config: IntakeParseOptions): Array<{ flag: string; rule: string; tone: IntakeRuleStat["tone"] }> {
+  return [
+    { flag: "materiality", rule: `Materiality >= ${formatAmount(config.materialityThreshold, config.displayCurrency)}`, tone: "danger" },
+    { flag: "fx outlier", rule: "FX outlier", tone: "warning" },
+    { flag: "round-number", rule: "Round-number", tone: "warning" },
+    { flag: "segregation of duties", rule: "Segregation of duties", tone: "danger" },
+    { flag: "duplicate", rule: "Duplicate", tone: "info" },
+    { flag: "unknown vendor", rule: "Unknown vendor", tone: "danger" },
+    { flag: "off-hours", rule: "Off-hours posting", tone: "info" },
+  ];
+}
 
 function parseDelimitedRows(text: string, delimiter: "," | "\t") {
   const rows: string[][] = [];
@@ -82,12 +169,16 @@ function parseAmount(value: string) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function formatAmount(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
+function formatAmount(value: number, currency: string) {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(value);
+  } catch {
+    return `${currency} ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value)}`;
+  }
 }
 
 function isWeekendOrOffHours(value: string) {
@@ -106,7 +197,7 @@ function isWeekendOrOffHours(value: string) {
   return day === 0 || day === 6 || hour < 6 || hour > 20;
 }
 
-function ruleLabelsForRow(row: LedgerRow, duplicateKeys: Set<string>) {
+function ruleLabelsForRow(row: LedgerRow, duplicateKeys: Set<string>, config: IntakeParseOptions) {
   const amount = Math.abs(parseAmount(getValue(row, ["amount_usd", "amount", "debit", "credit"])));
   const vendor = getValue(row, ["vendor", "vendor_name", "supplier"]);
   const currency = getValue(row, ["currency", "ccy"]).toUpperCase();
@@ -116,7 +207,7 @@ function ruleLabelsForRow(row: LedgerRow, duplicateKeys: Set<string>) {
   const duplicateKey = `${vendor.toLowerCase()}|${amount}`;
   const rules: string[] = [];
 
-  if (amount >= 25_000) {
+  if (amount >= config.materialityThreshold) {
     rules.push("materiality");
   }
 
@@ -124,11 +215,15 @@ function ruleLabelsForRow(row: LedgerRow, duplicateKeys: Set<string>) {
     rules.push("round-number");
   }
 
-  if ((currency && currency !== "USD" && fxRate === 0) || fxRate > 2 || (fxRate > 0 && fxRate < 0.2)) {
+  if (
+    (currency && currency !== config.displayCurrency && fxRate === 0) ||
+    fxRate > 2 ||
+    (fxRate > 0 && fxRate < 0.2)
+  ) {
     rules.push("fx outlier");
   }
 
-  if (["admin", "system", "rkumar"].some((token) => postedBy.includes(token))) {
+  if (config.segregationOfDutiesTokens.some((token) => postedBy.includes(token))) {
     rules.push("segregation of duties");
   }
 
@@ -147,17 +242,10 @@ function ruleLabelsForRow(row: LedgerRow, duplicateKeys: Set<string>) {
   return rules;
 }
 
-function toRuleStats(flaggedRows: FlaggedRow[]) {
+function toRuleStats(flaggedRows: FlaggedRow[], config: IntakeParseOptions) {
   const counts = new Map<string, number>();
-  const ruleNameByFlag: Record<string, string> = {
-    materiality: "Materiality >= $25k",
-    "fx outlier": "FX outlier",
-    "round-number": "Round-number",
-    "segregation of duties": "Segregation of duties",
-    duplicate: "Duplicate",
-    "unknown vendor": "Unknown vendor",
-    "off-hours": "Off-hours posting",
-  };
+  const definitions = ruleDefinitions(config);
+  const ruleNameByFlag = Object.fromEntries(definitions.map((definition) => [definition.flag, definition.rule]));
 
   flaggedRows.forEach((row) => {
     row.rules.forEach((rule) => {
@@ -166,9 +254,10 @@ function toRuleStats(flaggedRows: FlaggedRow[]) {
     });
   });
 
-  return ruleOrder.map((rule) => ({
-    ...rule,
-    count: counts.get(rule.rule) ?? 0,
+  return definitions.map(({ rule, tone }) => ({
+    rule,
+    tone,
+    count: counts.get(rule) ?? 0,
   }));
 }
 
@@ -187,7 +276,11 @@ function readFileText(file: File) {
   });
 }
 
-export async function parseLedgerFile(file: File): Promise<IntakeSummary> {
+export async function parseLedgerFile(
+  file: File,
+  options: Partial<IntakeParseOptions> = {},
+): Promise<IntakeSummary> {
+  const config = normalizeOptions(options);
   const text = await readFileText(file);
   const delimiter = file.name.toLowerCase().endsWith(".tsv") ? "\t" : ",";
   const parsedRows = parseDelimitedRows(text, delimiter);
@@ -236,8 +329,8 @@ export async function parseLedgerFile(file: File): Promise<IntakeSummary> {
         txnId: getValue(row, ["txn_id", "transaction_id", "id"]) || "UNMAPPED",
         vendor: getValue(row, ["vendor", "vendor_name", "supplier"]) || "Unknown vendor",
         account: getValue(row, ["account", "category", "gl_account"]) || "Unmapped account",
-        amount: formatAmount(amount),
-        rules: ruleLabelsForRow(row, duplicates),
+        amount: formatAmount(amount, config.displayCurrency),
+        rules: ruleLabelsForRow(row, duplicates, config),
       };
     })
     .filter((row) => row.rules.length > 0);
@@ -248,9 +341,9 @@ export async function parseLedgerFile(file: File): Promise<IntakeSummary> {
     flagged: flaggedRows.length,
     cleared: Math.max(rows.length - flaggedRows.length, 0),
     parseErrors,
-    estCostUsd: Number((flaggedRows.length * 0.21).toFixed(2)),
+    estCostUsd: Number((flaggedRows.length * config.estimatedAgentRunCostUsd).toFixed(2)),
     columns: headers,
-    ruleStats: toRuleStats(flaggedRows),
+    ruleStats: toRuleStats(flaggedRows, config),
     flaggedRows,
   };
 }
