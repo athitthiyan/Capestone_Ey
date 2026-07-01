@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import bcrypt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -92,6 +92,7 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
 
 
 def get_current_user(
+    request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db_session),
 ) -> Optional[User]:
@@ -118,4 +119,5 @@ def get_current_user(
     user = db.query(User).filter(User.username == username).first()
     if user is None or not user.is_active:
         raise credentials_exc
+    request.state.user = user
     return user

@@ -11,8 +11,10 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, actionLabel, icon: Icon = FileSearch }: EmptyStateProps) {
   return (
-    <section className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
-      <Icon className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" />
+    <section className="animate-surface-in rounded-lg border border-dashed border-border bg-gradient-to-b from-card to-muted/40 p-8 text-center shadow-card">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg border border-primary-border bg-primary-soft text-primary">
+        <Icon className="h-6 w-6" aria-hidden="true" />
+      </span>
       <h2 className="mt-4 text-base font-semibold text-foreground">{title}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{description}</p>
       {actionLabel ? (

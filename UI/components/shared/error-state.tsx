@@ -13,7 +13,7 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <section className="rounded-lg border border-danger-border bg-danger-soft p-5 text-danger-foreground">
+    <section className="animate-surface-in rounded-lg border border-danger-border bg-danger-soft p-5 text-danger-foreground shadow-card">
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 h-5 w-5" aria-hidden="true" />
         <div>

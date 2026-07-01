@@ -217,6 +217,7 @@ class InvestigationExecutor:
             "rag_context": "",
             "rag_citations": [],
             "messages": [],
+            "llm_usage": [],
             "workflow_state": "intake",
             "status": "running",
         }

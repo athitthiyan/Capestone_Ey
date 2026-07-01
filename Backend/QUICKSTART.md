@@ -13,9 +13,15 @@ cd backend
 cp .env.example .env
 ```
 
-Edit `.env` and add your Anthropic API key:
+Edit `.env` and add the API key for your selected default provider:
 ```env
+DEFAULT_LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-v1-your-key-here
+# Optional fallbacks:
+GROQ_API_KEY=
+OPENAI_API_KEY=
+ENABLE_LLM_FALLBACK=true
+LLM_FALLBACK_ORDER=groq,openai
 ```
 
 ### Step 2: Start Services (1 minute)

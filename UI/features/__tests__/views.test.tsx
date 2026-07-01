@@ -10,6 +10,7 @@ import { EvidenceView } from "@/features/evidence/evidence-view";
 import { IntakeView } from "@/features/intake/intake-view";
 import { ReportsView } from "@/features/reports/reports-view";
 import { ReplayView } from "@/features/replay/replay-view";
+import { SettingsView } from "@/features/settings/settings-view";
 import { VerificationView } from "@/features/verification/verification-view";
 
 function createWrapper() {
@@ -66,5 +67,12 @@ describe("feature views render with data", () => {
     render(<DashboardView />, { wrapper: createWrapper() });
 
     expect((await screen.findAllByText(/Skeptic Engine/i)).length).toBeGreaterThan(0);
+  });
+
+  it("renders the Settings page with LLM provider routing", async () => {
+    render(<SettingsView />, { wrapper: createWrapper() });
+
+    expect(await screen.findByText("LLM provider routing")).toBeInTheDocument();
+    expect(await screen.findByText("Model and threshold policy")).toBeInTheDocument();
   });
 });

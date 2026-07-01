@@ -106,6 +106,112 @@ globalThis.fetch = async (input, init) => {
     });
   }
 
+  if (path === "/settings/llm") {
+    if (method === "PUT") {
+      const body =
+        input instanceof Request
+          ? ((await input.json()) as Record<string, unknown>)
+          : init?.body
+            ? (JSON.parse(String(init.body)) as Record<string, unknown>)
+            : {};
+
+      return jsonResponse({
+        default_provider: body.default_provider ?? "groq",
+        active_provider: body.default_provider ?? "groq",
+        fallback_enabled: body.fallback_enabled ?? true,
+        fallback_order: body.fallback_order ?? ["anthropic", "openai"],
+        providers: [
+          {
+            id: "anthropic",
+            label: "Claude / Anthropic",
+            configured: true,
+            reasoning_model: "claude-3-5-sonnet-20241022",
+            lightweight_model: "claude-3-5-haiku-20241022",
+            missing_env: null,
+          },
+          {
+            id: "groq",
+            label: "Groq",
+            configured: true,
+            reasoning_model: "llama-3.3-70b-versatile",
+            lightweight_model: "llama-3.1-8b-instant",
+            missing_env: null,
+          },
+          {
+            id: "openai",
+            label: "OpenAI",
+            configured: false,
+            reasoning_model: "gpt-4.1",
+            lightweight_model: "gpt-4.1-mini",
+            missing_env: "OPENAI_API_KEY",
+          },
+        ],
+      });
+    }
+
+    return jsonResponse({
+      default_provider: "anthropic",
+      active_provider: "anthropic",
+      fallback_enabled: true,
+      fallback_order: ["groq", "openai"],
+      providers: [
+        {
+          id: "anthropic",
+          label: "Claude / Anthropic",
+          configured: true,
+          reasoning_model: "claude-3-5-sonnet-20241022",
+          lightweight_model: "claude-3-5-haiku-20241022",
+          missing_env: null,
+        },
+        {
+          id: "groq",
+          label: "Groq",
+          configured: true,
+          reasoning_model: "llama-3.3-70b-versatile",
+          lightweight_model: "llama-3.1-8b-instant",
+          missing_env: null,
+        },
+        {
+          id: "openai",
+          label: "OpenAI",
+          configured: false,
+          reasoning_model: "gpt-4.1",
+          lightweight_model: "gpt-4.1-mini",
+          missing_env: "OPENAI_API_KEY",
+        },
+      ],
+    });
+  }
+
+  if (path === "/settings/llm/providers") {
+    return jsonResponse([
+      {
+        id: "anthropic",
+        label: "Claude / Anthropic",
+        configured: true,
+        reasoning_model: "claude-3-5-sonnet-20241022",
+        lightweight_model: "claude-3-5-haiku-20241022",
+        missing_env: null,
+      },
+      {
+        id: "groq",
+        label: "Groq",
+        configured: true,
+        reasoning_model: "llama-3.3-70b-versatile",
+        lightweight_model: "llama-3.1-8b-instant",
+        missing_env: null,
+      },
+      {
+        id: "openai",
+        label: "OpenAI",
+        configured: false,
+        reasoning_model: "gpt-4.1",
+        lightweight_model: "gpt-4.1-mini",
+        missing_env: "OPENAI_API_KEY",
+      },
+    ]);
+  }
+
   if (path === "/intake/summary") {
     return jsonResponse(null);
   }
@@ -286,6 +392,140 @@ globalThis.fetch = async (input, init) => {
 
   if (path === "/analytics/trend" || path === "/analytics/agent-accuracy" || path === "/analytics/kpis") {
     return jsonResponse([]);
+  }
+
+  if (path === "/analytics/requests") {
+    return jsonResponse({
+      total_requests: 4,
+      error_rate: 0,
+      avg_duration_ms: 42.5,
+      p95_duration_ms: 88.1,
+      by_status: { "200": 4 },
+      top_paths: [{ path: "/api/v1/investigations", count: 2 }],
+      recent: [
+        {
+          request_id: "req-test-1",
+          method: "GET",
+          path: "/api/v1/investigations",
+          status_code: 200,
+          duration_ms: 42.5,
+          created_at: "2026-07-01T10:00:00",
+        },
+      ],
+    });
+  }
+
+  if (path.startsWith("/analytics/llm/summary")) {
+    return jsonResponse({
+      total_tokens: 12500,
+      prompt_tokens: 9000,
+      completion_tokens: 3500,
+      total_estimated_cost_usd: 0.0425,
+      total_actual_cost_usd: null,
+      successful_calls: 7,
+      failed_calls: 1,
+      fallback_calls: 2,
+      cache_hits: 1,
+      average_latency_ms: 820,
+      most_expensive_request_types: [{ request_type: "adjudication", estimated_cost_usd: 0.03 }],
+    });
+  }
+
+  if (path.startsWith("/analytics/llm/by-provider")) {
+    return jsonResponse([
+      {
+        provider_name: "anthropic",
+        calls: 4,
+        total_tokens: 9000,
+        prompt_tokens: 6500,
+        completion_tokens: 2500,
+        total_estimated_cost_usd: 0.035,
+        total_actual_cost_usd: null,
+        successful_calls: 4,
+        failed_calls: 0,
+        fallback_calls: 0,
+        cache_hits: 1,
+        average_latency_ms: 900,
+        most_expensive_request_types: [],
+      },
+      {
+        provider_name: "groq",
+        calls: 3,
+        total_tokens: 3500,
+        prompt_tokens: 2500,
+        completion_tokens: 1000,
+        total_estimated_cost_usd: 0.0075,
+        total_actual_cost_usd: null,
+        successful_calls: 3,
+        failed_calls: 1,
+        fallback_calls: 2,
+        cache_hits: 0,
+        average_latency_ms: 420,
+        most_expensive_request_types: [],
+      },
+    ]);
+  }
+
+  if (path.startsWith("/analytics/llm/by-model")) {
+    return jsonResponse([
+      {
+        model_name: "claude-3-5-sonnet-20241022",
+        calls: 4,
+        total_tokens: 9000,
+        prompt_tokens: 6500,
+        completion_tokens: 2500,
+        total_estimated_cost_usd: 0.035,
+        total_actual_cost_usd: null,
+        successful_calls: 4,
+        failed_calls: 0,
+        fallback_calls: 0,
+        cache_hits: 1,
+        average_latency_ms: 900,
+        most_expensive_request_types: [],
+      },
+    ]);
+  }
+
+  if (path.startsWith("/analytics/llm/recent-calls")) {
+    return jsonResponse([
+      {
+        id: "llm-call-1",
+        provider_name: "anthropic",
+        model_name: "claude-3-5-sonnet-20241022",
+        request_type: "adjudication",
+        prompt_tokens: 1200,
+        completion_tokens: 420,
+        total_tokens: 1620,
+        estimated_cost_usd: 0.01,
+        actual_cost_usd: null,
+        latency_ms: 860,
+        success: true,
+        error_message: null,
+        fallback_used: false,
+        fallback_provider: null,
+        cache_hit: false,
+        model_tier: "reasoning",
+        routing_reason: "complex or audit-critical request uses the stronger reasoning model",
+        quality_guardrail: "Preserve citations.",
+        user_id: null,
+        session_id: null,
+        request_id: "req-llm-1",
+        created_at: "2026-07-01T10:00:00",
+      },
+    ]);
+  }
+
+  if (path.startsWith("/analytics/llm/cost-trends")) {
+    return jsonResponse([
+      {
+        period: "2026-07-01",
+        calls: 7,
+        total_tokens: 12500,
+        estimated_cost_usd: 0.0425,
+        fallback_calls: 2,
+        average_latency_ms: 820,
+      },
+    ]);
   }
 
   if (path === "/reports") {

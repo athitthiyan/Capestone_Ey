@@ -251,6 +251,76 @@ class AuditLog(Base):
     )
 
 
+class RequestLog(Base):
+    """HTTP request telemetry for production analytics and auditability."""
+
+    __tablename__ = "request_logs"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    request_id = Column(String(64), nullable=False, index=True)
+    method = Column(String(12), nullable=False)
+    path = Column(String(500), nullable=False, index=True)
+    status_code = Column(Integer, nullable=False, index=True)
+    duration_ms = Column(Float, nullable=False)
+    client_host = Column(String(255), nullable=True)
+    user_agent = Column(Text, nullable=True)
+    user_id = Column(String(100), nullable=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    __table_args__ = (
+        Index("idx_request_logs_created_status", "created_at", "status_code"),
+        Index("idx_request_logs_path_created", "path", "created_at"),
+    )
+
+
+class RuntimeSetting(Base):
+    """Persisted runtime settings that can be changed without app restart."""
+
+    __tablename__ = "runtime_settings"
+
+    key = Column(String(100), primary_key=True)
+    value_json = Column(JSON, nullable=False)
+    updated_by = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class LLMCallLog(Base):
+    """Per-call LLM usage telemetry for cost, latency, and fallback analytics."""
+
+    __tablename__ = "llm_call_logs"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    provider_name = Column(String(50), nullable=False, index=True)
+    model_name = Column(String(120), nullable=False, index=True)
+    request_type = Column(String(100), nullable=False, index=True)
+    prompt_tokens = Column(Integer, default=0)
+    completion_tokens = Column(Integer, default=0)
+    total_tokens = Column(Integer, default=0)
+    estimated_cost_usd = Column(Float, default=0.0)
+    actual_cost_usd = Column(Float, nullable=True)
+    latency_ms = Column(Float, default=0.0)
+    success = Column(Boolean, default=False, index=True)
+    error_message = Column(Text, nullable=True)
+    fallback_used = Column(Boolean, default=False, index=True)
+    fallback_provider = Column(String(50), nullable=True)
+    cache_hit = Column(Boolean, default=False)
+    model_tier = Column(String(30), nullable=False, default="standard")
+    routing_reason = Column(Text, nullable=True)
+    quality_guardrail = Column(Text, nullable=True)
+    user_id = Column(String(100), nullable=True, index=True)
+    session_id = Column(String(100), nullable=True, index=True)
+    request_id = Column(String(100), nullable=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    __table_args__ = (
+        Index("idx_llm_provider_created", "provider_name", "created_at"),
+        Index("idx_llm_model_created", "model_name", "created_at"),
+        Index("idx_llm_request_type_created", "request_type", "created_at"),
+        Index("idx_llm_success_created", "success", "created_at"),
+    )
+
+
 class ReviewQueueItem(Base):
     """Human review queue."""
 

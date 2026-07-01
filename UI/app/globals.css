@@ -3,19 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --background: 225 33% 97%;
-  --foreground: 228 39% 13%;
+  --background: 0 0% 100%;
+  --foreground: 224 37% 13%;
   --card: 0 0% 100%;
-  --card-foreground: 228 39% 13%;
-  --border: 228 29% 93%;
-  --input: 225 24% 89%;
-  --ring: 254 70% 58%;
-  --muted: 225 25% 95%;
-  --muted-foreground: 225 12% 51%;
-  --primary: 254 70% 58%;
+  --card-foreground: 224 37% 13%;
+  --border: 220 25% 90%;
+  --input: 220 24% 86%;
+  --ring: 221 83% 53%;
+  --muted: 220 33% 97%;
+  --muted-foreground: 220 10% 46%;
+  --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
-  --primary-soft: 255 82% 96%;
-  --primary-border: 256 69% 92%;
+  --primary-soft: 217 100% 97%;
+  --primary-border: 217 91% 90%;
   --success: 160 84% 39%;
   --success-foreground: 158 94% 24%;
   --success-soft: 153 47% 93%;
@@ -79,5 +79,24 @@ select {
 
   .mono {
     font-family: theme("fontFamily.mono");
+  }
+
+  .animate-surface-in {
+    animation: surface-in 180ms ease-out both;
+  }
+
+  .shadow-focus {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.14);
+  }
+}
+
+@keyframes surface-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

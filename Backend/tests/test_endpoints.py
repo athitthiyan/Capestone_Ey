@@ -8,7 +8,9 @@ from app.db.models import (
     Investigation,
     InvestigationState,
     InvestigationStatus,
+    LLMCallLog,
     ReviewQueueItem,
+    RuntimeSetting,
     ThirdPartyEvidenceVerification,
     VerificationClaim,
 )
@@ -49,6 +51,92 @@ def test_runtime_settings_endpoint_exposes_no_secrets(client):
     assert body["estimated_agent_run_cost_usd"] == settings.ESTIMATED_AGENT_RUN_COST_USD
     assert "secret_key" not in body
     assert "default_admin_password" not in body
+
+
+def test_llm_settings_endpoint_exposes_provider_status_without_keys(client):
+    r = client.get("/api/v1/settings/llm")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["default_provider"] in ("anthropic", "groq", "openai")
+    assert any(provider["id"] == "anthropic" for provider in body["providers"])
+    assert "sk-" not in str(body).lower()
+    assert "secret" not in str(body).lower()
+
+
+def test_llm_settings_update_validates_missing_provider_key(client, monkeypatch):
+    monkeypatch.setattr(settings, "OPENAI_API_KEY", "")
+    r = client.put(
+        "/api/v1/settings/llm",
+        json={"default_provider": "openai", "fallback_enabled": False, "fallback_order": []},
+    )
+    assert r.status_code == 400
+    assert "OPENAI_API_KEY" in r.json()["detail"]
+
+
+def test_request_logging_populates_analytics(client):
+    r = client.get("/api/v1/investigations?limit=1", headers={"x-request-id": "req-test-1"})
+    assert r.status_code == 200, r.text
+    assert r.headers["x-request-id"] == "req-test-1"
+
+    analytics = client.get("/api/v1/analytics/requests")
+    assert analytics.status_code == 200, analytics.text
+    body = analytics.json()
+    assert body["total_requests"] >= 1
+    assert body["avg_duration_ms"] >= 0
+    assert body["by_status"].get("200", 0) >= 1
+    assert any(item["path"] == "/api/v1/investigations" for item in body["top_paths"])
+
+
+def test_llm_analytics_endpoints_aggregate_costs(client, db):
+    db.query(LLMCallLog).filter(LLMCallLog.request_type == "endpoint-test").delete()
+    db.query(RuntimeSetting).filter(RuntimeSetting.key == "llm").delete()
+    db.add_all(
+        [
+            LLMCallLog(
+                provider_name="anthropic",
+                model_name="claude-3-5-sonnet-20241022",
+                request_type="endpoint-test",
+                prompt_tokens=100,
+                completion_tokens=50,
+                total_tokens=150,
+                estimated_cost_usd=0.001,
+                latency_ms=120,
+                success=True,
+                fallback_used=False,
+                model_tier="reasoning",
+            ),
+            LLMCallLog(
+                provider_name="groq",
+                model_name="llama-3.3-70b-versatile",
+                request_type="endpoint-test",
+                prompt_tokens=80,
+                completion_tokens=20,
+                total_tokens=100,
+                estimated_cost_usd=0.0001,
+                latency_ms=45,
+                success=True,
+                fallback_used=True,
+                fallback_provider="groq",
+                model_tier="reasoning",
+            ),
+        ]
+    )
+    db.commit()
+
+    summary = client.get("/api/v1/analytics/llm/summary?request_type=endpoint-test")
+    assert summary.status_code == 200, summary.text
+    body = summary.json()
+    assert body["total_tokens"] == 250
+    assert body["fallback_calls"] == 1
+    assert body["successful_calls"] == 2
+
+    by_provider = client.get("/api/v1/analytics/llm/by-provider?request_type=endpoint-test")
+    assert by_provider.status_code == 200, by_provider.text
+    assert {row["provider_name"] for row in by_provider.json()} == {"anthropic", "groq"}
+
+    recent = client.get("/api/v1/analytics/llm/recent-calls?request_type=endpoint-test")
+    assert recent.status_code == 200
+    assert len(recent.json()) >= 2
 
 
 def test_agent_health_and_workflow_routes_use_persisted_state(client, db):

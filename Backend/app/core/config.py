@@ -56,10 +56,24 @@ class Settings(BaseSettings):
     EVENTSTORE_STREAM_PREFIX: str = "investigations"
     AUDIT_FALLBACK_TO_POSTGRES: bool = True
 
-    # Claude API
+    # LLM providers
     ANTHROPIC_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+    DEFAULT_LLM_PROVIDER: Literal["anthropic", "groq", "openai"] = "anthropic"
+    ENABLE_LLM_FALLBACK: bool = True
+    LLM_FALLBACK_ORDER: list[str] = ["groq", "openai"]
+    LLM_REQUEST_TIMEOUT_SECONDS: float = 45.0
+    LLM_CACHE_ENABLED: bool = True
+    LLM_CACHE_TTL_SECONDS: int = 1800
+    LLM_MAX_PROMPT_TOKENS: int = 18000
+    LLM_PRICING_OVERRIDES_JSON: str = ""
     CLAUDE_MODEL_REASONING: str = "claude-3-5-sonnet-20241022"
     CLAUDE_MODEL_LIGHTWEIGHT: str = "claude-3-5-haiku-20241022"
+    GROQ_MODEL_REASONING: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL_LIGHTWEIGHT: str = "llama-3.1-8b-instant"
+    OPENAI_MODEL_REASONING: str = "gpt-4.1"
+    OPENAI_MODEL_LIGHTWEIGHT: str = "gpt-4.1-mini"
     CLAUDE_MAX_TOKENS: int = 4000
     CLAUDE_TEMPERATURE: float = 0.7
     USE_REAL_AGENTS: bool = False
@@ -96,6 +110,14 @@ class Settings(BaseSettings):
     NOTIFICATIONS_ENABLED: bool = False
     AUDIT_RETENTION_YEARS: int = 7
     IP_ALLOWLIST_ENABLED: bool = False
+    REQUEST_LOGGING_ENABLED: bool = True
+    REQUEST_LOG_EXCLUDED_PATHS: list[str] = [
+        "/health",
+        "/health/detailed",
+        "/docs",
+        "/openapi.json",
+        "/favicon.ico",
+    ]
 
     # External APIs
     FX_API_BASE_URL: str = "https://api.frankfurter.app"
@@ -128,7 +150,14 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    @field_validator("CORS_ORIGINS", "ALLOWED_HOSTS", "CELERY_ACCEPT_CONTENT", mode="before")
+    @field_validator(
+        "CORS_ORIGINS",
+        "ALLOWED_HOSTS",
+        "CELERY_ACCEPT_CONTENT",
+        "REQUEST_LOG_EXCLUDED_PATHS",
+        "LLM_FALLBACK_ORDER",
+        mode="before",
+    )
     @classmethod
     def _split_csv(cls, value):
         """Accept either a JSON list or a comma-separated string from env."""
@@ -146,8 +175,18 @@ class Settings(BaseSettings):
         if self.AUTH_REQUIRED and not self.SECRET_KEY.strip():
             raise ValueError("SECRET_KEY is required when AUTH_REQUIRED=true")
 
-        if self.USE_REAL_AGENTS and not self.ANTHROPIC_API_KEY.strip():
-            raise ValueError("ANTHROPIC_API_KEY is required when USE_REAL_AGENTS=true")
+        if self.USE_REAL_AGENTS:
+            provider_key_env = {
+                "anthropic": "ANTHROPIC_API_KEY",
+                "groq": "GROQ_API_KEY",
+                "openai": "OPENAI_API_KEY",
+            }[self.DEFAULT_LLM_PROVIDER]
+            provider_key_value = getattr(self, provider_key_env)
+            if not provider_key_value.strip():
+                raise ValueError(
+                    f"{provider_key_env} is required when USE_REAL_AGENTS=true "
+                    f"and DEFAULT_LLM_PROVIDER={self.DEFAULT_LLM_PROVIDER}"
+                )
 
         if self.ENV != "production":
             return self

@@ -9,7 +9,8 @@ type PageHeaderProps = {
 
 export function PageHeader({ eyebrow, title, description, actions }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
+    <div className="relative flex animate-surface-in flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
+      <span className="absolute bottom-[-1px] left-0 h-px w-36 bg-gradient-to-r from-primary to-info" aria-hidden="true" />
       <div className="min-w-0">
         {eyebrow ? (
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-primary">{eyebrow}</p>

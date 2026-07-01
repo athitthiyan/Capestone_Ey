@@ -1,6 +1,7 @@
 "use client";
 
 import { Settings } from "lucide-react";
+import { LLMProviderSettings } from "@/components/forms/llm-provider-settings";
 import { SettingsForm } from "@/components/forms/settings-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
@@ -33,6 +34,8 @@ export function SettingsView() {
           </Button>
         }
       />
+
+      <LLMProviderSettings />
 
       {data ? (
         <SettingsForm settings={data} />

@@ -2,7 +2,7 @@
 Multi-agent crew orchestration using LangGraph.
 Defines the Supervisor, Evidence, Challenger, Defender, Adjudicator, and Verifier agents.
 
-Heavy dependencies (langgraph, langchain_anthropic) are imported lazily so this
+Heavy dependencies (langgraph and provider clients) are imported lazily so this
 module can be imported in environments where they are not installed.
 """
 
@@ -46,17 +46,7 @@ class InvestigationState(TypedDict, total=False):
     messages: list[InvestigationMessage]
     workflow_state: str
     status: str
-
-
-def _make_llm(model: str, temperature: float):
-    from langchain_anthropic import ChatAnthropic
-
-    return ChatAnthropic(
-        model=model,
-        temperature=temperature,
-        max_tokens=settings.CLAUDE_MAX_TOKENS,
-        api_key=settings.ANTHROPIC_API_KEY or None,
-    )
+    llm_usage: list[dict]
 
 
 def _extract_json(text: str) -> Optional[dict]:
@@ -70,6 +60,42 @@ def _extract_json(text: str) -> Optional[dict]:
             except json.JSONDecodeError:
                 return None
     return None
+
+
+def _complete_llm(
+    state: InvestigationState,
+    prompt: str,
+    *,
+    request_type: str,
+    complexity: str = "complex",
+    temperature: float | None = None,
+):
+    from app.llm import LLMRequest, get_llm_service
+
+    response = get_llm_service().complete(
+        LLMRequest(
+            prompt=prompt,
+            request_type=request_type,
+            complexity=complexity,  # type: ignore[arg-type]
+            temperature=settings.CLAUDE_TEMPERATURE if temperature is None else temperature,
+            max_tokens=settings.CLAUDE_MAX_TOKENS,
+            metadata={"investigation_id": state.get("investigation_id")},
+        )
+    )
+    state.setdefault("llm_usage", []).append(
+        {
+            "provider": response.provider,
+            "model": response.model,
+            "request_type": request_type,
+            "prompt_tokens": response.prompt_tokens,
+            "completion_tokens": response.completion_tokens,
+            "estimated_cost_usd": response.estimated_cost_usd,
+            "fallback_used": response.fallback_used,
+            "fallback_provider": response.fallback_provider,
+            "routing_reason": response.routing_reason,
+        }
+    )
+    return response
 
 
 def create_supervisor_agent() -> Callable[[InvestigationState], InvestigationState]:
@@ -139,10 +165,12 @@ Generate a concise evidence summary with actionable insights and clearly state
 whether external corroboration was found, missing, or still pending.
 Use the retrieved policy/data context when relevant and preserve citation ids.
 """
-        from langchain_core.messages import HumanMessage
-
-        client = _make_llm(settings.CLAUDE_MODEL_REASONING, settings.CLAUDE_TEMPERATURE)
-        response = client.invoke([HumanMessage(content=prompt)])
+        response = _complete_llm(
+            state,
+            prompt,
+            request_type="evidence_collection",
+            complexity="complex",
+        )
         summary = response.content
         if attempt > 1 and previous_summary not in ("", "None yet"):
             state["evidence_summary"] = f"{previous_summary}\n\nFollow-up corroboration query: {summary}"
@@ -150,7 +178,9 @@ Use the retrieved policy/data context when relevant and preserve citation ids.
             state["evidence_summary"] = summary
         state.setdefault("evidence", []).append(
             {
-                "source": "claude_analysis" if attempt == 1 else "claude_corroboration_query",
+                "source": f"{response.provider}_analysis"
+                if attempt == 1
+                else f"{response.provider}_corroboration_query",
                 "content": summary,
                 "citations": state.get("rag_citations", []),
                 "relevance_score": 0.75 if attempt == 1 else 0.85,
@@ -183,10 +213,12 @@ Defender's most recent rebuttal: {prior_defender[-1] if prior_defender else 'Non
 If this is a later round, advance the argument: respond to the Defender's rebuttal and
 sharpen the specific control risk instead of repeating your opening. Stay grounded in evidence.
 """
-        from langchain_core.messages import HumanMessage
-
-        client = _make_llm(settings.CLAUDE_MODEL_REASONING, settings.CLAUDE_TEMPERATURE)
-        response = client.invoke([HumanMessage(content=prompt)])
+        response = _complete_llm(
+            state,
+            prompt,
+            request_type="challenger_argument",
+            complexity="complex",
+        )
         state.setdefault("challenger_arguments", []).append(response.content)
         state.setdefault("debate_transcript", []).append(
             InvestigationMessage(role="assistant", content=response.content, agent="challenger")
@@ -218,10 +250,12 @@ Your previous rebuttal: {prior_defender[-1] if prior_defender else 'None yet'}
 Directly rebut the Challenger's latest point and cite specific evidence. If new evidence is
 available this round, use it - do not repeat your previous rebuttal verbatim.
 """
-        from langchain_core.messages import HumanMessage
-
-        client = _make_llm(settings.CLAUDE_MODEL_REASONING, settings.CLAUDE_TEMPERATURE)
-        response = client.invoke([HumanMessage(content=prompt)])
+        response = _complete_llm(
+            state,
+            prompt,
+            request_type="defender_argument",
+            complexity="complex",
+        )
         state.setdefault("defender_arguments", []).append(response.content)
         state.setdefault("debate_transcript", []).append(
             InvestigationMessage(role="assistant", content=response.content, agent="defender")
@@ -254,10 +288,12 @@ Return ONLY a JSON object:
 {{"risk_level": "critical|high|medium|low|cleared", "confidence": 0.0,
   "reasoning": "...", "key_concerns": ["..."], "mitigating_factors": ["..."]}}
 """
-        from langchain_core.messages import HumanMessage
-
-        client = _make_llm(settings.CLAUDE_MODEL_REASONING, settings.CLAUDE_TEMPERATURE)
-        response = client.invoke([HumanMessage(content=prompt)])
+        response = _complete_llm(
+            state,
+            prompt,
+            request_type="adjudication",
+            complexity="critical",
+        )
         adjudication = _extract_json(response.content) or {
             "risk_level": "medium",
             "confidence": 0.5,
@@ -298,10 +334,13 @@ If a claim is ungrounded, make the missing evidence actionable so the Supervisor
 Return ONLY a JSON object:
 {{"is_grounded": true|false, "ungrounded_claims": ["..."], "verification_report": "..."}}
 """
-        from langchain_core.messages import HumanMessage
-
-        client = _make_llm(settings.CLAUDE_MODEL_LIGHTWEIGHT, 0.2)
-        response = client.invoke([HumanMessage(content=prompt)])
+        response = _complete_llm(
+            state,
+            prompt,
+            request_type="verification",
+            complexity="critical",
+            temperature=0.2,
+        )
         parsed = _extract_json(response.content) or {
             "is_grounded": True,
             "ungrounded_claims": [],

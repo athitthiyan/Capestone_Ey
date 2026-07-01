@@ -35,7 +35,7 @@ backend/
 
 - Python 3.11+
 - Docker & Docker Compose
-- Anthropic API Key
+- At least one LLM provider API key when `USE_REAL_AGENTS=true` (Anthropic, Groq, or OpenAI)
 
 ### Option 1: Local Development (Docker Compose)
 
@@ -44,7 +44,7 @@ backend/
    ```bash
    cd backend
    cp .env.example .env
-   # Edit .env and add your ANTHROPIC_API_KEY
+   # Edit .env and add the API key for your DEFAULT_LLM_PROVIDER
    ```
 
 2. **Start services**
@@ -248,6 +248,8 @@ CLOSED
 - **evidence_artifacts** - Collected evidence
 - **verification_claims** - Verified claims
 - **third_party_evidence_verifications** - Claim amount benchmark checks
+- **runtime_settings** - Persisted provider routing settings from the UI
+- **llm_call_logs** - LLM token, cost, latency, fallback, cache, and routing telemetry
 - **audit_log** - Audit trail (legacy)
 - **review_queue** - Human review queue
 - **vector_embeddings** - RAG embeddings
@@ -276,9 +278,17 @@ CELERY_BROKER_URL=redis://localhost:6379/1
 # EventStoreDB
 EVENTSTORE_URL=esdb://localhost:2113?tls=false
 
-# Claude API
+# LLM providers
 ANTHROPIC_API_KEY=
+GROQ_API_KEY=
+OPENAI_API_KEY=
+DEFAULT_LLM_PROVIDER=anthropic
+ENABLE_LLM_FALLBACK=true
+LLM_FALLBACK_ORDER=groq,openai
+LLM_PRICING_OVERRIDES_JSON=
 CLAUDE_MODEL_REASONING=claude-3-5-sonnet-20241022
+GROQ_MODEL_REASONING=llama-3.3-70b-versatile
+OPENAI_MODEL_REASONING=gpt-4.1
 
 # Investigation Defaults
 MAX_DEBATE_ROUNDS=2
@@ -307,6 +317,48 @@ services that normalize each provider response into `reference_amount`,
 `provider_name`, `provider_reference_id`, `confidence`, and `reason`. Empty
 provider URLs and provider timeouts are recorded as `API_UNAVAILABLE` and do not
 block claim creation.
+
+### LLM Provider Routing, Fallback, and Cost Tracking
+
+The real-agent path uses a provider abstraction under `app/llm`.
+
+- Supported providers: Anthropic (`ANTHROPIC_API_KEY`), Groq (`GROQ_API_KEY`), and OpenAI (`OPENAI_API_KEY`).
+- `DEFAULT_LLM_PROVIDER` controls the first provider used by real agents.
+- `ENABLE_LLM_FALLBACK=true` enables retry on token/context limit, rate-limit, timeout, and quota failures.
+- `LLM_FALLBACK_ORDER` controls fallback order, for example `groq,openai`.
+- `GET /api/v1/settings/llm` returns provider status without secrets.
+- `PUT /api/v1/settings/llm` persists default provider, fallback toggle, and fallback order in `runtime_settings`.
+
+Every attempted LLM call is recorded in `llm_call_logs` with provider, model,
+request type, input/output/total tokens, estimated cost, actual cost when the
+provider returns it, latency, success/failure, fallback metadata, cache hits,
+routing reason, guardrail text, and available user/session/request IDs.
+
+LLM analytics endpoints:
+
+- `GET /api/v1/analytics/llm/summary`
+- `GET /api/v1/analytics/llm/by-provider`
+- `GET /api/v1/analytics/llm/by-model`
+- `GET /api/v1/analytics/llm/recent-calls`
+- `GET /api/v1/analytics/llm/cost-trends`
+
+Estimated cost uses `app/llm/pricing.py`. Keep model prices current with
+`LLM_PRICING_OVERRIDES_JSON`, for example:
+
+```env
+LLM_PRICING_OVERRIDES_JSON={"gpt-4.1-mini":{"input_per_million":0.40,"output_per_million":1.60}}
+```
+
+Cost optimization keeps quality guardrails in place:
+
+- Duplicate prompt lines are removed and prompts are trimmed to `LLM_MAX_PROMPT_TOKENS`.
+- Simple low-risk requests can use lightweight models.
+- Audit-critical tasks such as adjudication and verification use reasoning models.
+- Cache is used only for explicitly cacheable requests.
+- Routing decisions and quality guardrails are logged for review.
+
+Pricing estimates depend on the configured model price table and may differ from
+provider invoices if prices, discounts, or billing units change.
 
 ---
 
@@ -348,14 +400,20 @@ docker-compose down
 ### Deploy
 
 ```bash
-# Set secrets
+# Set secrets. Pick the provider key that matches DEFAULT_LLM_PROVIDER.
+export DEFAULT_LLM_PROVIDER=anthropic
 export ANTHROPIC_API_KEY=sk-ant-v1-...
+export GROQ_API_KEY=
+export OPENAI_API_KEY=
 export SECRET_KEY=$(openssl rand -hex 32)
 export DATABASE_PASSWORD=$(openssl rand -hex 16)
 
 # Create secrets in cluster
 kubectl create secret generic skeptic-secrets \
+  --from-literal=DEFAULT_LLM_PROVIDER=$DEFAULT_LLM_PROVIDER \
   --from-literal=ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  --from-literal=GROQ_API_KEY=$GROQ_API_KEY \
+  --from-literal=OPENAI_API_KEY=$OPENAI_API_KEY \
   --from-literal=SECRET_KEY=$SECRET_KEY \
   --from-literal=DATABASE_PASSWORD=$DATABASE_PASSWORD \
   -n skeptic-engine

@@ -4,7 +4,10 @@ import { cn } from "@/lib/utils";
 export function Card({ className, ...props }: React.ComponentProps<"section">) {
   return (
     <section
-      className={cn("rounded-lg border border-border bg-card text-card-foreground shadow-card", className)}
+      className={cn(
+        "animate-surface-in rounded-lg border border-border bg-card text-card-foreground shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-panel",
+        className,
+      )}
       {...props}
     />
   );

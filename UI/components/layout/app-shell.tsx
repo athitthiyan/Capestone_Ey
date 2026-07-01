@@ -96,7 +96,7 @@ function AppHeader() {
   const { setCommandOpen, setSidebarOpen } = useUiState();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/92 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-border bg-card/92 shadow-sm backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
         <Button
           variant="ghost"
@@ -142,9 +142,9 @@ function CommandOverlay() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 p-4 backdrop-blur-sm" role="presentation">
+    <div className="fixed inset-0 z-50 animate-in fade-in-0 bg-black/60 p-4 backdrop-blur-sm" role="presentation">
       <div
-        className="mx-auto mt-16 w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-panel"
+        className="mx-auto mt-16 w-full max-w-xl animate-in fade-in-0 zoom-in-95 overflow-hidden rounded-lg border border-border bg-card shadow-panel"
         role="dialog"
         aria-modal="true"
         aria-label="Search navigation"
@@ -184,7 +184,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 border-r border-border bg-card lg:block">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 border-r border-border bg-card shadow-sm lg:block">
         <SidebarContent />
       </aside>
 

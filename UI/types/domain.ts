@@ -241,6 +241,110 @@ export type AnalyticsKpi = {
   tone?: "default" | "success" | "warning" | "danger";
 };
 
+export type RequestAnalytics = {
+  totalRequests: number;
+  errorRate: number;
+  avgDurationMs: number;
+  p95DurationMs: number;
+  byStatus: Record<string, number>;
+  topPaths: Array<{ path: string; count: number }>;
+  recent: Array<{
+    requestId: string;
+    method: string;
+    path: string;
+    statusCode: number;
+    durationMs: number;
+    createdAt?: string | null;
+  }>;
+};
+
+export type LLMProviderName = "anthropic" | "groq" | "openai";
+
+export type LLMProviderStatus = {
+  id: LLMProviderName;
+  label: string;
+  configured: boolean;
+  reasoningModel: string;
+  lightweightModel: string;
+  missingEnv?: string | null;
+};
+
+export type LLMSettings = {
+  defaultProvider: LLMProviderName;
+  activeProvider: LLMProviderName;
+  fallbackEnabled: boolean;
+  fallbackOrder: LLMProviderName[];
+  providers: LLMProviderStatus[];
+};
+
+export type LLMSettingsUpdate = {
+  defaultProvider: LLMProviderName;
+  fallbackEnabled: boolean;
+  fallbackOrder: LLMProviderName[];
+};
+
+export type LLMAnalyticsFilters = {
+  dateFrom?: string;
+  dateTo?: string;
+  provider?: string;
+  model?: string;
+  requestType?: string;
+};
+
+export type LLMAnalyticsSummary = {
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalEstimatedCostUsd: number;
+  totalActualCostUsd?: number | null;
+  successfulCalls: number;
+  failedCalls: number;
+  fallbackCalls: number;
+  cacheHits: number;
+  averageLatencyMs: number;
+  mostExpensiveRequestTypes: Array<{ requestType: string; estimatedCostUsd: number }>;
+};
+
+export type LLMAggregate = LLMAnalyticsSummary & {
+  providerName?: string;
+  modelName?: string;
+  calls: number;
+};
+
+export type LLMRecentCall = {
+  id: string;
+  providerName: string;
+  modelName: string;
+  requestType: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  estimatedCostUsd: number;
+  actualCostUsd?: number | null;
+  latencyMs: number;
+  success: boolean;
+  errorMessage?: string | null;
+  fallbackUsed: boolean;
+  fallbackProvider?: string | null;
+  cacheHit: boolean;
+  modelTier: string;
+  routingReason?: string | null;
+  qualityGuardrail?: string | null;
+  userId?: string | null;
+  sessionId?: string | null;
+  requestId?: string | null;
+  createdAt?: string | null;
+};
+
+export type LLMCostTrend = {
+  period: string;
+  calls: number;
+  totalTokens: number;
+  estimatedCostUsd: number;
+  fallbackCalls: number;
+  averageLatencyMs: number;
+};
+
 export type ReviewQueueItem = {
   id: string;
   caseId: string;

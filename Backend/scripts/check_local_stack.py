@@ -1,4 +1,4 @@
-"""Preflight checks for the local production-like backend stack.
+r"""Preflight checks for the local production-like backend stack.
 
 Run from Backend:
     .\.venv\Scripts\python.exe scripts\check_local_stack.py
@@ -100,24 +100,37 @@ def _eventstore_check() -> Check:
         return Check("EventStoreDB", False, f"{health_url} failed: {exc}")
 
 
-def _anthropic_check() -> Check:
+def _llm_provider_check() -> Check:
     if not settings.USE_REAL_AGENTS:
-        return Check("Anthropic", True, "not required while USE_REAL_AGENTS=false")
+        return Check("LLM provider", True, "not required while USE_REAL_AGENTS=false")
 
-    if not settings.ANTHROPIC_API_KEY or "replace-with-your-local-key" in settings.ANTHROPIC_API_KEY:
-        return Check("Anthropic", False, "ANTHROPIC_API_KEY is missing or still a placeholder")
+    key_env = {
+        "anthropic": "ANTHROPIC_API_KEY",
+        "groq": "GROQ_API_KEY",
+        "openai": "OPENAI_API_KEY",
+    }[settings.DEFAULT_LLM_PROVIDER]
+    key_value = str(getattr(settings, key_env, "") or "")
+    if not key_value or "replace-with" in key_value:
+        return Check("LLM provider", False, f"{key_env} is missing or still a placeholder")
 
-    try:
-        from langchain_anthropic import ChatAnthropic
+    if settings.ENABLE_LLM_FALLBACK:
+        configured_fallbacks = []
+        for provider in settings.LLM_FALLBACK_ORDER:
+            normalized = provider.strip().lower()
+            fallback_env = {
+                "anthropic": "ANTHROPIC_API_KEY",
+                "groq": "GROQ_API_KEY",
+                "openai": "OPENAI_API_KEY",
+            }.get(normalized)
+            if fallback_env and str(getattr(settings, fallback_env, "") or "").strip():
+                configured_fallbacks.append(normalized)
+        if not configured_fallbacks:
+            return Check("LLM provider", False, "fallback is enabled but no fallback provider key is configured")
+        fallback_detail = f"; fallback ready: {', '.join(configured_fallbacks)}"
+    else:
+        fallback_detail = "; fallback disabled"
 
-        ChatAnthropic(
-            model=settings.CLAUDE_MODEL_LIGHTWEIGHT,
-            max_tokens=128,
-            api_key=settings.ANTHROPIC_API_KEY,
-        )
-        return Check("Anthropic", True, "client initialized; no token-spending API call was made")
-    except Exception as exc:  # noqa: BLE001
-        return Check("Anthropic", False, f"client initialization failed: {exc}")
+    return Check("LLM provider", True, f"default={settings.DEFAULT_LLM_PROVIDER} via {key_env}{fallback_detail}")
 
 
 def main() -> int:
@@ -126,7 +139,7 @@ def main() -> int:
         _redis_check(),
         _celery_broker_check(),
         _eventstore_check(),
-        _anthropic_check(),
+        _llm_provider_check(),
     ]
 
     width = max(len(check.name) for check in checks)

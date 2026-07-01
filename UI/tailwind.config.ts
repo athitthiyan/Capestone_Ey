@@ -60,8 +60,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(17, 24, 39, 0.04)",
-        panel: "0 2px 10px rgba(17, 24, 39, 0.06)",
+        card: "0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 24px rgba(15, 23, 42, 0.04)",
+        panel: "0 16px 40px rgba(15, 23, 42, 0.12)",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],

@@ -29,6 +29,7 @@ from app.api.routes import (
     settings as settings_routes,
 )
 from app.core.config import settings
+from app.core.request_logging import add_request_logging_middleware
 from app.core.security import seed_default_user
 from app.db.session import engine, init_db
 
@@ -85,6 +86,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
+    add_request_logging_middleware(app)
 
     # Health at root; everything else under the API root path.
     app.include_router(health.router)

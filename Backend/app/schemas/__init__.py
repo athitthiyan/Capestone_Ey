@@ -140,6 +140,43 @@ class AppSettingsOut(BaseModel):
     estimated_agent_run_cost_usd: float
 
 
+LLMProviderName = Literal["anthropic", "groq", "openai"]
+
+
+class LLMProviderStatusOut(BaseModel):
+    id: LLMProviderName
+    label: str
+    configured: bool
+    reasoning_model: str
+    lightweight_model: str
+    missing_env: Optional[str] = None
+
+
+class LLMSettingsOut(BaseModel):
+    default_provider: LLMProviderName
+    active_provider: LLMProviderName
+    fallback_enabled: bool
+    fallback_order: list[LLMProviderName]
+    providers: list[LLMProviderStatusOut]
+
+
+class LLMSettingsUpdate(BaseModel):
+    default_provider: LLMProviderName
+    fallback_enabled: bool
+    fallback_order: list[LLMProviderName] = Field(default_factory=list)
+
+    @field_validator("fallback_order")
+    @classmethod
+    def _dedupe_fallback_order(cls, value: list[str]) -> list[str]:
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for provider in value:
+            if provider not in seen:
+                seen.add(provider)
+                deduped.append(provider)
+        return deduped
+
+
 class IntakeRuleStatOut(BaseModel):
     rule: str
     count: int

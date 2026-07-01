@@ -1,7 +1,7 @@
 # Local Production-Like Stack
 
 This setup keeps your existing local PostgreSQL database and runs only the extra
-production services locally: Redis, Celery, EventStoreDB, and real Anthropic
+production services locally: Redis, Celery, EventStoreDB, and real LLM
 agents.
 
 ## 1. Start Redis and EventStoreDB
@@ -31,7 +31,13 @@ Copy-Item .env.local-production.example .env
 Then edit `.env` and replace:
 
 ```env
+DEFAULT_LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-v1-replace-with-your-local-key
+# Optional fallbacks:
+GROQ_API_KEY=
+OPENAI_API_KEY=
+ENABLE_LLM_FALLBACK=true
+LLM_FALLBACK_ORDER=groq,openai
 ```
 
 Keep these values enabled for the full local stack:
@@ -108,4 +114,5 @@ Use the UI:
 5. Refresh evidence, debate, verification, and audit panels.
 
 Do not run all 100 sample cases with `USE_REAL_AGENTS=true` until you are happy
-with cost and latency. Each case makes multiple Anthropic calls.
+with cost and latency. Each case makes multiple LLM calls. Token/cost telemetry
+appears in the UI Analytics page and through `/api/v1/analytics/llm/*`.

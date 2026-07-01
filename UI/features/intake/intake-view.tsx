@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { routes } from "@/constants/routes";
+import { heldBackCaseCount, MAX_CASES_PER_INTAKE_RUN, rowsForCaseCreation } from "@/features/intake/intake-limits";
 import { useCreateInvestigations, useDeleteImportedInvestigations, useExecuteInvestigations } from "@/hooks/use-cases";
 import { useIntakeSummary } from "@/hooks/use-intake";
 import { useSettings } from "@/hooks/use-settings";
@@ -116,9 +117,10 @@ export function IntakeView() {
   }
 
   async function handleCreateCases(summary: IntakeSummary, options: { replaceExisting?: boolean } = {}) {
-    const rowsToCreate = summary.flaggedRows;
+    const rowsToCreate = rowsForCaseCreation(summary.flaggedRows);
+    const skippedRows = heldBackCaseCount(summary.flaggedRows.length);
 
-    if (rowsToCreate.length === 0) {
+    if (summary.flaggedRows.length === 0) {
       setRunStatus("No flagged rows are available for case creation.");
       return;
     }
@@ -148,7 +150,8 @@ export function IntakeView() {
       const created = await createCases.mutateAsync(
         rowsToCreate.map((row) => toInvestigationInput(row, summary, parserOptions.materialityThreshold)),
       );
-      setRunStatus(`Created ${created.length} cases. Starting the agent crew...`);
+      const limitMessage = skippedRows > 0 ? ` ${skippedRows} additional flagged row(s) were held for the next run.` : "";
+      setRunStatus(`Created ${created.length} cases.${limitMessage} Starting the agent crew...`);
       await runCases.mutateAsync(created.map((item) => item.id));
       setRunStatus(`Started the crew for ${created.length} cases. Opening the first workspace...`);
       router.push(routes.caseWorkspace(created[0].id));
@@ -180,7 +183,15 @@ export function IntakeView() {
           helper: `${summary.parseErrors} parse errors`,
           tone: "text-foreground",
         },
-        { label: "Flagged -> cases", value: summary.flagged.toLocaleString(), helper: "enter the crew", tone: "text-primary" },
+        {
+          label: "Flagged -> cases",
+          value: Math.min(summary.flagged, MAX_CASES_PER_INTAKE_RUN).toLocaleString(),
+          helper:
+            summary.flagged > MAX_CASES_PER_INTAKE_RUN
+              ? `${summary.flagged - MAX_CASES_PER_INTAKE_RUN} held back`
+              : "enter the crew",
+          tone: "text-primary",
+        },
         {
           label: "Cleared at intake",
           value: summary.cleared.toLocaleString(),
@@ -280,7 +291,10 @@ export function IntakeView() {
                   if (!summary) {
                     return;
                   }
-                  setRunStatus(`Pre-filter completed for ${summary.fileName}; ${summary.flagged} cases ready.`);
+                  const capped = Math.min(summary.flagged, MAX_CASES_PER_INTAKE_RUN);
+                  setRunStatus(
+                    `Pre-filter completed for ${summary.fileName}; ${capped} of ${summary.flagged} flagged row(s) ready for case creation.`,
+                  );
                 }}
               >
                 Run pre-filter
@@ -379,7 +393,11 @@ export function IntakeView() {
               disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending || summary.flaggedRows.length === 0}
               onClick={() => void handleCreateCases(summary)}
             >
-              {createCases.isPending ? "Creating..." : runCases.isPending ? "Starting crew..." : `Create ${summary.flaggedRows.length} cases`}
+              {createCases.isPending
+                ? "Creating..."
+                : runCases.isPending
+                  ? "Starting crew..."
+                  : `Create ${Math.min(summary.flaggedRows.length, MAX_CASES_PER_INTAKE_RUN)} cases`}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           </CardContent>
