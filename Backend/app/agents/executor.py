@@ -41,6 +41,11 @@ from app.realtime.websocket_manager import (
     PipelineStageEvent,
     connection_manager,
 )
+from app.knowledge.retriever import (
+    format_context,
+    retrieve_knowledge_context,
+    retrieve_knowledge_context_from_db,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -209,6 +214,8 @@ class InvestigationExecutor:
             "debate_transcript": [],
             "adjudication": {},
             "verification_results": {},
+            "rag_context": "",
+            "rag_citations": [],
             "messages": [],
             "workflow_state": "intake",
             "status": "running",
@@ -284,6 +291,23 @@ class InvestigationExecutor:
             ).to_dict(),
         )
 
+        query = " ".join(
+            [
+                str(state.get("vendor", "")),
+                str(state.get("category", "")),
+                str(state.get("amount", "")),
+                str(state.get("verification_feedback", "")),
+                "materiality approval vendor policy expense evidence",
+            ]
+        )
+        try:
+            policy_chunks = retrieve_knowledge_context_from_db(self.db, query, limit=4)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("DB-backed RAG retrieval failed; using corpus fallback: %s", exc)
+            policy_chunks = retrieve_knowledge_context(query, limit=4)
+        state["rag_context"] = format_context(policy_chunks)
+        state["rag_citations"] = [chunk["id"] for chunk in policy_chunks]
+
         new_items: list[dict] = []
         if settings.USE_REAL_AGENTS:
             # Real retrieval: re-invoking the node issues a fresh (feedback-aware)
@@ -295,7 +319,8 @@ class InvestigationExecutor:
             await asyncio.sleep(0.2)
             state["evidence_summary"] = (
                 f"Ledger transaction {state['transaction_id']} for {state['vendor']} "
-                f"was posted to {state['category']} for {state['amount']:.2f}."
+                f"was posted to {state['category']} for {state['amount']:.2f}. "
+                f"Retrieved {len(policy_chunks)} policy/data chunks from the knowledge base."
             )
             new_items = [
                 {
@@ -317,6 +342,15 @@ class InvestigationExecutor:
                     "relevance_score": 0.68,
                 },
             ]
+            if policy_chunks:
+                new_items.append(
+                    {
+                        "source": "policy_kb",
+                        "content": state["rag_context"],
+                        "citations": state["rag_citations"],
+                        "relevance_score": 0.82,
+                    }
+                )
             state["evidence"] = list(new_items)
         else:
             # Re-run: the Supervisor sent the case back for corroboration. A

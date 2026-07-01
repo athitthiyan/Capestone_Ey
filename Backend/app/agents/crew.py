@@ -31,6 +31,8 @@ class InvestigationState(TypedDict, total=False):
     materiality: float
     evidence: list[dict]
     evidence_summary: str
+    rag_context: str
+    rag_citations: list[str]
     debate_round: int
     attempt: int
     has_corroboration: bool
@@ -127,12 +129,15 @@ Transaction Details:
 Attempt: {attempt}
 Prior Evidence Summary: {previous_summary}
 Verifier Feedback: {feedback or 'None yet'}
+Retrieved Policy/Data Context:
+{state.get('rag_context') or 'No policy chunks retrieved.'}
 
 List key evidence sources, red flags, follow-up questions, and citations. If this
 is a retry, focus the query on missing external corroboration such as vendor
 master data, purchase orders, approvals, contracts, or policy authority.
 Generate a concise evidence summary with actionable insights and clearly state
 whether external corroboration was found, missing, or still pending.
+Use the retrieved policy/data context when relevant and preserve citation ids.
 """
         from langchain_core.messages import HumanMessage
 
@@ -147,7 +152,7 @@ whether external corroboration was found, missing, or still pending.
             {
                 "source": "claude_analysis" if attempt == 1 else "claude_corroboration_query",
                 "content": summary,
-                "citations": [],
+                "citations": state.get("rag_citations", []),
                 "relevance_score": 0.75 if attempt == 1 else 0.85,
             }
         )

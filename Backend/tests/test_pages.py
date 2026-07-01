@@ -13,6 +13,25 @@ def test_knowledge_sources(client):
         assert {"id", "title", "clause_preview", "embedding_status", "version_history"} <= set(source)
 
 
+def test_knowledge_chunks_and_search(client):
+    reindex = client.post("/api/v1/knowledge/reindex")
+    assert reindex.status_code == 200, reindex.text
+    assert reindex.json()["synced_chunks"] >= 10
+
+    chunks = client.get("/api/v1/knowledge/chunks")
+    assert chunks.status_code == 200, chunks.text
+    body = chunks.json()
+    assert len(body) >= 10
+    assert {"id", "source_id", "content", "keywords"} <= set(body[0])
+
+    search = client.get("/api/v1/knowledge/search?q=flight%20benchmark&limit=3")
+    assert search.status_code == 200, search.text
+    results = search.json()
+    assert results
+    assert any("flight" in item["content"].lower() for item in results)
+    assert {"score", "lexical_score", "vector_score"} <= set(results[0])
+
+
 def test_analytics_endpoints_return_lists(client):
     for path in ("trend", "agent-accuracy", "kpis"):
         r = client.get(f"/api/v1/analytics/{path}")

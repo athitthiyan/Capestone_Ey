@@ -204,11 +204,19 @@ def cleanup_old_states() -> dict:
 
 @app.task(name="tasks.sync_vector_embeddings")
 def sync_vector_embeddings() -> dict:
-    """Sync vector embeddings for the RAG pipeline (placeholder)."""
+    """Sync curated knowledge chunks into the RAG embedding table."""
     logger.info("Syncing vector embeddings")
+    from app.db.session import SessionLocal
+    from app.knowledge.retriever import sync_knowledge_embeddings
+
+    db = SessionLocal()
     try:
-        logger.info("Vector embeddings synced")
-        return {"status": "success"}
+        result = sync_knowledge_embeddings(db)
+        logger.info("Vector embeddings synced (%s chunks)", result.get("synced_chunks", 0))
+        return result
     except Exception as exc:
+        db.rollback()
         logger.error(f"Vector sync failed: {exc}")
         return {"status": "error", "error": str(exc)}
+    finally:
+        db.close()

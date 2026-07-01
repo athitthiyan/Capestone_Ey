@@ -63,7 +63,9 @@ def test_executor_runs_full_pipeline(db):
     evidence_sources = {
         row.source for row in db.query(EvidenceArtifact).filter_by(investigation_id=inv_id).all()
     }
-    assert {"ledger_row", "intake_prefilter", "vendor_registry"}.issubset(evidence_sources)
+    assert {"ledger_row", "intake_prefilter", "policy_kb", "vendor_registry"}.issubset(
+        evidence_sources
+    )
 
     claims = db.query(VerificationClaim).filter_by(investigation_id=inv_id).all()
     assert len(claims) >= 2

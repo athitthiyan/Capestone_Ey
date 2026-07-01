@@ -210,6 +210,19 @@ export type KnowledgeSource = {
   embeddingStatus: "indexed" | "indexing" | "failed";
 };
 
+export type KnowledgeChunk = {
+  id: string;
+  sourceId: string;
+  sourceTitle: string;
+  section: string;
+  title: string;
+  content: string;
+  keywords: string[];
+  score?: number;
+  lexicalScore?: number;
+  vectorScore?: number;
+};
+
 export type AnalyticsPoint = {
   week: string;
   confidence: number;

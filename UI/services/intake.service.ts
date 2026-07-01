@@ -240,8 +240,7 @@ export async function parseLedgerFile(file: File): Promise<IntakeSummary> {
         rules: ruleLabelsForRow(row, duplicates),
       };
     })
-    .filter((row) => row.rules.length > 0)
-    .slice(0, 50);
+    .filter((row) => row.rules.length > 0);
 
   return {
     fileName: file.name,

@@ -241,7 +241,56 @@ globalThis.fetch = async (input, init) => {
   }
 
   if (path === "/knowledge/sources") {
-    return jsonResponse([]);
+    return jsonResponse([
+      {
+        id: "kb-approval-matrix",
+        title: "Delegated Approval Matrix",
+        description: "Spend authority limits by role.",
+        owner: "Controllership",
+        count: "1 chunks",
+        freshness: "Updated today",
+        status: "synced",
+        clause_preview: "Payments above 25000 require dual approval.",
+        version_history: ["v4.2 (current)"],
+        citation_ids: ["approval-matrix-4.2-sec-2.1"],
+        embedding_status: "indexed",
+      },
+    ]);
+  }
+
+  if (path === "/knowledge/chunks") {
+    return jsonResponse([
+      {
+        id: "approval-matrix-4.2-sec-2.1",
+        source_id: "kb-approval-matrix",
+        source_title: "Delegated Approval Matrix",
+        section: "2.1",
+        title: "Dual Approval Threshold",
+        content: "Payments above 25000 require dual approval.",
+        keywords: ["approval", "threshold"],
+      },
+    ]);
+  }
+
+  if (path.startsWith("/knowledge/search")) {
+    return jsonResponse([
+      {
+        id: "approval-matrix-4.2-sec-2.1",
+        source_id: "kb-approval-matrix",
+        source_title: "Delegated Approval Matrix",
+        section: "2.1",
+        title: "Dual Approval Threshold",
+        content: "Payments above 25000 require dual approval.",
+        keywords: ["approval", "threshold"],
+        score: 4.2,
+        lexical_score: 3,
+        vector_score: 0.4,
+      },
+    ]);
+  }
+
+  if (path === "/knowledge/reindex") {
+    return jsonResponse({ status: "success", synced_chunks: 1 });
   }
 
   if (path === "/audit/recent") {

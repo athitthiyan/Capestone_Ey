@@ -41,6 +41,18 @@ async def lifespan(app: FastAPI):
     logger.info("Database initialized")
     seed_default_user()
     try:
+        from app.db.session import SessionLocal
+        from app.knowledge.retriever import sync_knowledge_embeddings
+
+        db = SessionLocal()
+        try:
+            result = sync_knowledge_embeddings(db)
+            logger.info("Knowledge base indexed (%s chunks)", result.get("synced_chunks", 0))
+        finally:
+            db.close()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Knowledge base indexing skipped: %s", exc)
+    try:
         from app.audit.eventstore import get_audit_log
 
         await get_audit_log()
