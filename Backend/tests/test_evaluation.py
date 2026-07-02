@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.db.models import Base, EvidenceArtifact, Investigation, VerificationClaim
+from app.db.models import Base, EvidenceArtifact, Investigation, InvestigationStatus, VerificationClaim
 from app.evaluation.ragas import METRIC_CATALOG, compute_ragas_summary
 
 
@@ -40,6 +40,7 @@ def test_summary_scores_when_data_present():
             category="consulting",
             amount=1000.0,
             confidence=0.9,
+            status=InvestigationStatus.CLOSED,
         )
         session.add(inv)
         session.commit()

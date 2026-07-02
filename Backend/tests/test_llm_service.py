@@ -66,7 +66,7 @@ def test_model_routing_uses_reasoning_for_critical_tasks():
 
 def test_provider_fallback_tracks_failed_and_successful_calls(monkeypatch, db, clean_llm_tables):
     monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "anthropic-key")
-    monkeypatch.setattr(settings, "GROQ_API_KEY", "groq-key")
+    monkeypatch.setattr(settings, "GROQ_API_KEY", "groq-api-key-value")
     save_llm_settings(
         db,
         {"default_provider": "anthropic", "fallback_enabled": True, "fallback_order": ["groq"]},
@@ -116,7 +116,7 @@ def test_provider_fallback_tracks_failed_and_successful_calls(monkeypatch, db, c
 
 def test_fallback_disabled_surfaces_provider_error(monkeypatch, db, clean_llm_tables):
     monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "anthropic-key")
-    monkeypatch.setattr(settings, "GROQ_API_KEY", "groq-key")
+    monkeypatch.setattr(settings, "GROQ_API_KEY", "groq-api-key-value")
     save_llm_settings(
         db,
         {"default_provider": "anthropic", "fallback_enabled": False, "fallback_order": ["groq"]},
