@@ -160,7 +160,7 @@ class AppSettingsUpdate(BaseModel):
     estimated_agent_run_cost_usd: Optional[float] = None
 
 
-LLMProviderName = Literal["anthropic", "groq", "openai", "gemini"]
+LLMProviderName = Literal["anthropic", "groq", "openai", "gemini", "deepseek"]
 
 
 class LLMProviderStatusOut(BaseModel):

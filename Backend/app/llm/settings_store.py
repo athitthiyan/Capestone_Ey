@@ -18,12 +18,14 @@ PROVIDER_LABELS: dict[ProviderName, str] = {
     "groq": "Groq",
     "openai": "OpenAI",
     "gemini": "Gemini / Google",
+    "deepseek": "DeepSeek",
 }
 PROVIDER_KEY_ENV: dict[ProviderName, str] = {
     "anthropic": "ANTHROPIC_API_KEY",
     "groq": "GROQ_API_KEY",
     "openai": "OPENAI_API_KEY",
     "gemini": "GEMINI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
 }
 
 
@@ -75,6 +77,8 @@ def provider_models(provider: ProviderName) -> tuple[str, str]:
         return settings.GROQ_MODEL_REASONING, settings.GROQ_MODEL_LIGHTWEIGHT
     if provider == "gemini":
         return settings.GEMINI_MODEL_REASONING, settings.GEMINI_MODEL_LIGHTWEIGHT
+    if provider == "deepseek":
+        return settings.DEEPSEEK_MODEL_REASONING, settings.DEEPSEEK_MODEL_LIGHTWEIGHT
     return settings.OPENAI_MODEL_REASONING, settings.OPENAI_MODEL_LIGHTWEIGHT
 
 

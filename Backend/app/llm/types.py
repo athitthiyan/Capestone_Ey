@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Literal, Protocol
 
-ProviderName = Literal["anthropic", "groq", "openai", "gemini"]
+ProviderName = Literal["anthropic", "groq", "openai", "gemini", "deepseek"]
 LLMComplexity = Literal["simple", "standard", "complex", "critical"]
-PROVIDER_NAMES: tuple[ProviderName, ...] = ("anthropic", "groq", "openai", "gemini")
+PROVIDER_NAMES: tuple[ProviderName, ...] = ("anthropic", "groq", "openai", "gemini", "deepseek")
 
 
 class LLMFailureKind(str, Enum):

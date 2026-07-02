@@ -98,6 +98,8 @@ export function LLMAnalyticsPanel({
               <option value="anthropic">Claude</option>
               <option value="groq">Groq</option>
               <option value="openai">OpenAI</option>
+              <option value="gemini">Gemini</option>
+              <option value="deepseek">DeepSeek</option>
             </select>
           </label>
           <label className="text-xs font-medium text-muted-foreground">

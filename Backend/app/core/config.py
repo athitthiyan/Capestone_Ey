@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
     GROQ_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
-    DEFAULT_LLM_PROVIDER: Literal["anthropic", "groq", "openai", "gemini"] = "anthropic"
+    DEFAULT_LLM_PROVIDER: Literal["anthropic", "groq", "openai", "gemini", "deepseek"] = "anthropic"
     ENABLE_LLM_FALLBACK: bool = True
     LLM_FALLBACK_ORDER: Annotated[list[str], NoDecode] = ["groq", "openai"]
     LLM_REQUEST_TIMEOUT_SECONDS: float = 45.0
@@ -77,13 +77,24 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL_REASONING: str = "gemini-2.0-flash"
     GEMINI_MODEL_LIGHTWEIGHT: str = "gemini-2.0-flash-lite"
+    DEEPSEEK_API_KEY: str = ""
+    DEEPSEEK_MODEL_REASONING: str = "deepseek-reasoner"
+    DEEPSEEK_MODEL_LIGHTWEIGHT: str = "deepseek-chat"
     CLAUDE_MAX_TOKENS: int = 4000
     CLAUDE_TEMPERATURE: float = 0.7
     ANTHROPIC_TEMPERATURE: float = 0.3
     GROQ_TEMPERATURE: float = 0.2
     OPENAI_TEMPERATURE: float = 0.2
     GEMINI_TEMPERATURE: float = 0.3
+    DEEPSEEK_TEMPERATURE: float = 0.2
     USE_REAL_AGENTS: bool = False
+
+    # Observability
+    METRICS_ENABLED: bool = True
+    LANGSMITH_TRACING: bool = False
+    LANGSMITH_API_KEY: str = ""
+    LANGSMITH_PROJECT: str = "skeptic-engine"
+    LANGSMITH_ENDPOINT: str = "https://api.smith.langchain.com"
 
     # Authentication
     SECRET_KEY: str = ""
@@ -190,6 +201,7 @@ class Settings(BaseSettings):
                 "groq": "GROQ_API_KEY",
                 "openai": "OPENAI_API_KEY",
                 "gemini": "GEMINI_API_KEY",
+                "deepseek": "DEEPSEEK_API_KEY",
             }[self.DEFAULT_LLM_PROVIDER]
             provider_key_value = getattr(self, provider_key_env)
             if not provider_key_value.strip():
@@ -197,6 +209,9 @@ class Settings(BaseSettings):
                     f"{provider_key_env} is required when USE_REAL_AGENTS=true "
                     f"and DEFAULT_LLM_PROVIDER={self.DEFAULT_LLM_PROVIDER}"
                 )
+
+        if self.LANGSMITH_TRACING and not self.LANGSMITH_API_KEY.strip():
+            raise ValueError("LANGSMITH_API_KEY is required when LANGSMITH_TRACING=true")
 
         if self.ENV != "production":
             return self

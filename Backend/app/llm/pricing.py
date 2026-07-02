@@ -28,6 +28,8 @@ DEFAULT_PRICING_USD_PER_MILLION: dict[str, ModelPricing] = {
     "gemini-1.5-flash": ModelPricing(0.075, 0.30),
     "gemini-2.0-flash": ModelPricing(0.10, 0.40),
     "gemini-2.0-flash-lite": ModelPricing(0.075, 0.30),
+    "deepseek-chat": ModelPricing(0.27, 1.10),
+    "deepseek-reasoner": ModelPricing(0.55, 2.19),
 }
 
 
