@@ -32,27 +32,27 @@ describe("feature views render with data", () => {
   it("renders the RAGAS Evaluation page", async () => {
     render(<EvaluationView />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText(/RAGAS evaluation/i)).toBeInTheDocument();
+    expect(await screen.findByText("Is the AI accurate?")).toBeInTheDocument();
     expect(await screen.findByText("No evaluation results")).toBeInTheDocument();
   });
 
   it("renders the Audit Log page", async () => {
     render(<AuditLogsView />, { wrapper: createWrapper() });
 
-    expect(await screen.findByText("Replay timeline")).toBeInTheDocument();
+    expect(await screen.findByText("Everything that happened")).toBeInTheDocument();
   });
 
   it("renders case-scoped investigation pages from the active case", async () => {
     const debate = render(<DebateView />, { wrapper: createWrapper() });
-    expect(await screen.findByText("Challenger and defender exchange")).toBeInTheDocument();
+    expect(await screen.findByText("Both sides of the argument")).toBeInTheDocument();
     debate.unmount();
 
     const evidence = render(<EvidenceView />, { wrapper: createWrapper() });
-    expect(await screen.findByText("Source-grounded evidence")).toBeInTheDocument();
+    expect(await screen.findByText("What we found")).toBeInTheDocument();
     evidence.unmount();
 
     const verification = render(<VerificationView />, { wrapper: createWrapper() });
-    expect(await screen.findByText("Claim grounding")).toBeInTheDocument();
+    expect(await screen.findByText("Is every claim backed up?")).toBeInTheDocument();
     verification.unmount();
 
     const replay = render(<ReplayView />, { wrapper: createWrapper() });
@@ -60,7 +60,7 @@ describe("feature views render with data", () => {
     replay.unmount();
 
     render(<ReportsView />, { wrapper: createWrapper() });
-    expect(await screen.findByText("Professional skepticism reports")).toBeInTheDocument();
+    expect(await screen.findByText("Case reports")).toBeInTheDocument();
   });
 
   it("renders the Dashboard page", async () => {
