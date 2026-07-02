@@ -145,6 +145,14 @@ globalThis.fetch = async (input, init) => {
             lightweight_model: "gpt-4.1-mini",
             missing_env: "OPENAI_API_KEY",
           },
+          {
+            id: "deepseek",
+            label: "DeepSeek",
+            configured: false,
+            reasoning_model: "deepseek-reasoner",
+            lightweight_model: "deepseek-chat",
+            missing_env: "DEEPSEEK_API_KEY",
+          },
         ],
       });
     }
@@ -179,6 +187,14 @@ globalThis.fetch = async (input, init) => {
           lightweight_model: "gpt-4.1-mini",
           missing_env: "OPENAI_API_KEY",
         },
+        {
+          id: "deepseek",
+          label: "DeepSeek",
+          configured: false,
+          reasoning_model: "deepseek-reasoner",
+          lightweight_model: "deepseek-chat",
+          missing_env: "DEEPSEEK_API_KEY",
+        },
       ],
     });
   }
@@ -208,6 +224,14 @@ globalThis.fetch = async (input, init) => {
         reasoning_model: "gpt-4.1",
         lightweight_model: "gpt-4.1-mini",
         missing_env: "OPENAI_API_KEY",
+      },
+      {
+        id: "deepseek",
+        label: "DeepSeek",
+        configured: false,
+        reasoning_model: "deepseek-reasoner",
+        lightweight_model: "deepseek-chat",
+        missing_env: "DEEPSEEK_API_KEY",
       },
     ]);
   }
