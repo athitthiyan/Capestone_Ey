@@ -44,7 +44,7 @@ function getStaticToken() {
   return process.env.NEXT_PUBLIC_API_TOKEN?.trim() || null;
 }
 
-async function requestPasswordToken() {
+function getPasswordCredentials() {
   const username = process.env.NEXT_PUBLIC_API_USERNAME?.trim();
   const password = process.env.NEXT_PUBLIC_API_PASSWORD?.trim();
 
@@ -52,9 +52,19 @@ async function requestPasswordToken() {
     return null;
   }
 
+  return { username, password };
+}
+
+async function requestPasswordToken() {
+  const credentials = getPasswordCredentials();
+
+  if (!credentials) {
+    return null;
+  }
+
   const body = new URLSearchParams();
-  body.set("username", username);
-  body.set("password", password);
+  body.set("username", credentials.username);
+  body.set("password", credentials.password);
 
   const response = await fetch(`${apiBaseUrl}/auth/token`, {
     method: "POST",
@@ -78,8 +88,21 @@ async function getAccessToken() {
     return staticToken;
   }
 
-  tokenPromise ??= requestPasswordToken();
-  return tokenPromise;
+  if (!getPasswordCredentials()) {
+    return null;
+  }
+
+  tokenPromise ??= requestPasswordToken().catch((error) => {
+    tokenPromise = null;
+    throw error;
+  });
+  const token = await tokenPromise;
+
+  if (!token) {
+    tokenPromise = null;
+  }
+
+  return token;
 }
 
 async function parseResponse(response: Response) {
@@ -117,11 +140,25 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     }
   }
 
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    ...requestInit,
-    headers,
-    cache: requestInit.cache ?? "no-store",
-  });
+  const fetchWithHeaders = (requestHeaders: Headers) =>
+    fetch(`${apiBaseUrl}${path}`, {
+      ...requestInit,
+      headers: requestHeaders,
+      cache: requestInit.cache ?? "no-store",
+    });
+
+  let response = await fetchWithHeaders(headers);
+
+  if (auth && response.status === 401 && !getStaticToken()) {
+    tokenPromise = null;
+    const refreshedToken = await getAccessToken();
+    if (refreshedToken) {
+      const retryHeaders = new Headers(headers);
+      retryHeaders.set("Authorization", `Bearer ${refreshedToken}`);
+      response = await fetchWithHeaders(retryHeaders);
+    }
+  }
+
   const payload = await parseResponse(response);
 
   if (!response.ok) {

@@ -1,7 +1,7 @@
 import { apiRequest } from "@/services/api";
 import type { VerificationClaim } from "@/types/domain";
 
-type ApiVerificationClaim = {
+export type ApiVerificationClaim = {
   id: string;
   claim_text: string;
   is_grounded?: boolean | null;
@@ -20,7 +20,7 @@ function supportingEvidence(value?: unknown[] | null) {
     .join(", ");
 }
 
-function mapVerificationClaim(row: ApiVerificationClaim): VerificationClaim {
+export function mapVerificationClaim(row: ApiVerificationClaim): VerificationClaim {
   const grounded = Boolean(row.is_grounded);
 
   return {

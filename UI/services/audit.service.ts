@@ -127,10 +127,16 @@ export function mapAuditEvent(row: ApiAuditEvent, fallbackCaseId: string): Audit
   };
 }
 
-export async function getAuditEvents(caseId?: string): Promise<AuditEvent[]> {
+export async function getAuditEvents(
+  caseId?: string,
+  options: { limit?: number } = {},
+): Promise<AuditEvent[]> {
   // Case-scoped when a case is selected; otherwise fall back to the most recent
   // events across every investigation so the global audit log is never empty.
-  const path = caseId ? `/investigations/${caseId}/audit` : "/audit/recent";
+  const params = new URLSearchParams({ limit: String(options.limit ?? 200) });
+  const path = caseId
+    ? `/investigations/${caseId}/audit?${params.toString()}`
+    : `/audit/recent?${params.toString()}`;
   const rows = await apiRequest<ApiAuditEvent[]>(path);
   return rows.map((row) => mapAuditEvent(row, caseId ?? ""));
 }

@@ -20,10 +20,10 @@ export function useDashboardSummary() {
   });
 }
 
-export function useInvestigations(options: { enabled?: boolean } = {}) {
+export function useInvestigations(options: { enabled?: boolean; limit?: number; skip?: number } = {}) {
   return useQuery({
-    queryKey: ["investigations"],
-    queryFn: () => getInvestigations(),
+    queryKey: ["investigations", options.limit ?? 500, options.skip ?? 0],
+    queryFn: () => getInvestigations({ limit: options.limit, skip: options.skip }),
     enabled: options.enabled ?? true,
   });
 }
@@ -31,7 +31,7 @@ export function useInvestigations(options: { enabled?: boolean } = {}) {
 export function useDebatedInvestigations(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ["investigations", "with-debate"],
-    queryFn: () => getInvestigations({ hasDebate: true }),
+    queryFn: () => getInvestigations({ hasDebate: true, limit: 100 }),
     enabled: options.enabled ?? true,
   });
 }

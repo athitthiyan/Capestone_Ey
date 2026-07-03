@@ -11,7 +11,7 @@ import type {
   RiskLevel,
 } from "@/types/domain";
 
-type ApiInvestigation = {
+export type ApiInvestigation = {
   id: string;
   transaction_id: string;
   vendor: string;
@@ -118,7 +118,7 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-function mapInvestigation(row: ApiInvestigation): Investigation {
+export function mapInvestigation(row: ApiInvestigation): Investigation {
   const risk = isRiskLevel(row.risk) ? row.risk : "medium";
   const status = isInvestigationStatus(row.status) ? row.status : "failed";
   const postedAt = formatDate(row.posted_at ?? row.created_at);
@@ -245,9 +245,19 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   return mapDashboard(stats, list.investigations.map(mapInvestigation), agentHealth);
 }
 
-export async function getInvestigations(options: { hasDebate?: boolean } = {}): Promise<Investigation[]> {
-  const query = options.hasDebate ? "/investigations?limit=500&has_debate=true" : "/investigations?limit=500";
-  const payload = await apiRequest<ApiInvestigationList>(query);
+export async function getInvestigations(
+  options: { hasDebate?: boolean; limit?: number; skip?: number } = {},
+): Promise<Investigation[]> {
+  const params = new URLSearchParams();
+  params.set("limit", String(options.limit ?? 500));
+  if (options.skip) {
+    params.set("skip", String(options.skip));
+  }
+  if (options.hasDebate) {
+    params.set("has_debate", "true");
+  }
+
+  const payload = await apiRequest<ApiInvestigationList>(`/investigations?${params.toString()}`);
   return payload.investigations.map(mapInvestigation);
 }
 
@@ -260,7 +270,7 @@ export async function getInvestigation(caseId: string): Promise<Investigation | 
 }
 
 export async function getReviewQueue(): Promise<ReviewQueueItem[]> {
-  const queue = await apiRequest<ApiReviewQueueItem[]>("/reviews/queue");
+  const queue = await apiRequest<ApiReviewQueueItem[]>("/reviews/queue?limit=100");
 
   return queue.map((item) => ({
     id: item.id,

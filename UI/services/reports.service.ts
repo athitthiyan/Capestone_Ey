@@ -1,7 +1,7 @@
 import { apiRequest } from "@/services/api";
 import type { ReportArtifact, RiskLevel } from "@/types/domain";
 
-type ApiReport = {
+export type ApiReport = {
   id: string;
   title: string;
   status: ReportArtifact["status"];
@@ -30,10 +30,8 @@ function formatDate(value?: string | null) {
   return Number.isNaN(date.getTime()) ? value.slice(0, 10) : date.toISOString().slice(0, 10);
 }
 
-export async function getReports(): Promise<ReportArtifact[]> {
-  const rows = await apiRequest<ApiReport[]>("/reports");
-
-  return rows.map((row) => ({
+export function mapReport(row: ApiReport): ReportArtifact {
+  return {
     id: row.id,
     title: row.title,
     status: row.status,
@@ -45,5 +43,15 @@ export async function getReports(): Promise<ReportArtifact[]> {
     executiveSummary: row.executive_summary,
     humanDecision: row.human_decision,
     reviewerSignature: row.reviewer_signature,
-  }));
+  };
+}
+
+export async function getReports(options: { caseId?: string } = {}): Promise<ReportArtifact[]> {
+  const params = new URLSearchParams();
+  if (options.caseId) {
+    params.set("investigation_id", options.caseId);
+  }
+  const query = params.toString();
+  const rows = await apiRequest<ApiReport[]>(`/reports${query ? `?${query}` : ""}`);
+  return rows.map(mapReport);
 }

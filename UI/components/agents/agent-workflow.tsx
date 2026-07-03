@@ -9,13 +9,16 @@ import ReactFlow, {
   Handle,
   MiniMap,
   Position,
+  ReactFlowProvider,
+  useNodesInitialized,
+  useReactFlow,
   type Edge,
+  type FitViewOptions,
   type Node,
   type NodeProps,
 } from "reactflow";
 import { Maximize2, Minimize2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ConfidenceMeter } from "@/components/shared/confidence-meter";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { cn } from "@/lib/utils";
@@ -27,9 +30,9 @@ type WorkflowNodeData = {
 
 function WorkflowNode({ data }: NodeProps<WorkflowNodeData>) {
   return (
-    <div className="w-64 rounded-lg border border-border bg-card p-3 shadow-card">
+    <div className="flex h-[285px] w-64 flex-col overflow-hidden rounded-lg border border-border bg-card p-3 shadow-card">
       <Handle type="target" position={Position.Left} className="!bg-primary" />
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex shrink-0 items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-foreground">{data.step.role}</p>
           <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{data.step.detail}</p>
@@ -53,9 +56,9 @@ function WorkflowNode({ data }: NodeProps<WorkflowNodeData>) {
       {typeof data.step.confidence === "number" ? (
         <ConfidenceMeter value={data.step.confidence} className="mt-3" />
       ) : null}
-      <details className="mt-3 text-xs text-muted-foreground">
+      <details className="mt-3 min-h-0 text-xs text-muted-foreground">
         <summary className="cursor-pointer text-primary">Expand details</summary>
-        <p className="mt-2 leading-5">{data.step.expandedDetail}</p>
+        <p className="mt-2 max-h-24 overflow-y-auto pr-1 leading-5">{data.step.expandedDetail}</p>
       </details>
       <Handle type="source" position={Position.Right} className="!bg-primary" />
     </div>
@@ -66,9 +69,19 @@ const nodeTypes = {
   workflow: WorkflowNode,
 };
 
-export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; className?: string }) {
+const fitViewOptions = {
+  padding: 0.18,
+  minZoom: 0.25,
+  maxZoom: 1,
+} satisfies FitViewOptions;
+const nodeColumnSpacing = 310;
+const nodeRowSpacing = 315;
+
+function AgentWorkflowCanvas({ steps, className }: { steps: PipelineStep[]; className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { fitView } = useReactFlow();
+  const nodesInitialized = useNodesInitialized();
 
   const nodes = useMemo<Node<WorkflowNodeData>[]>(
     () =>
@@ -76,11 +89,16 @@ export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; cla
         id: step.id,
         type: "workflow",
         position: {
-          x: (index % 4) * 310,
-          y: Math.floor(index / 4) * 190,
+          x: (index % 4) * nodeColumnSpacing,
+          y: Math.floor(index / 4) * nodeRowSpacing,
         },
         data: { step },
       })),
+    [steps],
+  );
+
+  const fitSignature = useMemo(
+    () => steps.map((step) => `${step.id}:${step.state}`).join("|"),
     [steps],
   );
 
@@ -115,6 +133,18 @@ export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; cla
     }
   }, []);
 
+  useEffect(() => {
+    if (!nodesInitialized || nodes.length === 0) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void fitView({ ...fitViewOptions, duration: 250 });
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [fitSignature, fitView, isFullscreen, nodes.length, nodesInitialized]);
+
   return (
     <div
       ref={containerRef}
@@ -129,7 +159,8 @@ export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; cla
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
-        minZoom={0.55}
+        fitViewOptions={fitViewOptions}
+        minZoom={0.25}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
@@ -148,5 +179,13 @@ export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; cla
         </Controls>
       </ReactFlow>
     </div>
+  );
+}
+
+export function AgentWorkflow({ steps, className }: { steps: PipelineStep[]; className?: string }) {
+  return (
+    <ReactFlowProvider>
+      <AgentWorkflowCanvas steps={steps} className={className} />
+    </ReactFlowProvider>
   );
 }

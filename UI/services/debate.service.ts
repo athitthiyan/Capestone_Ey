@@ -1,7 +1,7 @@
 import { apiRequest } from "@/services/api";
 import type { DebateArgument } from "@/types/domain";
 
-type ApiDebateMessage = {
+export type ApiDebateMessage = {
   id: string;
   round: number;
   speaker: string;
@@ -24,7 +24,7 @@ function sideFor(speaker: string): DebateArgument["side"] {
   return "challenger";
 }
 
-function mapDebateMessage(row: ApiDebateMessage): DebateArgument {
+export function mapDebateMessage(row: ApiDebateMessage): DebateArgument {
   const side = sideFor(row.speaker);
   const label = side.charAt(0).toUpperCase() + side.slice(1);
 

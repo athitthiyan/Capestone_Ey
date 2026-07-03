@@ -2,7 +2,7 @@ import { apiRequest } from "@/services/api";
 import { normalizeProviderName, normalizeVerificationReason } from "@/services/evidence-verification.service";
 import type { EvidenceSource, EvidenceVerification } from "@/types/domain";
 
-type ApiEvidence = {
+export type ApiEvidence = {
   id: string;
   source: string;
   content: string;
@@ -57,7 +57,7 @@ function citationFor(row: ApiEvidence) {
   return row.source;
 }
 
-function mapEvidence(row: ApiEvidence, caseId: string): EvidenceSource {
+export function mapEvidence(row: ApiEvidence, caseId: string): EvidenceSource {
   const confidence = row.relevance_score ?? 0;
 
   return {

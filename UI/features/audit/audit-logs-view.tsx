@@ -10,7 +10,6 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useActiveInvestigationId } from "@/hooks/use-active-investigation-id";
 import { useAuditEvents } from "@/hooks/use-audit-events";
 import { downloadJson } from "@/lib/download";
 import type { AuditEvent } from "@/types/domain";
@@ -18,8 +17,7 @@ import type { AuditEvent } from "@/types/domain";
 const emptyEvents: AuditEvent[] = [];
 
 export function AuditLogsView({ caseId: explicitCaseId }: { caseId?: string }) {
-  const activeCase = useActiveInvestigationId(explicitCaseId);
-  const caseId = activeCase.caseId;
+  const caseId = explicitCaseId?.trim() || undefined;
   // Show case-scoped events when a case is active, otherwise fall back to the
   // global recent audit feed so the page is never blank.
   const { data, error, isLoading, refetch } = useAuditEvents(caseId, { enabled: true });
@@ -41,12 +39,8 @@ export function AuditLogsView({ caseId: explicitCaseId }: { caseId?: string }) {
     });
   }, [eventType, events, query]);
 
-  if (activeCase.isLoading || isLoading) {
+  if (isLoading) {
     return <LoadingState label="Loading audit log" />;
-  }
-
-  if (activeCase.error) {
-    return <ErrorState error={activeCase.error} onRetry={() => void activeCase.refetch()} />;
   }
 
   if (error || !data) {

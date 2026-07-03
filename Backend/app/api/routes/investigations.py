@@ -14,19 +14,24 @@ from app.db.models import (
     DebateTranscript,
     EvidenceArtifact,
     Investigation,
-    InvestigationState as DBInvestigationState,
     ReviewQueueItem,
     ThirdPartyEvidenceVerification,
     VerificationClaim,
 )
+from app.db.models import (
+    InvestigationState as DBInvestigationState,
+)
 from app.db.session import get_db_session
+from app.evaluation.ragas import compute_ragas_summary
 from app.schemas import (
     AuditEventOut,
+    ClaimEvidenceVerificationOut,
     DebateMessageOut,
+    EvaluationSummaryOut,
     EvidenceOut,
     ExecuteResponse,
-    InvestigationDeleteResponse,
     InvestigationCreate,
+    InvestigationDeleteResponse,
     InvestigationList,
     InvestigationOut,
     StatsSummary,
@@ -35,6 +40,23 @@ from app.schemas import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/investigations", tags=["investigations"])
+
+
+def _dump(model) -> dict:
+    return model.model_dump(mode="json", by_alias=True)
+
+
+def _case_report_payloads(investigation: Investigation) -> list[dict]:
+    from app.api.routes.reports import REPORTABLE_STATUS_VALUES, report_payload
+
+    status_value = (
+        investigation.status.value
+        if hasattr(investigation.status, "value")
+        else str(investigation.status)
+    )
+    if status_value not in REPORTABLE_STATUS_VALUES:
+        return []
+    return [report_payload(investigation)]
 
 
 async def _run_investigation_inline(investigation_id: str) -> None:
@@ -305,6 +327,99 @@ async def get_investigation(
     return investigation
 
 
+@router.get("/{investigation_id}/workspace")
+async def get_investigation_workspace(
+    investigation_id: str,
+    db: Session = Depends(get_db_session),
+    user=Depends(get_current_user),
+):
+    """One-shot workspace payload to avoid a cascade of client requests."""
+    del user
+    investigation = db.get(Investigation, investigation_id)
+    if not investigation:
+        raise HTTPException(status_code=404, detail="Investigation not found")
+
+    evidence_rows = (
+        db.query(EvidenceArtifact)
+        .filter(EvidenceArtifact.investigation_id == investigation_id)
+        .order_by(EvidenceArtifact.created_at.asc())
+        .all()
+    )
+    debate_rows = (
+        db.query(DebateTranscript)
+        .filter(DebateTranscript.investigation_id == investigation_id)
+        .order_by(DebateTranscript.round.asc(), DebateTranscript.created_at.asc())
+        .all()
+    )
+    verification_rows = (
+        db.query(VerificationClaim)
+        .filter(VerificationClaim.investigation_id == investigation_id)
+        .order_by(VerificationClaim.created_at.asc())
+        .all()
+    )
+
+    try:
+        from app.audit.eventstore import get_audit_log
+
+        log = await get_audit_log()
+        audit_events = await log.get_events(investigation_id, limit=50)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Workspace audit load failed for %s: %s", investigation_id, exc)
+        audit_events = []
+
+    try:
+        from app.evidence_verification import EvidenceVerificationService
+
+        latest_evidence_verification = EvidenceVerificationService().get_latest(
+            db, investigation_id
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "Workspace evidence verification load failed for %s: %s",
+            investigation_id,
+            exc,
+        )
+        latest_evidence_verification = None
+
+    return {
+        "investigation": _dump(InvestigationOut.model_validate(investigation)),
+        "evidence": [
+            _dump(EvidenceOut.model_validate(row))
+            for row in evidence_rows
+        ],
+        "debate": [
+            _dump(
+                DebateMessageOut(
+                    id=row.id,
+                    round=row.round,
+                    speaker=row.speaker,
+                    message=row.message,
+                    token_count=row.token_count or 0,
+                    confidence=investigation.confidence
+                    if row.speaker.lower() == "adjudicator"
+                    else None,
+                    created_at=row.created_at,
+                )
+            )
+            for row in debate_rows
+        ],
+        "verification": [
+            _dump(VerificationOut.model_validate(row))
+            for row in verification_rows
+        ],
+        "evidence_verification": (
+            _dump(ClaimEvidenceVerificationOut.model_validate(latest_evidence_verification))
+            if latest_evidence_verification
+            else None
+        ),
+        "audit": [_dump(AuditEventOut(**event)) for event in audit_events],
+        "reports": _case_report_payloads(investigation),
+        "evaluation": _dump(
+            EvaluationSummaryOut(**compute_ragas_summary(db, investigation_id=investigation_id))
+        ),
+    }
+
+
 @router.get("/stats/summary", response_model=StatsSummary)
 async def investigation_stats(
     db: Session = Depends(get_db_session),
@@ -409,6 +524,7 @@ async def get_verification(
 @router.get("/{investigation_id}/audit", response_model=list[AuditEventOut])
 async def get_audit_trail(
     investigation_id: str,
+    limit: int = 200,
     db: Session = Depends(get_db_session),
     user=Depends(get_current_user),
 ):
@@ -416,8 +532,9 @@ async def get_audit_trail(
         raise HTTPException(status_code=404, detail="Investigation not found")
     from app.audit.eventstore import get_audit_log
 
+    limit = max(1, min(limit, 500))
     log = await get_audit_log()
-    events = await log.get_events(investigation_id)
+    events = await log.get_events(investigation_id, limit=limit)
     return [AuditEventOut(**event) for event in events]
 
 
@@ -517,7 +634,9 @@ async def get_replay(
                 "title": title,
                 "agent": agent,
                 "timestamp": cp.created_at.isoformat() if cp.created_at else None,
-                "state": "review" if is_review_gate else "failed" if base == "escalation" else "done",
+                "state": (
+                    "review" if is_review_gate else "failed" if base == "escalation" else "done"
+                ),
                 "prompt": prompt,
                 "input": frame_input,
                 "output": output,

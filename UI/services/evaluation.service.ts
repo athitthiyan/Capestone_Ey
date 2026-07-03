@@ -1,7 +1,7 @@
 import { apiRequest } from "@/services/api";
 import type { EvaluationSummary, RagasMetric } from "@/types/domain";
 
-type ApiRagasMetric = {
+export type ApiRagasMetric = {
   metric: string;
   category: RagasMetric["category"];
   score: number;
@@ -10,13 +10,13 @@ type ApiRagasMetric = {
   helper: string;
 };
 
-type ApiEvaluationSummary = {
+export type ApiEvaluationSummary = {
   cases: number;
   metrics: ApiRagasMetric[];
   conclusion: string;
 };
 
-function mapEvaluation(data: ApiEvaluationSummary): EvaluationSummary {
+export function mapEvaluation(data: ApiEvaluationSummary): EvaluationSummary {
   return {
     cases: data.cases,
     metrics: data.metrics.map((metric) => ({

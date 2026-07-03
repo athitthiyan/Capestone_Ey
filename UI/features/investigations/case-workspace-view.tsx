@@ -23,16 +23,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { routes } from "@/constants/routes";
 import { useAgentWorkflow } from "@/hooks/use-agent-workflow";
-import { useAuditEvents } from "@/hooks/use-audit-events";
+import { useCaseWorkspace } from "@/hooks/use-case-workspace";
 import { useExecuteInvestigation } from "@/hooks/use-cases";
-import { useDebateArguments } from "@/hooks/use-debate";
-import { useCaseEvaluation } from "@/hooks/use-evaluation";
-import { useEvidence } from "@/hooks/use-evidence";
-import { useEvidenceVerification, useVerifyEvidence } from "@/hooks/use-evidence-verification";
-import { useInvestigation } from "@/hooks/use-investigation";
+import { useVerifyEvidence } from "@/hooks/use-evidence-verification";
 import { useInvestigationRealtime } from "@/hooks/use-investigation-realtime";
-import { useReports } from "@/hooks/use-reports";
-import { useVerificationClaims } from "@/hooks/use-verification";
 import { friendlyError } from "@/lib/friendly-error";
 import { formatCurrency } from "@/lib/utils";
 import type { AgentRole, Investigation, InvestigationStatus, PipelineStep, WorkState } from "@/types/domain";
@@ -171,38 +165,24 @@ function InlineEmpty({ title, description, icon: Icon = FileSearch }: { title: s
 }
 
 export function CaseWorkspaceView({ caseId }: { caseId: string }) {
-  const investigationQuery = useInvestigation(caseId);
+  const workspaceQuery = useCaseWorkspace(caseId);
+  const { refetch: refetchWorkspace } = workspaceQuery;
   const workflowQuery = useAgentWorkflow(caseId);
-  const evidenceQuery = useEvidence(caseId);
-  const evidenceVerificationQuery = useEvidenceVerification(caseId);
-  const debateQuery = useDebateArguments(caseId);
-  const verificationQuery = useVerificationClaims(caseId);
-  const reportsQuery = useReports();
-  const caseEvaluationQuery = useCaseEvaluation(caseId);
-  const auditQuery = useAuditEvents(caseId);
+  const { refetch: refetchWorkflow } = workflowQuery;
   const executeCase = useExecuteInvestigation();
   const verifyEvidence = useVerifyEvidence(caseId);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
-  const { refetch: refetchInvestigation } = investigationQuery;
-  const { refetch: refetchEvidence } = evidenceQuery;
-  const { refetch: refetchEvidenceVerification } = evidenceVerificationQuery;
-  const { refetch: refetchDebate } = debateQuery;
-  const { refetch: refetchVerification } = verificationQuery;
-  const { refetch: refetchAudit } = auditQuery;
 
-  const investigation = investigationQuery.data;
-  const evidence = evidenceQuery.data ?? [];
-  const evidenceVerification = evidenceVerificationQuery.data ?? null;
-  const debate = debateQuery.data ?? [];
-  const verification = verificationQuery.data ?? [];
-  const reports = reportsQuery.data ?? [];
-  const auditEvents = auditQuery.data ?? [];
-  const isPipelineRunning =
-    executeCase.isPending ||
-    investigation?.status === "collecting_evidence" ||
-    investigation?.status === "agent_debate" ||
-    investigation?.status === "verification";
+  const workspace = workspaceQuery.data;
+  const investigation = workspace?.investigation;
+  const evidence = workspace?.evidence ?? [];
+  const evidenceVerification = workspace?.evidenceVerification ?? null;
+  const debate = workspace?.debate ?? [];
+  const verification = workspace?.verification ?? [];
+  const reports = workspace?.reports ?? [];
+  const auditEvents = workspace?.auditEvents ?? [];
+  const evaluation = workspace?.evaluation;
   useInvestigationRealtime(caseId, { onMessage: setRunMessage });
   const workflowSteps = useMemo(() => {
     if (!investigation) {
@@ -212,23 +192,21 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
     return workflowQuery.data?.length ? workflowQuery.data : workflowFromInvestigation(investigation);
   }, [investigation, workflowQuery.data]);
 
+  const hasActiveWorkflow = workflowSteps.some(
+    (step) =>
+      (step.state === "running" || step.state === "queued" || step.state === "retry") &&
+      !(step.id === "review" && investigation?.status === "human_review"),
+  );
+  const isPipelineRunning =
+    executeCase.isPending ||
+    hasActiveWorkflow ||
+    investigation?.status === "collecting_evidence" ||
+    investigation?.status === "agent_debate" ||
+    investigation?.status === "verification";
+
   const refreshWorkspace = useCallback(async () => {
-    await Promise.all([
-      refetchInvestigation(),
-      refetchEvidence(),
-      refetchEvidenceVerification(),
-      refetchDebate(),
-      refetchVerification(),
-      refetchAudit(),
-    ]);
-  }, [
-    refetchAudit,
-    refetchDebate,
-    refetchEvidence,
-    refetchEvidenceVerification,
-    refetchInvestigation,
-    refetchVerification,
-  ]);
+    await Promise.all([refetchWorkspace(), refetchWorkflow()]);
+  }, [refetchWorkspace, refetchWorkflow]);
 
   async function handleRunCrew() {
     setRunError(null);
@@ -265,22 +243,17 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
 
     const interval = window.setInterval(() => {
       void refreshWorkspace();
-    }, 1500);
+    }, 10_000);
 
     return () => window.clearInterval(interval);
   }, [isPipelineRunning, refreshWorkspace]);
 
-  if (investigationQuery.isLoading || evidenceQuery.isLoading) {
+  if (workspaceQuery.isLoading) {
     return <LoadingState label="Loading case workspace" />;
   }
 
-  if (investigationQuery.error || evidenceQuery.error) {
-    return (
-      <ErrorState
-        error={investigationQuery.error ?? evidenceQuery.error}
-        onRetry={() => void Promise.all([investigationQuery.refetch(), evidenceQuery.refetch()])}
-      />
-    );
+  if (workspaceQuery.error) {
+    return <ErrorState error={workspaceQuery.error} onRetry={() => void workspaceQuery.refetch()} />;
   }
 
   if (!investigation) {
@@ -433,8 +406,8 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
 
       <section className="space-y-3">
         <EvidenceVerificationCard
-          error={evidenceVerificationQuery.error}
-          isLoading={evidenceVerificationQuery.isLoading}
+          error={null}
+          isLoading={workspaceQuery.isFetching && !workspace}
           isReverifying={verifyEvidence.isPending}
           onReverify={() => void handleReverifyEvidence()}
           verification={evidenceVerification}
@@ -533,12 +506,12 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base font-semibold text-foreground">Quality scores for this case</h2>
-          {caseEvaluationQuery.data?.conclusion ? (
-            <p className="text-xs text-muted-foreground">{caseEvaluationQuery.data.conclusion}</p>
+          {evaluation?.conclusion ? (
+            <p className="text-xs text-muted-foreground">{evaluation.conclusion}</p>
           ) : null}
         </div>
-        {caseEvaluationQuery.data && caseEvaluationQuery.data.metrics.length > 0 ? (
-          <EvaluationScorecard metrics={caseEvaluationQuery.data.metrics} />
+        {evaluation && evaluation.metrics.length > 0 ? (
+          <EvaluationScorecard metrics={evaluation.metrics} />
         ) : (
           <InlineEmpty
             title="No quality scores yet"

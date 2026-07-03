@@ -3,11 +3,129 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiWebSocketUrl } from "@/services/api";
+import type { PipelineStep, WorkState } from "@/types/domain";
 
 type UseInvestigationRealtimeOptions = {
   enabled?: boolean;
   onMessage?: (message: string) => void;
 };
+
+const AGENT_TO_STEP: Record<string, string> = {
+  adjudicator: "adjudicator",
+  challenger: "challenger",
+  confidence_gate: "review",
+  defender: "defender",
+  evidence: "evidence",
+  evidence_agent: "evidence",
+  supervisor: "intake",
+  verifier: "verifier",
+};
+
+const STAGE_TO_STEPS: Record<string, string[]> = {
+  agent_debate: ["challenger", "defender", "adjudicator"],
+  closed: ["report", "audit"],
+  collecting_evidence: ["evidence"],
+  confidence_gate: ["review"],
+  human_review: ["review"],
+  intake: ["intake"],
+  report_ready: ["report", "audit"],
+  verification: ["verifier"],
+};
+
+function realtimeState(value: unknown): WorkState {
+  const state = String(value ?? "running");
+  if (
+    state === "done" ||
+    state === "running" ||
+    state === "queued" ||
+    state === "review" ||
+    state === "failed" ||
+    state === "retry" ||
+    state === "escalated"
+  ) {
+    return state;
+  }
+  return "running";
+}
+
+function stageStepIds(value: unknown) {
+  return STAGE_TO_STEPS[String(value ?? "")] ?? [];
+}
+
+function patchWorkflowSteps(
+  current: PipelineStep[] | undefined,
+  event: Record<string, unknown>,
+): PipelineStep[] | undefined {
+  if (!current?.length) {
+    return current;
+  }
+
+  if (event.type === "pipeline_stage") {
+    const fromSteps = new Set(stageStepIds(event.from_stage));
+    const toSteps = new Set(stageStepIds(event.to_stage));
+    const toStage = String(event.to_stage ?? "");
+
+    return current.map((step) => {
+      if (toSteps.has(step.id)) {
+        const state: WorkState = toStage === "human_review" ? "review" : "running";
+        return {
+          ...step,
+          state,
+        };
+      }
+      if (fromSteps.has(step.id) && (step.state === "running" || step.state === "queued")) {
+        return { ...step, state: "done" };
+      }
+      return step;
+    });
+  }
+
+  if (event.type === "agent_status") {
+    const stepId = AGENT_TO_STEP[String(event.agent ?? "").toLowerCase()];
+    if (!stepId) {
+      return current;
+    }
+    const message = typeof event.message === "string" ? event.message : undefined;
+    return current.map((step) =>
+      step.id === stepId
+        ? {
+            ...step,
+            state: realtimeState(event.state),
+            detail: message || step.detail,
+          }
+        : step,
+    );
+  }
+
+  if (event.type === "debate_message") {
+    const stepId = AGENT_TO_STEP[String(event.speaker ?? "").toLowerCase()];
+    if (!stepId) {
+      return current;
+    }
+    return current.map((step) =>
+      step.id === stepId
+        ? {
+            ...step,
+            state: "done",
+            detail: `Round ${String(event.round ?? "")}: message recorded.`,
+          }
+        : step,
+    );
+  }
+
+  if (event.type === "verification") {
+    return current.map((step) =>
+      step.id === "verifier"
+        ? {
+            ...step,
+            state: String(event.status ?? "").toLowerCase() === "failed" ? "failed" : "done",
+          }
+        : step,
+    );
+  }
+
+  return current;
+}
 
 export function messageFromRealtimeEvent(value: unknown) {
   if (!value || typeof value !== "object") {
@@ -57,20 +175,43 @@ export function useInvestigationRealtime(
     let reconnectAttempt = 0;
     let reconnectTimer: number | undefined;
 
-    const refreshCaseQueries = () => {
+    const refreshCaseQueries = (payload?: Record<string, unknown>) => {
+      if (payload) {
+        queryClient.setQueryData<PipelineStep[]>(
+          ["agent-workflow", caseId],
+          (current) => patchWorkflowSteps(current, payload),
+        );
+      }
+
+      const type = String(payload?.type ?? "");
+      const shouldRefreshWorkspace =
+        !payload ||
+        type === "pipeline_stage" ||
+        type === "debate_message" ||
+        type === "verification" ||
+        type === "review_queue";
+      const shouldRefreshLists =
+        !payload ||
+        type === "pipeline_stage" ||
+        type === "verification" ||
+        type === "review_queue";
+
       void Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] }),
-        queryClient.invalidateQueries({ queryKey: ["investigations"] }),
-        queryClient.invalidateQueries({ queryKey: ["review-queue"] }),
-        queryClient.invalidateQueries({ queryKey: ["investigation", caseId] }),
         queryClient.invalidateQueries({ queryKey: ["agent-workflow", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["evidence", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["evidence-verification", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["debate", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["verification", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["audit-events", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["evaluation-case", caseId] }),
-        queryClient.invalidateQueries({ queryKey: ["reports"] }),
+        ...(shouldRefreshWorkspace
+          ? [
+              queryClient.invalidateQueries({ queryKey: ["case-workspace", caseId] }),
+              queryClient.invalidateQueries({ queryKey: ["investigation", caseId] }),
+            ]
+          : []),
+        ...(shouldRefreshLists
+          ? [
+              queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] }),
+              queryClient.invalidateQueries({ queryKey: ["investigations"] }),
+              queryClient.invalidateQueries({ queryKey: ["review-queue"] }),
+              queryClient.invalidateQueries({ queryKey: ["reports"] }),
+            ]
+          : []),
       ]);
     };
 
@@ -88,7 +229,7 @@ export function useInvestigationRealtime(
 
           if (message) {
             onMessage?.(message);
-            refreshCaseQueries();
+            refreshCaseQueries(payload as Record<string, unknown>);
           }
         } catch {
           onMessage?.(String(event.data));
@@ -97,14 +238,12 @@ export function useInvestigationRealtime(
       };
       socket.onerror = () => {
         onMessage?.("Realtime connection interrupted; reconnecting.");
-        refreshCaseQueries();
       };
       socket.onclose = () => {
         if (closedByEffect) {
           return;
         }
 
-        refreshCaseQueries();
         const delayMs = Math.min(1000 * 2 ** reconnectAttempt, 10_000);
         reconnectAttempt += 1;
         reconnectTimer = window.setTimeout(connect, delayMs);
