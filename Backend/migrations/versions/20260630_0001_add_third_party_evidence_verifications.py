@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "20260630_0001"
-down_revision: Union[str, None] = None
+down_revision: Union[str, None] = "20260625_0000"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

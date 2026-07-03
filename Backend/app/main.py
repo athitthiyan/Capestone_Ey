@@ -61,8 +61,14 @@ _configure_langsmith_tracing()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting Skeptic Engine Backend (env=%s)", settings.ENV)
-    init_db()
-    logger.info("Database initialized")
+    if settings.ENV == "production":
+        # Schema is managed exclusively by Alembic in production
+        # (`alembic upgrade head` in the start command). create_all() here
+        # would mask missing migrations and cause schema drift.
+        logger.info("Skipping create_all in production; schema managed by Alembic")
+    else:
+        init_db()
+        logger.info("Database initialized")
     seed_default_user()
     try:
         from app.db.session import SessionLocal

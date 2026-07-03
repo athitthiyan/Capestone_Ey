@@ -132,6 +132,7 @@ class Settings(BaseSettings):
     REQUEST_LOG_EXCLUDED_PATHS: Annotated[list[str], NoDecode] = [
         "/health",
         "/health/detailed",
+        "/api/v1/auth/token",
         "/docs",
         "/openapi.json",
         "/favicon.ico",
