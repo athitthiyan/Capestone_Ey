@@ -195,6 +195,39 @@ def _get_or_404(db: Session, investigation_id: str) -> Investigation:
     return investigation
 
 
+def _apply_ground_truth(investigation: Investigation, payload: ReviewActionRequest) -> bool:
+    """Stamp the reviewer's confirmed verdict onto the case, if provided.
+
+    Returns True when a new ground truth was set, so the caller knows whether
+    to kick off reference-metric RAGAS scoring (Factual Correctness, Semantic
+    Similarity, Context Entity Recall) in addition to the no-reference metrics.
+    """
+    text = (payload.ground_truth or "").strip()
+    if not text:
+        return False
+    investigation.ground_truth_verdict = text
+    investigation.ground_truth_set_at = datetime.utcnow()
+    return True
+
+
+def _trigger_ragas_scoring(investigation_id: str) -> None:
+    """Fire RAGAS judge scoring after a ground truth is set; never let scoring
+    affect the request. Mirrors the Celery-or-inline fallback used for the
+    main investigation pipeline (app/api/routes/investigations.py) so this
+    also works in dev/test environments with no Redis broker running.
+    """
+    try:
+        from app.api.routes.investigations import _celery_broker_available
+        from app.tasks.celery_app import score_investigation_ragas_task
+
+        if _celery_broker_available():
+            score_investigation_ragas_task.delay(investigation_id)
+        else:
+            score_investigation_ragas_task.run(investigation_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Could not run RAGAS scoring for %s: %s", investigation_id, exc)
+
+
 @router.post("/{investigation_id}/approve", response_model=ReviewActionResponse)
 async def approve(
     investigation_id: str,
@@ -207,9 +240,12 @@ async def approve(
     investigation.status = InvestigationStatus.CLOSED
     investigation.reviewer = actor
     investigation.completed_at = datetime.utcnow()
+    ground_truth_set = _apply_ground_truth(investigation, payload)
     _close_pending_queue(db, investigation_id, "approved", actor, payload.comment)
     db.commit()
     await _log_review(investigation_id, "case_approved", actor, {"comment": payload.comment})
+    if ground_truth_set:
+        _trigger_ragas_scoring(investigation_id)
     return ReviewActionResponse(
         investigation_id=investigation_id,
         action="approve",
@@ -230,9 +266,12 @@ async def reject(
     investigation.status = InvestigationStatus.CLOSED
     investigation.reviewer = actor
     investigation.completed_at = datetime.utcnow()
+    ground_truth_set = _apply_ground_truth(investigation, payload)
     _close_pending_queue(db, investigation_id, "rejected", actor, payload.comment)
     db.commit()
     await _log_review(investigation_id, "case_rejected", actor, {"comment": payload.comment})
+    if ground_truth_set:
+        _trigger_ragas_scoring(investigation_id)
     return ReviewActionResponse(
         investigation_id=investigation_id,
         action="reject",

@@ -19,6 +19,7 @@ from sqlalchemy import (
     JSON,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -92,6 +93,13 @@ class Investigation(Base):
     materiality = Column(Float, default=50000.0)
     description = Column(Text, nullable=True)
     error_message = Column(Text, nullable=True)
+
+    # Human-confirmed final verdict, set when a reviewer approves/rejects a
+    # case with a ground-truth answer. Unlocks the 3 reference-dependent RAGAS
+    # metrics (Factual Correctness, Semantic Similarity, Context Entity Recall)
+    # in app/evaluation/ragas_judge.py - those stay null/unscored until this is set.
+    ground_truth_verdict = Column(Text, nullable=True)
+    ground_truth_set_at = Column(DateTime, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -291,6 +299,7 @@ class LLMCallLog(Base):
     __tablename__ = "llm_call_logs"
 
     id = Column(String(36), primary_key=True, default=_uuid)
+    investigation_id = Column(String(36), nullable=True, index=True)
     provider_name = Column(String(50), nullable=False, index=True)
     model_name = Column(String(120), nullable=False, index=True)
     request_type = Column(String(100), nullable=False, index=True)
@@ -318,6 +327,38 @@ class LLMCallLog(Base):
         Index("idx_llm_model_created", "model_name", "created_at"),
         Index("idx_llm_request_type_created", "request_type", "created_at"),
         Index("idx_llm_success_created", "success", "created_at"),
+    )
+
+
+class RagasEvaluationResult(Base):
+    """Real-time RAGAS metric score from the LLM-judge pipeline (app/evaluation/ragas_judge.py).
+
+    One row per (investigation, metric); re-scoring updates the existing row
+    in place rather than appending, so this always reflects the latest judged
+    score. `scored_provider`/`scored_model` identify which LLM produced the
+    response that was judged, so scores can be broken down per-provider to
+    compare which LLM performs best on each metric.
+    """
+
+    __tablename__ = "ragas_evaluation_results"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    investigation_id = Column(
+        String(36), ForeignKey("investigations.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    metric = Column(String(100), nullable=False, index=True)
+    score = Column(Float, nullable=True)  # null = judge failed/skipped this metric
+    is_reference_metric = Column(Boolean, default=False)
+    scored_provider = Column(String(50), nullable=True, index=True)
+    scored_model = Column(String(120), nullable=True, index=True)
+    judge_model = Column(String(120), nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("investigation_id", "metric", name="uq_ragas_investigation_metric"),
+        Index("idx_ragas_provider_model", "scored_provider", "scored_model"),
     )
 
 

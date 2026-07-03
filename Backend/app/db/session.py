@@ -4,9 +4,9 @@ Handles connection pooling, session lifecycle, and transaction management.
 """
 
 import logging
-from typing import Iterator
+from typing import Iterable, Iterator
 
-from sqlalchemy import create_engine, event, text
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool, QueuePool
 
@@ -54,7 +54,71 @@ def get_db_session() -> Iterator[Session]:
 def init_db() -> None:
     logger.info("Initializing database...")
     Base.metadata.create_all(bind=engine)
+    ensure_schema_compatibility()
     logger.info("Database initialized")
+
+
+def _compile_column_type(table_name: str, column_name: str) -> str:
+    column = Base.metadata.tables[table_name].c[column_name]
+    return column.type.compile(dialect=engine.dialect)
+
+
+def _add_missing_columns(table_name: str, column_names: Iterable[str]) -> None:
+    inspector = inspect(engine)
+    if not inspector.has_table(table_name):
+        return
+
+    existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
+    missing_columns = [
+        column_name for column_name in column_names if column_name not in existing_columns
+    ]
+    if not missing_columns:
+        return
+
+    with engine.begin() as connection:
+        for column_name in missing_columns:
+            column_type = _compile_column_type(table_name, column_name)
+            logger.warning(
+                "Adding missing schema column %s.%s at startup",
+                table_name,
+                column_name,
+            )
+            connection.execute(
+                text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+            )
+
+
+def _ensure_indexes(table_name: str) -> None:
+    table = Base.metadata.tables.get(table_name)
+    inspector = inspect(engine)
+    if table is None or not inspector.has_table(table_name):
+        return
+    existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
+    for index in table.indexes:
+        if any(column.name not in existing_columns for column in index.columns):
+            continue
+        index.create(bind=engine, checkfirst=True)
+
+
+def ensure_schema_compatibility() -> None:
+    """Patch additive columns/tables missed by older create_all bootstraps.
+
+    Alembic is still the source of truth. This exists for local/test databases
+    that were originally created with SQLAlchemy create_all(), because create_all
+    will create new tables but will not ALTER existing tables when models gain
+    nullable columns.
+    """
+
+    _add_missing_columns(
+        "investigations",
+        ("ground_truth_verdict", "ground_truth_set_at"),
+    )
+    _add_missing_columns("llm_call_logs", ("investigation_id",))
+
+    ragas_table = Base.metadata.tables["ragas_evaluation_results"]
+    ragas_table.create(bind=engine, checkfirst=True)
+    _ensure_indexes("llm_call_logs")
+    _ensure_indexes("ragas_evaluation_results")
 
 
 def drop_db() -> None:

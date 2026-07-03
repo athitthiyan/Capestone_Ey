@@ -25,10 +25,16 @@ flower==2.0.1
 
 # Agent Orchestration & LLM
 langgraph==0.2.60
-langchain==0.3.13
-langchain-core==0.3.28
+langchain==0.3.25
+langchain-core==0.3.63
 langchain-anthropic==0.3.1
 anthropic==0.42.0
+
+# Real-time RAGAS evaluation (LLM-judge scoring of each investigation).
+# Pulls in langchain-community/langchain-openai/datasets/openai as transitive
+# deps of the ragas package itself - openai is never called at runtime, the
+# judge LLM is ChatAnthropic (see app/evaluation/ragas_judge.py).
+ragas==0.2.15
 
 # EventStoreDB (maintained client; replaces the unmaintained `esdb` package)
 esdbclient==1.1.3

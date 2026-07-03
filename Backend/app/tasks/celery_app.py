@@ -74,6 +74,7 @@ def execute_investigation_task(self, investigation_id: str) -> dict:
             # check Celery would consider the task a success and never retry.
             if result.get("status") == "failed":
                 raise RuntimeError(result.get("error") or "Investigation execution failed")
+            score_investigation_ragas_task.delay(investigation_id)
             return result
         finally:
             db.close()
@@ -250,6 +251,73 @@ def check_materiality_task(self, investigation_id: str) -> dict:
     except Exception as exc:
         logger.error(f"Materiality check failed for {investigation_id}: {exc}")
         raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
+
+
+@app.task(bind=True, max_retries=2, default_retry_delay=30, name="tasks.score_investigation_ragas")
+def score_investigation_ragas_task(self, investigation_id: str) -> dict:
+    """Score an investigation with the real-time RAGAS LLM judge.
+
+    Always runs the 6 no-reference metrics (Faithfulness, Context Precision,
+    Response Relevancy, Tool Call Accuracy, Topic Adherence, Agent Goal
+    Accuracy). Also runs the 3 reference-dependent metrics (Factual
+    Correctness, Semantic Similarity, Context Entity Recall) once the case has
+    a human-confirmed `ground_truth_verdict` (see app/api/routes/reviews.py).
+    Best-effort telemetry: never allowed to affect the investigation pipeline
+    itself, so failures here retry a couple times then give up quietly.
+    """
+    logger.info(f"Scoring RAGAS metrics for investigation: {investigation_id}")
+    from app.db.models import RagasEvaluationResult
+    from app.db.session import SessionLocal
+    from app.evaluation import ragas_judge as rj
+
+    if not rj.judge_available():
+        logger.info(f"RAGAS realtime judge disabled/unavailable; skipping {investigation_id}")
+        return {"status": "skipped", "investigation_id": investigation_id}
+
+    db = SessionLocal()
+    try:
+        case = rj.load_scored_case(db, investigation_id)
+        if case is None:
+            logger.warning(f"Investigation {investigation_id} not found for RAGAS scoring")
+            return {"status": "skipped", "reason": "not_found", "investigation_id": investigation_id}
+
+        results = asyncio.run(rj.score_realtime_metrics(case))
+
+        if case.investigation.ground_truth_verdict:
+            reference_results = asyncio.run(
+                rj.score_reference_metrics(case, case.investigation.ground_truth_verdict)
+            )
+            results.update(reference_results)
+
+        reference_metrics = {"Context Entity Recall", "Factual Correctness", "Semantic Similarity"}
+        judge_model = settings.RAGAS_JUDGE_MODEL or settings.CLAUDE_MODEL_REASONING
+        for metric, score in results.items():
+            row = (
+                db.query(RagasEvaluationResult)
+                .filter(
+                    RagasEvaluationResult.investigation_id == investigation_id,
+                    RagasEvaluationResult.metric == metric,
+                )
+                .first()
+            )
+            if row is None:
+                row = RagasEvaluationResult(investigation_id=investigation_id, metric=metric)
+                db.add(row)
+            row.score = score
+            row.is_reference_metric = metric in reference_metrics
+            row.scored_provider = case.scored_provider
+            row.scored_model = case.scored_model
+            row.judge_model = judge_model
+            row.error_message = None if score is not None else "Judge scoring failed or was skipped; see worker logs."
+        db.commit()
+        logger.info(f"RAGAS scoring stored for {investigation_id}: {results}")
+        return {"status": "success", "investigation_id": investigation_id, "scores": results}
+    except Exception as exc:
+        db.rollback()
+        logger.error(f"RAGAS scoring failed for {investigation_id}: {exc}", exc_info=True)
+        raise self.retry(exc=exc, countdown=30 * (2 ** self.request.retries))
+    finally:
+        db.close()
 
 
 app.conf.beat_schedule = {

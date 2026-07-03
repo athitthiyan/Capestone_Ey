@@ -1,6 +1,7 @@
 """End-to-end executor test using deterministic stub agents (no LLM)."""
 
 import asyncio
+from collections import Counter
 
 from app.agents.executor import InvestigationExecutor
 from app.core.config import settings
@@ -71,6 +72,38 @@ def test_executor_runs_full_pipeline(db):
     assert len(claims) >= 2
     assert any(not claim.is_grounded for claim in claims)
     assert any(claim.is_grounded for claim in claims)
+
+
+def test_executor_emits_realtime_events(db):
+    investigation = Investigation(
+        transaction_id="TXN-REALTIME",
+        vendor="Realtime LLC",
+        category="software",
+        amount=120000.0,
+        materiality=50000.0,
+    )
+    db.add(investigation)
+    db.commit()
+    db.refresh(investigation)
+
+    executor = InvestigationExecutor(db)
+    emitted = []
+
+    async def collect_emit(investigation_id, event):
+        assert investigation_id == investigation.id
+        emitted.append(event)
+
+    executor._emit = collect_emit
+
+    result = asyncio.run(executor.execute_investigation(investigation.id))
+    counts = Counter(event.get("type") for event in emitted)
+
+    assert result["status"] == "review"
+    assert counts["pipeline_stage"] >= 5
+    assert counts["agent_status"] >= 10
+    assert counts["debate_message"] == ((settings.MAX_DEBATE_ROUNDS * 2) + 1) * result[
+        "attempts"
+    ]
 
 
 def test_executor_marks_failed_on_missing_investigation(db):

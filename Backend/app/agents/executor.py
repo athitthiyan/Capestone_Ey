@@ -2,10 +2,25 @@
 Investigation Executor - orchestrates agent crew execution with real-time
 event streaming, state checkpointing, and failure recovery.
 
-The Supervisor control loop lives here: after the Verifier judges the verdict,
-an ungrounded result sends the case back for a bounded re-run (fetching extra
-corroboration) before escalating to human review. Each debate round and re-run
-attempt evolves the transcript instead of repeating it.
+The pipeline is a compiled LangGraph ``StateGraph`` (see ``_build_graph``):
+evidence -> challenger <-> defender (debate rounds, conditional edge) ->
+adjudication -> verification -> either confidence_gate (grounded) or
+prepare_retry -> evidence again (ungrounded, retry budget remaining) or
+escalate (retry budget exhausted). confidence_gate then routes to either
+END (needs human review) or report_and_audit -> END. Both loops - the debate
+round loop and the supervisor's verification-retry loop - are native graph
+cycles driven by conditional edges, not Python-level for-loops; each debate
+round and re-run attempt evolves the transcript instead of repeating it.
+
+The graph is compiled once per executor instance with an in-process
+``MemorySaver`` checkpointer, keyed by ``thread_id=investigation_id``. This
+gives crash-resume/replay within a single run; it does NOT persist across
+process restarts (MemorySaver is in-memory only) - if cross-process resume
+is ever needed, swap in a persistent checkpointer (e.g. a Postgres-backed
+one) here without touching node logic. This is independent of, and in
+addition to, the existing manual checkpoints written to the
+`investigation_states` table via `_checkpoint_state` (unchanged, still the
+system of record for the audit/timeline UI).
 
 Events are emitted two ways:
   1. Published to Redis (so the FastAPI process can forward them to WebSocket
@@ -20,10 +35,11 @@ import json
 import logging
 import time
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session
 
+from app.agents.crew import InvestigationState as CrewState
 from app.core.config import settings
 from app.core.metrics import (
     debate_rounds_total,
@@ -64,12 +80,36 @@ def _risk_from_str(value: str) -> RiskLevel:
         return RiskLevel.MEDIUM
 
 
+class GraphState(CrewState, total=False):
+    """Runtime state passed between graph nodes.
+
+    Extends app/agents/crew.py's InvestigationState (the fields its
+    real-agent node functions read/write: investigation_id, evidence,
+    debate_round, ...) with the extra bookkeeping this executor's graph
+    control flow needs. Must be a real TypedDict, not a plain dict subclass:
+    LangGraph's StateGraph inspects `__annotations__` to determine which
+    channels exist, so a schema with no declared keys has nothing to write
+    to. No field is `Annotated` with a reducer, so every key gets ordinary
+    last-write-wins merge semantics, which is exactly right here since every
+    node mutates and returns the same state dict.
+    """
+
+    round_cursor: int
+    rag_relevance: float
+    max_attempts: int
+    grounded: bool
+    needs_review: bool
+    confidence_gate: dict
+    outcome: Optional[str]
+
+
 class InvestigationExecutor:
-    """Executes investigations using the LangGraph agent crew."""
+    """Executes investigations on a compiled LangGraph StateGraph."""
 
     def __init__(self, db_session: Session):
         self.db = db_session
         self._nodes = None
+        self._graph = None
 
     async def _emit(self, investigation_id: str, event: Dict[str, Any]) -> None:
         try:
@@ -99,6 +139,93 @@ class InvestigationExecutor:
             }
         return self._nodes
 
+    # ------------------------------------------------------------------
+    # Graph construction
+    # ------------------------------------------------------------------
+
+    def _recursion_limit(self, max_attempts: int) -> int:
+        # Each debate round is 2 node executions (challenger + defender); each
+        # attempt is roughly evidence + 2*max_debate_rounds + adjudication +
+        # verification (+ prepare_retry on a retry). Generous headroom over
+        # the theoretical max so this is a safety valve, not a real constraint.
+        return max(
+            50, 10 + max_attempts * (6 + settings.MAX_DEBATE_ROUNDS * 2)
+        )
+
+    def _get_graph(self):
+        if self._graph is None:
+            self._graph = self._build_graph()
+        return self._graph
+
+    def _build_graph(self):
+        from langgraph.checkpoint.memory import MemorySaver
+        from langgraph.graph import END, StateGraph
+
+        from app.agents.crew import route_debate
+
+        graph = StateGraph(GraphState)
+
+        # Node names must not collide with GraphState field names (LangGraph
+        # rejects that), hence collect_evidence/adjudicate/confidence_routing
+        # rather than evidence/adjudication/confidence_gate - those are the
+        # state keys the nodes themselves read and write.
+        graph.add_node("collect_evidence", self._node_evidence)
+        graph.add_node("challenger", self._node_challenger)
+        graph.add_node("defender", self._node_defender)
+        graph.add_node("adjudicate", self._node_adjudication)
+        graph.add_node("verification", self._node_verification)
+        graph.add_node("prepare_retry", self._node_prepare_retry)
+        graph.add_node("escalate", self._node_escalate)
+        graph.add_node("confidence_routing", self._node_confidence_gate)
+        graph.add_node("report_and_audit", self._node_report_and_audit)
+
+        graph.set_entry_point("collect_evidence")
+        graph.add_edge("collect_evidence", "challenger")
+        graph.add_edge("challenger", "defender")
+        graph.add_conditional_edges(
+            "defender",
+            route_debate,
+            {"challenger": "challenger", "adjudicator": "adjudicate"},
+        )
+        graph.add_edge("adjudicate", "verification")
+        graph.add_conditional_edges(
+            "verification",
+            self._route_after_verification,
+            {
+                "confidence_gate": "confidence_routing",
+                "prepare_retry": "prepare_retry",
+                "escalate": "escalate",
+            },
+        )
+        graph.add_edge("prepare_retry", "collect_evidence")
+        graph.add_edge("escalate", END)
+        graph.add_conditional_edges(
+            "confidence_routing",
+            self._route_after_confidence_gate,
+            {"review": END, "report": "report_and_audit"},
+        )
+        graph.add_edge("report_and_audit", END)
+
+        return graph.compile(checkpointer=MemorySaver())
+
+    # ------------------------------------------------------------------
+    # Routing (conditional edges) - pure functions of state, no side effects
+    # ------------------------------------------------------------------
+
+    def _route_after_verification(self, state: dict) -> str:
+        if state.get("grounded"):
+            return "confidence_gate"
+        if state.get("attempt", 1) < state.get("max_attempts", 1):
+            return "prepare_retry"
+        return "escalate"
+
+    def _route_after_confidence_gate(self, state: dict) -> str:
+        return "review" if state.get("needs_review") else "report"
+
+    # ------------------------------------------------------------------
+    # Entry point
+    # ------------------------------------------------------------------
+
     async def execute_investigation(self, investigation_id: str) -> Dict[str, Any]:
         logger.info(f"Starting investigation execution: {investigation_id}")
         started = time.perf_counter()
@@ -121,41 +248,18 @@ class InvestigationExecutor:
                 ).to_dict(),
             )
 
-            # Supervisor control loop: run the crew, and if the Verifier rejects
-            # the verdict as ungrounded, re-run a bounded number of times
-            # (fetching extra corroboration) before escalating to a human.
-            max_attempts = settings.MAX_VERIFICATION_RETRIES + 1
-            grounded = False
-            for attempt in range(1, max_attempts + 1):
-                state["attempt"] = attempt
+            graph = self._get_graph()
+            final_state = await graph.ainvoke(
+                state,
+                config={
+                    "configurable": {"thread_id": investigation_id},
+                    "recursion_limit": self._recursion_limit(state["max_attempts"]),
+                },
+            )
 
-                await self._phase_evidence_collection(investigation_id, state)
-                await self._phase_debate(investigation_id, state)
-                await self._phase_adjudication(investigation_id, state)
-                grounded = await self._phase_verification(investigation_id, state)
+            outcome = final_state.get("outcome")
 
-                if grounded:
-                    break
-
-                if attempt < max_attempts:
-                    feedback = "; ".join(
-                        state.get("verification_results", {}).get("ungrounded_claims", [])
-                    )
-                    state["verification_feedback"] = feedback
-                    await self._emit(
-                        investigation_id,
-                        AgentStatusUpdateEvent(
-                            investigation_id,
-                            "supervisor",
-                            "retry",
-                            f"Verification ungrounded - re-running with a corroboration "
-                            f"query (attempt {attempt + 1} of {max_attempts})",
-                            metadata={"attempt": attempt + 1, "feedback": feedback},
-                        ).to_dict(),
-                    )
-
-            if not grounded:
-                await self._phase_escalate(investigation_id, state)
+            if outcome == "escalated":
                 result_status = "escalated"
                 return {
                     "status": "escalated",
@@ -163,28 +267,33 @@ class InvestigationExecutor:
                     "reason": "verdict could not be grounded within the retry budget",
                 }
 
-            needs_review = await self._phase_confidence_gate(investigation_id, state)
-            if needs_review:
+            if outcome == "review":
                 result_status = "review"
                 return {
                     "status": "review",
                     "investigation_id": investigation_id,
-                    "risk": state.get("adjudication", {}).get("risk_level", "unknown"),
-                    "confidence": state.get("adjudication", {}).get("confidence", 0),
-                    "attempts": state.get("attempt", 1),
+                    "risk": final_state.get("adjudication", {}).get("risk_level", "unknown"),
+                    "confidence": final_state.get("adjudication", {}).get("confidence", 0),
+                    "attempts": final_state.get("attempt", 1),
                 }
 
-            await self._phase_report_and_audit(investigation_id, state)
+            if outcome == "completed":
+                logger.info(f"Investigation {investigation_id} completed")
+                result_status = "completed"
+                return {
+                    "status": "completed",
+                    "investigation_id": investigation_id,
+                    "risk": final_state.get("adjudication", {}).get("risk_level", "unknown"),
+                    "confidence": final_state.get("adjudication", {}).get("confidence", 0),
+                    "attempts": final_state.get("attempt", 1),
+                }
 
-            logger.info(f"Investigation {investigation_id} completed")
-            result_status = "completed"
-            return {
-                "status": "completed",
-                "investigation_id": investigation_id,
-                "risk": state.get("adjudication", {}).get("risk_level", "unknown"),
-                "confidence": state.get("adjudication", {}).get("confidence", 0),
-                "attempts": state.get("attempt", 1),
-            }
+            # Defensive: the graph should always set one of the three outcomes
+            # above before reaching END. If it didn't, treat it as a failure
+            # rather than silently returning an ambiguous result.
+            raise RuntimeError(
+                f"Investigation graph ended without a recognized outcome: {final_state!r}"
+            )
 
         except Exception as e:  # noqa: BLE001
             logger.error(f"Investigation {investigation_id} failed: {e}", exc_info=True)
@@ -210,33 +319,39 @@ class InvestigationExecutor:
             investigation_duration_seconds.observe(time.perf_counter() - started)
 
     def _initialize_state(self, investigation: Investigation) -> dict:
-        return {
-            "investigation_id": investigation.id,
-            "transaction_id": investigation.transaction_id,
-            "vendor": investigation.vendor,
-            "category": investigation.category,
-            "amount": investigation.amount,
-            "materiality": investigation.materiality,
-            "evidence": [],
-            "evidence_summary": "",
-            "debate_round": 0,
-            "round_cursor": 0,
-            "attempt": 1,
-            "has_corroboration": False,
-            "verification_feedback": "",
-            "max_debate_rounds": settings.MAX_DEBATE_ROUNDS,
-            "challenger_arguments": [],
-            "defender_arguments": [],
-            "debate_transcript": [],
-            "adjudication": {},
-            "verification_results": {},
-            "rag_context": "",
-            "rag_citations": [],
-            "messages": [],
-            "llm_usage": [],
-            "workflow_state": "intake",
-            "status": "running",
-        }
+        return GraphState(
+            investigation_id=investigation.id,
+            transaction_id=investigation.transaction_id,
+            vendor=investigation.vendor,
+            category=investigation.category,
+            amount=investigation.amount,
+            materiality=investigation.materiality,
+            evidence=[],
+            evidence_summary="",
+            debate_round=0,
+            round_cursor=0,
+            attempt=1,
+            max_attempts=settings.MAX_VERIFICATION_RETRIES + 1,
+            has_corroboration=False,
+            verification_feedback="",
+            max_debate_rounds=settings.MAX_DEBATE_ROUNDS,
+            challenger_arguments=[],
+            defender_arguments=[],
+            debate_transcript=[],
+            adjudication={},
+            verification_results={},
+            rag_context="",
+            rag_citations=[],
+            rag_relevance=0.0,
+            messages=[],
+            llm_usage=[],
+            workflow_state="intake",
+            status="running",
+            grounded=False,
+            needs_review=False,
+            confidence_gate={},
+            outcome=None,
+        )
 
     def _reset_generated_outputs(self, investigation_id: str) -> None:
         """Keep re-runs idempotent by replacing generated investigation outputs."""
@@ -287,7 +402,16 @@ class InvestigationExecutor:
             investigation.status = status
             self.db.commit()
 
-    async def _phase_evidence_collection(self, investigation_id: str, state: dict) -> None:
+    # ------------------------------------------------------------------
+    # Graph nodes
+    # ------------------------------------------------------------------
+
+    async def _node_evidence(self, state: dict) -> dict:
+        investigation_id = state["investigation_id"]
+        # Fresh debate-round budget for this attempt - _route_debate uses this
+        # to run exactly max_debate_rounds full rounds before adjudication.
+        state["debate_round"] = 0
+
         attempt = state.get("attempt", 1)
         logger.info(f"Evidence collection phase (attempt {attempt}): {investigation_id}")
         self._set_status(investigation_id, InvestigationStatus.COLLECTING_EVIDENCE)
@@ -432,6 +556,7 @@ class InvestigationExecutor:
             ).to_dict(),
         )
         self._checkpoint_state(investigation_id, f"evidence_collection_{attempt}", state)
+        return state
 
     # --- deterministic stub argument generators (USE_REAL_AGENTS=false) ---
 
@@ -471,99 +596,116 @@ class InvestigationExecutor:
             f"small and fully traceable to the ledger row."
         )
 
-    async def _phase_debate(self, investigation_id: str, state: dict) -> None:
+    async def _node_challenger(self, state: dict) -> dict:
+        investigation_id = state["investigation_id"]
         attempt = state.get("attempt", 1)
-        logger.info(f"Debate phase (attempt {attempt}): {investigation_id}")
-        self._set_status(investigation_id, InvestigationStatus.AGENT_DEBATE)
 
-        await self._emit(
-            investigation_id,
-            PipelineStageEvent(investigation_id, "collecting_evidence", "agent_debate").to_dict(),
-        )
-        await self._write_audit(
-            investigation_id,
-            "debate_started",
-            actor="supervisor",
-            details={"max_rounds": settings.MAX_DEBATE_ROUNDS, "attempt": attempt},
-        )
-
-        nodes = self._get_nodes() if settings.USE_REAL_AGENTS else None
-
-        for _ in range(settings.MAX_DEBATE_ROUNDS):
-            state["round_cursor"] = state.get("round_cursor", 0) + 1
-            round_num = state["round_cursor"]
-            debate_rounds_total.inc()
-
+        if state.get("debate_round", 0) == 0:
+            # First round of this attempt - transition the pipeline stage and
+            # write the one-time "debate started" audit event.
+            logger.info(f"Debate phase (attempt {attempt}): {investigation_id}")
+            self._set_status(investigation_id, InvestigationStatus.AGENT_DEBATE)
             await self._emit(
                 investigation_id,
-                AgentStatusUpdateEvent(
-                    investigation_id, "challenger", "running",
-                    f"Round {round_num}: presenting risk analysis...",
+                PipelineStageEvent(
+                    investigation_id, "collecting_evidence", "agent_debate"
                 ).to_dict(),
-            )
-            if nodes:
-                state.update(await asyncio.to_thread(nodes["challenger"], state))
-                challenger_msg = state["challenger_arguments"][-1]
-            else:
-                await asyncio.sleep(0.05)
-                challenger_msg = self._stub_challenger(state, round_num)
-                state.setdefault("challenger_arguments", []).append(challenger_msg)
-
-            self.db.add(
-                DebateTranscript(
-                    investigation_id=investigation_id,
-                    round=round_num,
-                    speaker="challenger",
-                    message=challenger_msg,
-                    token_count=len(challenger_msg.split()),
-                )
-            )
-            self.db.commit()
-            await self._emit(
-                investigation_id,
-                DebateMessageEvent(investigation_id, round_num, "challenger", challenger_msg).to_dict(),
-            )
-
-            await self._emit(
-                investigation_id,
-                AgentStatusUpdateEvent(
-                    investigation_id, "defender", "running",
-                    f"Round {round_num}: presenting supporting evidence...",
-                ).to_dict(),
-            )
-            if nodes:
-                state.update(await asyncio.to_thread(nodes["defender"], state))
-                defender_msg = state["defender_arguments"][-1]
-            else:
-                await asyncio.sleep(0.05)
-                defender_msg = self._stub_defender(state, round_num)
-                state.setdefault("defender_arguments", []).append(defender_msg)
-                state["debate_round"] = round_num
-
-            self.db.add(
-                DebateTranscript(
-                    investigation_id=investigation_id,
-                    round=round_num,
-                    speaker="defender",
-                    message=defender_msg,
-                    token_count=len(defender_msg.split()),
-                )
-            )
-            self.db.commit()
-            await self._emit(
-                investigation_id,
-                DebateMessageEvent(investigation_id, round_num, "defender", defender_msg).to_dict(),
             )
             await self._write_audit(
                 investigation_id,
-                "debate_round_completed",
-                actor="agent_crew",
-                details={"round": round_num, "messages": 2},
+                "debate_started",
+                actor="supervisor",
+                details={"max_rounds": settings.MAX_DEBATE_ROUNDS, "attempt": attempt},
             )
 
-        self._checkpoint_state(investigation_id, f"debate_{attempt}", state)
+        nodes = self._get_nodes() if settings.USE_REAL_AGENTS else None
 
-    async def _phase_adjudication(self, investigation_id: str, state: dict) -> None:
+        state["round_cursor"] = state.get("round_cursor", 0) + 1
+        round_num = state["round_cursor"]
+        debate_rounds_total.inc()
+
+        await self._emit(
+            investigation_id,
+            AgentStatusUpdateEvent(
+                investigation_id, "challenger", "running",
+                f"Round {round_num}: presenting risk analysis...",
+            ).to_dict(),
+        )
+        if nodes:
+            state.update(await asyncio.to_thread(nodes["challenger"], state))
+            challenger_msg = state["challenger_arguments"][-1]
+        else:
+            await asyncio.sleep(0.05)
+            challenger_msg = self._stub_challenger(state, round_num)
+            state.setdefault("challenger_arguments", []).append(challenger_msg)
+
+        self.db.add(
+            DebateTranscript(
+                investigation_id=investigation_id,
+                round=round_num,
+                speaker="challenger",
+                message=challenger_msg,
+                token_count=len(challenger_msg.split()),
+            )
+        )
+        self.db.commit()
+        await self._emit(
+            investigation_id,
+            DebateMessageEvent(investigation_id, round_num, "challenger", challenger_msg).to_dict(),
+        )
+        return state
+
+    async def _node_defender(self, state: dict) -> dict:
+        investigation_id = state["investigation_id"]
+        round_num = state["round_cursor"]
+        nodes = self._get_nodes() if settings.USE_REAL_AGENTS else None
+
+        await self._emit(
+            investigation_id,
+            AgentStatusUpdateEvent(
+                investigation_id, "defender", "running",
+                f"Round {round_num}: presenting supporting evidence...",
+            ).to_dict(),
+        )
+        if nodes:
+            state.update(await asyncio.to_thread(nodes["defender"], state))
+            defender_msg = state["defender_arguments"][-1]
+            # crew.py's real defender_node already increments debate_round.
+        else:
+            await asyncio.sleep(0.05)
+            defender_msg = self._stub_defender(state, round_num)
+            state.setdefault("defender_arguments", []).append(defender_msg)
+            state["debate_round"] = state.get("debate_round", 0) + 1
+
+        self.db.add(
+            DebateTranscript(
+                investigation_id=investigation_id,
+                round=round_num,
+                speaker="defender",
+                message=defender_msg,
+                token_count=len(defender_msg.split()),
+            )
+        )
+        self.db.commit()
+        await self._emit(
+            investigation_id,
+            DebateMessageEvent(investigation_id, round_num, "defender", defender_msg).to_dict(),
+        )
+        await self._write_audit(
+            investigation_id,
+            "debate_round_completed",
+            actor="agent_crew",
+            details={"round": round_num, "messages": 2},
+        )
+
+        if state.get("debate_round", 0) >= settings.MAX_DEBATE_ROUNDS:
+            self._checkpoint_state(
+                investigation_id, f"debate_{state.get('attempt', 1)}", state
+            )
+        return state
+
+    async def _node_adjudication(self, state: dict) -> dict:
+        investigation_id = state["investigation_id"]
         logger.info(f"Adjudication phase: {investigation_id}")
         await self._emit(
             investigation_id,
@@ -677,9 +819,11 @@ class InvestigationExecutor:
             details={"risk": risk_level, "confidence": confidence},
         )
         self._checkpoint_state(investigation_id, f"adjudication_{state.get('attempt', 1)}", state)
+        return state
 
-    async def _phase_verification(self, investigation_id: str, state: dict) -> bool:
-        """Run the Verifier. Returns True when the verdict is grounded."""
+    async def _node_verification(self, state: dict) -> dict:
+        """Run the Verifier and record whether the verdict is grounded."""
+        investigation_id = state["investigation_id"]
         logger.info(f"Verification phase: {investigation_id}")
         self._set_status(investigation_id, InvestigationStatus.VERIFICATION)
 
@@ -734,6 +878,7 @@ class InvestigationExecutor:
             state["verification_results"] = verification
 
         is_grounded = bool(verification.get("is_grounded", True))
+        state["grounded"] = is_grounded
         verification_results_total.labels(grounded=str(is_grounded).lower()).inc()
         adjudication = state.get("adjudication", {})
         self.db.add(
@@ -773,7 +918,33 @@ class InvestigationExecutor:
             details={"is_grounded": is_grounded},
         )
         self._checkpoint_state(investigation_id, f"verification_{state.get('attempt', 1)}", state)
-        return is_grounded
+        return state
+
+    async def _node_prepare_retry(self, state: dict) -> dict:
+        """Verifier rejected the verdict and retry budget remains - loop back
+        to evidence collection with feedback about what needs corroboration."""
+        investigation_id = state["investigation_id"]
+        attempt = state.get("attempt", 1)
+        max_attempts = state.get("max_attempts", 1)
+        feedback = "; ".join(
+            state.get("verification_results", {}).get("ungrounded_claims", [])
+        )
+        state["verification_feedback"] = feedback
+        next_attempt = attempt + 1
+
+        await self._emit(
+            investigation_id,
+            AgentStatusUpdateEvent(
+                investigation_id,
+                "supervisor",
+                "retry",
+                f"Verification ungrounded - re-running with a corroboration "
+                f"query (attempt {next_attempt} of {max_attempts})",
+                metadata={"attempt": next_attempt, "feedback": feedback},
+            ).to_dict(),
+        )
+        state["attempt"] = next_attempt
+        return state
 
     def _latest_third_party_verification(
         self,
@@ -821,8 +992,9 @@ class InvestigationExecutor:
         self.db.refresh(row)
         return row
 
-    async def _phase_confidence_gate(self, investigation_id: str, state: dict) -> bool:
+    async def _node_confidence_gate(self, state: dict) -> dict:
         """Route grounded cases either to report generation or human review."""
+        investigation_id = state["investigation_id"]
         logger.info(f"Confidence gate phase: {investigation_id}")
         investigation = self.db.get(Investigation, investigation_id)
         risk = investigation.risk or RiskLevel.MEDIUM
@@ -863,6 +1035,7 @@ class InvestigationExecutor:
             ],
         }
         state["confidence_gate"] = gate
+        state["needs_review"] = needs_review
 
         await self._emit(
             investigation_id,
@@ -900,6 +1073,7 @@ class InvestigationExecutor:
                     "review_queue_item_id": review_item.id,
                 }
             )
+            state["outcome"] = "review"
             await self._emit(
                 investigation_id,
                 PipelineStageEvent(investigation_id, "confidence_gate", "human_review").to_dict(),
@@ -937,10 +1111,11 @@ class InvestigationExecutor:
             details=gate,
         )
         self._checkpoint_state(investigation_id, "confidence_gate", state)
-        return needs_review
+        return state
 
-    async def _phase_escalate(self, investigation_id: str, state: dict) -> None:
+    async def _node_escalate(self, state: dict) -> dict:
         """Retry budget exhausted - hand the case to a human reviewer."""
+        investigation_id = state["investigation_id"]
         logger.info(f"Escalation phase: {investigation_id}")
         investigation = self.db.get(Investigation, investigation_id)
         investigation.status = InvestigationStatus.HUMAN_REVIEW
@@ -970,8 +1145,11 @@ class InvestigationExecutor:
             ).to_dict(),
         )
         self._checkpoint_state(investigation_id, "escalation", state)
+        state["outcome"] = "escalated"
+        return state
 
-    async def _phase_report_and_audit(self, investigation_id: str, state: dict) -> None:
+    async def _node_report_and_audit(self, state: dict) -> dict:
+        investigation_id = state["investigation_id"]
         logger.info(f"Report & audit phase: {investigation_id}")
         investigation = self.db.get(Investigation, investigation_id)
         investigation.status = InvestigationStatus.REPORT_READY
@@ -1010,9 +1188,11 @@ class InvestigationExecutor:
             ).to_dict(),
         )
         self._checkpoint_state(investigation_id, "report_and_audit", state)
+        state["outcome"] = "completed"
+        return state
 
     def _checkpoint_state(self, investigation_id: str, phase: str, state: dict) -> None:
-        state_json = json.loads(json.dumps(state, default=str))
+        state_json = json.loads(json.dumps(dict(state), default=str))
         state_hash = hashlib.sha256(
             json.dumps(state_json, sort_keys=True).encode()
         ).hexdigest()

@@ -338,6 +338,11 @@ class ReviewQueueOut(BaseModel):
 class ReviewActionRequest(BaseModel):
     actor: Optional[str] = None
     comment: Optional[str] = None
+    # Reviewer's confirmed final answer for this case. When provided on
+    # approve/reject, it's stored as Investigation.ground_truth_verdict and
+    # unlocks the 3 reference-dependent RAGAS metrics (Factual Correctness,
+    # Semantic Similarity, Context Entity Recall) for real-time scoring.
+    ground_truth: Optional[str] = None
 
 
 class ReviewActionResponse(BaseModel):
@@ -359,6 +364,13 @@ class RagasMetricOut(BaseModel):
     # `pass` is a Python keyword; expose it as JSON "pass" via an alias.
     passed: bool = Field(..., alias="pass")
     helper: str
+    # "real" once the app/evaluation/ragas_judge.py LLM judge has scored this
+    # metric for the case; "proxy" while it falls back to telemetry-derived
+    # heuristics in app/evaluation/ragas.py (unscored yet, or judge failed).
+    source: Literal["real", "proxy"] = "proxy"
+    scored_provider: Optional[str] = None
+    scored_model: Optional[str] = None
+    judge_model: Optional[str] = None
 
 
 class EvaluationSummaryOut(BaseModel):
@@ -367,3 +379,17 @@ class EvaluationSummaryOut(BaseModel):
     cases: int
     metrics: list[RagasMetricOut]
     conclusion: str
+
+
+class LlmMetricBreakdownOut(BaseModel):
+    """Mean real (LLM-judge) RAGAS score for one metric, for one provider/model.
+
+    Powers "which LLM scores best on which metric" comparisons across every
+    case the real-time judge has scored so far.
+    """
+
+    provider: str
+    model: str
+    metric: str
+    mean_score: float = Field(..., ge=0.0, le=1.0)
+    cases_scored: int

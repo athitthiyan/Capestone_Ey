@@ -90,6 +90,14 @@ class Settings(BaseSettings):
     DEEPSEEK_TEMPERATURE: float = 0.2
     USE_REAL_AGENTS: bool = False
 
+    # Real-time RAGAS evaluation (LLM-judge scoring via the `ragas` package).
+    # The judge always calls Anthropic directly regardless of which provider
+    # produced the scored response, so scores are comparable apples-to-apples
+    # across providers instead of each response grading itself.
+    RAGAS_REALTIME_ENABLED: bool = True
+    RAGAS_JUDGE_MODEL: str = ""  # blank -> CLAUDE_MODEL_REASONING
+    RAGAS_JUDGE_TIMEOUT_SECONDS: float = 45.0
+
     # Observability
     METRICS_ENABLED: bool = True
     LANGSMITH_TRACING: bool = False

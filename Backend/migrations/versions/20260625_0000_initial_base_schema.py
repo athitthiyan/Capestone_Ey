@@ -30,6 +30,7 @@ _LATER_MIGRATION_TABLES = {
     "request_logs",                        # 20260701_0002
     "runtime_settings",                    # 20260701_0003
     "llm_call_logs",                       # 20260701_0003
+    "ragas_evaluation_results",            # 20260704_0004
 }
 
 

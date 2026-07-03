@@ -404,15 +404,21 @@ Adjudication to check: risk={adjudication.get('risk_level', 'unknown')}, confide
 
 
 def route_debate(state: InvestigationState) -> str:
+    """Conditional edge: loop the debate back to the Challenger for another
+    round, or hand off to the Adjudicator once max_debate_rounds is reached.
+
+    Used by app/agents/executor.py's compiled StateGraph (see
+    InvestigationExecutor._build_graph) as the routing function on the
+    defender -> {challenger, adjudicator} conditional edge - this is the
+    actual live graph, not a parallel/unused one. The node factories in this
+    file (create_evidence_agent, create_challenger_agent, etc.) are the real
+    LLM-backed node bodies the graph calls into when USE_REAL_AGENTS=true;
+    InvestigationExecutor also wraps each one with the DB writes, websocket
+    events, and audit logging the graph nodes need, and adds the supervisor's
+    bounded verification-retry loop (also a native conditional-edge cycle,
+    not a Python for-loop) on top of the linear evidence -> debate ->
+    adjudication -> verification sequence defined here.
+    """
     if state.get("debate_round", 0) < state.get("max_debate_rounds", 2):
         return "challenger"
     return "adjudicator"
-
-
-# NOTE: there used to be a `create_investigation_graph()` here that compiled a
-# LangGraph StateGraph over these same node factories, but nothing ever called
-# it - it was dead code. app/agents/executor.py's InvestigationExecutor is the
-# actual runtime orchestrator: it calls these node functions directly and adds
-# control flow the simple linear graph above didn't have (bounded supervisor
-# retries with corroboration re-queries when the Verifier rejects a verdict).
-# Removed rather than left in place so it can't be mistaken for the live path.

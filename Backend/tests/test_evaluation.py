@@ -79,3 +79,47 @@ def test_summary_endpoint_returns_pass_key(client):
     r = client.get("/api/v1/evaluation/summary")
     assert r.status_code == 200, r.text
     assert all("pass" in m for m in r.json()["metrics"])
+
+
+def test_metrics_default_to_proxy_source(client):
+    """Before any real-time RAGAS judge score exists, every metric on the
+    aggregate summary should be tagged as coming from the telemetry proxy."""
+    r = client.get("/api/v1/evaluation/summary")
+    assert r.status_code == 200, r.text
+    assert all(m.get("source", "proxy") == "proxy" for m in r.json()["metrics"])
+
+
+def test_overlay_real_scores_prefers_real_and_falls_back_to_proxy():
+    from app.api.routes.evaluation import _overlay_real_scores
+    from app.db.models import RagasEvaluationResult
+
+    summary = {
+        "cases": 1,
+        "metrics": [
+            {"metric": "Faithfulness", "category": "generation", "score": 0.5, "target": 0.9, "pass": False, "helper": "x"},
+            {"metric": "Context Recall", "category": "retrieval", "score": 0.6, "target": 0.85, "pass": False, "helper": "y"},
+        ],
+        "conclusion": "",
+    }
+    real_rows = {
+        "Faithfulness": RagasEvaluationResult(
+            metric="Faithfulness", score=0.95, scored_provider="anthropic", scored_model="claude-sonnet-5"
+        ),
+        # Context Recall present in the table but with a null score (judge
+        # failed/skipped) - must still fall back to the proxy value.
+        "Context Recall": RagasEvaluationResult(metric="Context Recall", score=None),
+    }
+    result = _overlay_real_scores(summary, real_rows)
+    by_metric = {m["metric"]: m for m in result["metrics"]}
+    assert by_metric["Faithfulness"]["score"] == 0.95
+    assert by_metric["Faithfulness"]["pass"] is True
+    assert by_metric["Faithfulness"]["source"] == "real"
+    assert by_metric["Faithfulness"]["scored_provider"] == "anthropic"
+    assert by_metric["Context Recall"]["score"] == 0.6
+    assert by_metric["Context Recall"]["source"] == "proxy"
+
+
+def test_by_llm_endpoint_empty_when_no_real_scores(client):
+    r = client.get("/api/v1/evaluation/by-llm")
+    assert r.status_code == 200, r.text
+    assert isinstance(r.json(), list)

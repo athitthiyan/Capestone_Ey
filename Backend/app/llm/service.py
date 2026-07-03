@@ -334,6 +334,7 @@ class LLMService:
         try:
             db.add(
                 LLMCallLog(
+                    investigation_id=request.metadata.get("investigation_id"),
                     provider_name=provider,
                     model_name=model,
                     request_type=request.request_type,
