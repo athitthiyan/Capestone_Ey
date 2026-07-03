@@ -1,7 +1,7 @@
 import { ApiError, apiRequest } from "@/services/api";
 import type { EvidenceVerification } from "@/types/domain";
 
-type ApiEvidenceVerification = {
+export type ApiEvidenceVerification = {
   id?: string | null;
   claim_id?: string | null;
   category: string;
@@ -36,7 +36,7 @@ export type EvidenceVerificationRequest = {
   metadata?: Record<string, unknown>;
 };
 
-function mapEvidenceVerification(row: ApiEvidenceVerification): EvidenceVerification {
+export function mapEvidenceVerification(row: ApiEvidenceVerification): EvidenceVerification {
   return {
     id: row.id ?? undefined,
     claimId: row.claim_id ?? undefined,

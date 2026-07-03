@@ -41,32 +41,26 @@ export function AnalyticsView() {
   const llmByModelQuery = useLlmByModel(llmFilters);
   const llmRecentQuery = useLlmRecentCalls(llmFilters);
   const llmTrendQuery = useLlmCostTrends(llmFilters);
-
-  if (
-    trendQuery.isLoading ||
-    accuracyQuery.isLoading ||
-    kpiQuery.isLoading ||
-    requestQuery.isLoading ||
+  const baseLoading = trendQuery.isLoading || accuracyQuery.isLoading || kpiQuery.isLoading || requestQuery.isLoading;
+  const baseError = trendQuery.error || accuracyQuery.error || kpiQuery.error || requestQuery.error;
+  const llmLoading =
     llmSummaryQuery.isLoading ||
     llmByProviderQuery.isLoading ||
     llmByModelQuery.isLoading ||
     llmRecentQuery.isLoading ||
-    llmTrendQuery.isLoading
-  ) {
-    return <LoadingState label="Loading analytics" />;
-  }
-
-  if (
-    trendQuery.error ||
-    accuracyQuery.error ||
-    kpiQuery.error ||
-    requestQuery.error ||
+    llmTrendQuery.isLoading;
+  const llmError =
     llmSummaryQuery.error ||
     llmByProviderQuery.error ||
     llmByModelQuery.error ||
     llmRecentQuery.error ||
-    llmTrendQuery.error
-  ) {
+    llmTrendQuery.error;
+
+  if (baseLoading) {
+    return <LoadingState label="Loading analytics" />;
+  }
+
+  if (baseError) {
     return (
       <ErrorState
         onRetry={() =>
@@ -75,11 +69,6 @@ export function AnalyticsView() {
             accuracyQuery.refetch(),
             kpiQuery.refetch(),
             requestQuery.refetch(),
-            llmSummaryQuery.refetch(),
-            llmByProviderQuery.refetch(),
-            llmByModelQuery.refetch(),
-            llmRecentQuery.refetch(),
-            llmTrendQuery.refetch(),
           ])
         }
       />
@@ -99,7 +88,14 @@ export function AnalyticsView() {
   const latestVerifierRate = trend.at(-1)?.verifierRate ?? 0;
   const hasRequestAnalytics = Boolean(requestAnalytics && requestAnalytics.totalRequests > 0);
   const hasLlmAnalytics = Boolean(llmSummary);
-  const hasAnalytics = trend.length > 0 || accuracy.length > 0 || kpis.length > 0 || hasRequestAnalytics || hasLlmAnalytics;
+  const hasAnalytics =
+    trend.length > 0 ||
+    accuracy.length > 0 ||
+    kpis.length > 0 ||
+    hasRequestAnalytics ||
+    hasLlmAnalytics ||
+    llmLoading ||
+    Boolean(llmError);
 
   return (
     <div className="space-y-6">
@@ -186,7 +182,21 @@ export function AnalyticsView() {
             </section>
           ) : null}
 
-          {llmSummary ? (
+          {llmLoading ? (
+            <LoadingState label="Loading LLM telemetry" />
+          ) : llmError ? (
+            <ErrorState
+              onRetry={() =>
+                void Promise.all([
+                  llmSummaryQuery.refetch(),
+                  llmByProviderQuery.refetch(),
+                  llmByModelQuery.refetch(),
+                  llmRecentQuery.refetch(),
+                  llmTrendQuery.refetch(),
+                ])
+              }
+            />
+          ) : llmSummary ? (
             <LLMAnalyticsPanel
               filters={llmFilters}
               onFiltersChange={setLlmFilters}

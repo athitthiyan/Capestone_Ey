@@ -3,9 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { getReports } from "@/services/reports.service";
 
-export function useReports() {
+export function useReports(options: { caseId?: string } = {}) {
   return useQuery({
-    queryKey: ["reports"],
-    queryFn: getReports,
+    queryKey: ["reports", options.caseId ?? ""],
+    queryFn: () => getReports(options),
   });
 }

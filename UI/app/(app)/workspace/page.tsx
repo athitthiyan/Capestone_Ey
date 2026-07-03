@@ -11,7 +11,7 @@ import { useInvestigations } from "@/hooks/use-cases";
 
 export default function WorkspacePage() {
   const router = useRouter();
-  const { data, error, isLoading, refetch } = useInvestigations();
+  const { data, error, isLoading, refetch } = useInvestigations({ limit: 1 });
   const firstInvestigation = data?.[0];
 
   useEffect(() => {

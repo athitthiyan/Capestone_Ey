@@ -109,11 +109,13 @@ def _close_pending_queue(
 
 @router.get("/queue", response_model=list[ReviewQueueOut])
 async def review_queue(
+    limit: int = 100,
     db: Session = Depends(get_db_session),
     user=Depends(get_current_user),
 ):
     """Cases awaiting human review, backed by the review_queue table."""
     del user
+    limit = max(1, min(limit, 500))
     queued_rows = (
         db.query(ReviewQueueItem, Investigation)
         .join(Investigation, Investigation.id == ReviewQueueItem.investigation_id)
@@ -127,6 +129,7 @@ async def review_queue(
             Investigation.due_at.asc(),
             ReviewQueueItem.created_at.asc(),
         )
+        .limit(limit)
         .all()
     )
     queued_ids = {investigation.id for _, investigation in queued_rows}
@@ -141,7 +144,11 @@ async def review_queue(
         fallback_query = fallback_query.filter(~Investigation.id.in_(queued_ids))
 
     backfilled: list[tuple[ReviewQueueItem, Investigation]] = []
-    for investigation in fallback_query.all():
+    remaining = max(limit - len(queued_rows), 0)
+    if remaining:
+        fallback_query = fallback_query.order_by(Investigation.due_at.asc()).limit(remaining)
+    fallback_rows = fallback_query.all() if remaining else []
+    for investigation in fallback_rows:
         assigned_to = investigation.reviewer or (
             "engagement_partner" if investigation.risk == RiskLevel.CRITICAL else "reviewer_pool"
         )

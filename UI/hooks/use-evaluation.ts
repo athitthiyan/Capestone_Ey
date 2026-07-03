@@ -16,7 +16,8 @@ export function useCaseEvaluation(caseId: string | undefined) {
     queryFn: () => getCaseEvaluation(caseId as string),
     enabled: Boolean(caseId),
     // Refresh the per-case RAGAS scores as the case progresses.
-    refetchInterval: 8_000,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }

@@ -50,7 +50,7 @@ export async function getReviewHistory(caseId?: string): Promise<ReviewHistoryIt
     return [];
   }
 
-  const rows = await apiRequest<ApiAuditEvent[]>(`/investigations/${caseId}/audit`);
+  const rows = await apiRequest<ApiAuditEvent[]>(`/investigations/${caseId}/audit?limit=100`);
   return rows.map(mapHistory).filter((item): item is ReviewHistoryItem => item !== null);
 }
 

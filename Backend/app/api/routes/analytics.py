@@ -1,14 +1,20 @@
 """Analytics routes - aggregates derived from investigation and request telemetry."""
 
-from collections import Counter
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
-from app.db.models import Investigation, InvestigationStatus, LLMCallLog, RequestLog, VerificationClaim
+from app.db.models import (
+    Investigation,
+    InvestigationStatus,
+    LLMCallLog,
+    RequestLog,
+    VerificationClaim,
+)
 from app.db.session import get_db_session
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -32,7 +38,7 @@ def _percentile(values: list[float], percentile: float) -> float:
     return float(ordered[index])
 
 
-def _llm_rows(
+def _llm_query(
     db: Session,
     *,
     date_from: datetime | None = None,
@@ -40,8 +46,7 @@ def _llm_rows(
     provider: str | None = None,
     model: str | None = None,
     request_type: str | None = None,
-    limit: int | None = None,
-) -> list[LLMCallLog]:
+):
     query = db.query(LLMCallLog)
     if date_from:
         query = query.filter(LLMCallLog.created_at >= date_from)
@@ -53,10 +58,83 @@ def _llm_rows(
         query = query.filter(LLMCallLog.model_name == model)
     if request_type:
         query = query.filter(LLMCallLog.request_type == request_type)
-    query = query.order_by(LLMCallLog.created_at.desc())
-    if limit is not None:
-        query = query.limit(max(1, min(limit, 1000)))
+    return query
+
+
+def _llm_rows(
+    db: Session,
+    *,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    provider: str | None = None,
+    model: str | None = None,
+    request_type: str | None = None,
+    limit: int | None = None,
+) -> list[LLMCallLog]:
+    query = _llm_query(
+        db,
+        date_from=date_from,
+        date_to=date_to,
+        provider=provider,
+        model=model,
+        request_type=request_type,
+    ).order_by(LLMCallLog.created_at.desc())
+    query = query.limit(max(1, min(limit or 5000, 5000)))
     return query.all()
+
+
+def _count_if(condition):
+    return func.coalesce(func.sum(case((condition, 1), else_=0)), 0)
+
+
+def _sum(query, column, default=0):
+    return query.with_entities(func.coalesce(func.sum(column), default)).scalar() or default
+
+
+def _llm_summary_from_query(query) -> dict:
+    total_tokens = _sum(query, LLMCallLog.total_tokens)
+    prompt_tokens = _sum(query, LLMCallLog.prompt_tokens)
+    completion_tokens = _sum(query, LLMCallLog.completion_tokens)
+    total_cost = _sum(query, LLMCallLog.estimated_cost_usd, 0.0)
+    actual_cost = query.with_entities(func.sum(LLMCallLog.actual_cost_usd)).scalar()
+    successful = query.with_entities(_count_if(LLMCallLog.success.is_(True))).scalar() or 0
+    failed = query.with_entities(_count_if(LLMCallLog.success.is_(False))).scalar() or 0
+    fallback_calls = (
+        query.with_entities(_count_if(LLMCallLog.fallback_used.is_(True))).scalar() or 0
+    )
+    cache_hits = query.with_entities(_count_if(LLMCallLog.cache_hit.is_(True))).scalar() or 0
+    average_latency = (
+        query.filter(LLMCallLog.cache_hit.is_(False))
+        .with_entities(func.avg(LLMCallLog.latency_ms))
+        .scalar()
+        or 0.0
+    )
+    expensive_rows = (
+        query.with_entities(
+            LLMCallLog.request_type,
+            func.coalesce(func.sum(LLMCallLog.estimated_cost_usd), 0.0).label("cost"),
+        )
+        .group_by(LLMCallLog.request_type)
+        .order_by(func.sum(LLMCallLog.estimated_cost_usd).desc())
+        .limit(8)
+        .all()
+    )
+    return {
+        "total_tokens": int(total_tokens or 0),
+        "prompt_tokens": int(prompt_tokens or 0),
+        "completion_tokens": int(completion_tokens or 0),
+        "total_estimated_cost_usd": round(float(total_cost or 0.0), 6),
+        "total_actual_cost_usd": round(float(actual_cost), 6) if actual_cost is not None else None,
+        "successful_calls": int(successful or 0),
+        "failed_calls": int(failed or 0),
+        "fallback_calls": int(fallback_calls or 0),
+        "cache_hits": int(cache_hits or 0),
+        "average_latency_ms": round(float(average_latency or 0.0), 2),
+        "most_expensive_request_types": [
+            {"request_type": key, "estimated_cost_usd": round(float(value or 0.0), 6)}
+            for key, value in expensive_rows
+        ],
+    }
 
 
 def _llm_summary(rows: list[LLMCallLog]) -> dict:
@@ -82,7 +160,11 @@ def _llm_summary(rows: list[LLMCallLog]) -> dict:
         "average_latency_ms": round(_ratio(sum(durations), len(durations)), 2),
         "most_expensive_request_types": [
             {"request_type": key, "estimated_cost_usd": round(value, 6)}
-            for key, value in sorted(expensive_by_type.items(), key=lambda item: item[1], reverse=True)[:8]
+            for key, value in sorted(
+                expensive_by_type.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:8]
         ],
     }
 
@@ -98,6 +180,64 @@ def _aggregate_llm(rows: list[LLMCallLog], key: str) -> list[dict]:
             "calls": len(group_rows),
         }
         for group_key, group_rows in sorted(grouped.items())
+    ]
+
+
+def _aggregate_llm_from_query(query, key: str) -> list[dict]:
+    column = getattr(LLMCallLog, key)
+    rows = (
+        query.with_entities(
+            column.label("group_key"),
+            func.count(LLMCallLog.id).label("calls"),
+            func.coalesce(func.sum(LLMCallLog.total_tokens), 0).label("total_tokens"),
+            func.coalesce(func.sum(LLMCallLog.prompt_tokens), 0).label("prompt_tokens"),
+            func.coalesce(func.sum(LLMCallLog.completion_tokens), 0).label("completion_tokens"),
+            func.coalesce(func.sum(LLMCallLog.estimated_cost_usd), 0.0).label("estimated_cost"),
+            func.sum(LLMCallLog.actual_cost_usd).label("actual_cost"),
+            _count_if(LLMCallLog.success.is_(True)).label("successful"),
+            _count_if(LLMCallLog.success.is_(False)).label("failed"),
+            _count_if(LLMCallLog.fallback_used.is_(True)).label("fallback_calls"),
+            _count_if(LLMCallLog.cache_hit.is_(True)).label("cache_hits"),
+            func.avg(
+                case((LLMCallLog.cache_hit.is_(False), LLMCallLog.latency_ms), else_=None)
+            ).label("average_latency"),
+        )
+        .group_by(column)
+        .order_by(column.asc())
+        .all()
+    )
+    return [
+        {
+            key: group_key or "unknown",
+            "total_tokens": int(total_tokens or 0),
+            "prompt_tokens": int(prompt_tokens or 0),
+            "completion_tokens": int(completion_tokens or 0),
+            "total_estimated_cost_usd": round(float(estimated_cost or 0.0), 6),
+            "total_actual_cost_usd": round(float(actual_cost), 6)
+            if actual_cost is not None
+            else None,
+            "successful_calls": int(successful or 0),
+            "failed_calls": int(failed or 0),
+            "fallback_calls": int(fallback_calls or 0),
+            "cache_hits": int(cache_hits or 0),
+            "average_latency_ms": round(float(average_latency or 0.0), 2),
+            "most_expensive_request_types": [],
+            "calls": int(calls or 0),
+        }
+        for (
+            group_key,
+            calls,
+            total_tokens,
+            prompt_tokens,
+            completion_tokens,
+            estimated_cost,
+            actual_cost,
+            successful,
+            failed,
+            fallback_calls,
+            cache_hits,
+            average_latency,
+        ) in rows
     ]
 
 
@@ -134,18 +274,18 @@ async def analytics_trend(
     user=Depends(get_current_user),
 ):
     """Weekly confidence + verifier-grounding trend."""
-    investigations = db.query(Investigation).all()
-    claims = db.query(VerificationClaim).all()
+    investigations = db.query(Investigation.created_at, Investigation.confidence).all()
+    claims = db.query(VerificationClaim.created_at, VerificationClaim.is_grounded).all()
     if not investigations:
         return []
 
     conf_by_week: dict[str, list[float]] = defaultdict(list)
-    for inv in investigations:
-        conf_by_week[_week_label(inv.created_at)].append(float(inv.confidence or 0.0))
+    for created_at, confidence in investigations:
+        conf_by_week[_week_label(created_at)].append(float(confidence or 0.0))
 
     claims_by_week: dict[str, list[bool]] = defaultdict(list)
-    for claim in claims:
-        claims_by_week[_week_label(claim.created_at)].append(bool(claim.is_grounded))
+    for created_at, is_grounded in claims:
+        claims_by_week[_week_label(created_at)].append(bool(is_grounded))
 
     weeks = sorted(set(conf_by_week) | set(claims_by_week))
     points = []
@@ -170,19 +310,28 @@ async def agent_accuracy(
     user=Depends(get_current_user),
 ):
     """Per-agent accuracy proxies derived from run telemetry."""
-    investigations = db.query(Investigation).all()
-    claims = db.query(VerificationClaim).all()
-    if not investigations:
+    total = db.query(func.count(Investigation.id)).scalar() or 0
+    if not total:
         return []
 
-    total = len(investigations)
-    mean_conf = _ratio(sum(float(i.confidence or 0.0) for i in investigations), total)
-    grounded_rate = _ratio(sum(1 for c in claims if c.is_grounded), len(claims)) if claims else 0.0
-    completed = sum(
-        1
-        for i in investigations
-        if (i.status.value if hasattr(i.status, "value") else str(i.status))
-        in ("report_ready", "closed")
+    mean_conf = float(db.query(func.avg(Investigation.confidence)).scalar() or 0.0)
+    claims_total = db.query(func.count(VerificationClaim.id)).scalar() or 0
+    grounded = (
+        db.query(func.count(VerificationClaim.id))
+        .filter(VerificationClaim.is_grounded.is_(True))
+        .scalar()
+        or 0
+    )
+    grounded_rate = _ratio(grounded, claims_total)
+    completed = (
+        db.query(func.count(Investigation.id))
+        .filter(
+            Investigation.status.in_(
+                (InvestigationStatus.REPORT_READY, InvestigationStatus.CLOSED)
+            )
+        )
+        .scalar()
+        or 0
     )
     goal_rate = _ratio(completed, total)
 
@@ -202,25 +351,34 @@ async def analytics_kpis(
     user=Depends(get_current_user),
 ):
     """Headline analytics KPI cards."""
-    investigations = db.query(Investigation).all()
-    claims = db.query(VerificationClaim).all()
-    total = len(investigations)
+    total = db.query(func.count(Investigation.id)).scalar() or 0
     if total == 0:
         return []
 
-    mean_conf = _ratio(sum(float(i.confidence or 0.0) for i in investigations), total)
-    grounded_rate = _ratio(sum(1 for c in claims if c.is_grounded), len(claims)) if claims else 0.0
-    in_review = sum(
-        1
-        for i in investigations
-        if (i.status.value if hasattr(i.status, "value") else str(i.status))
-        == InvestigationStatus.HUMAN_REVIEW.value
+    mean_conf = float(db.query(func.avg(Investigation.confidence)).scalar() or 0.0)
+    claims_total = db.query(func.count(VerificationClaim.id)).scalar() or 0
+    grounded = (
+        db.query(func.count(VerificationClaim.id))
+        .filter(VerificationClaim.is_grounded.is_(True))
+        .scalar()
+        or 0
     )
-    closed = sum(
-        1
-        for i in investigations
-        if (i.status.value if hasattr(i.status, "value") else str(i.status))
-        in ("report_ready", "closed")
+    grounded_rate = _ratio(grounded, claims_total)
+    in_review = (
+        db.query(func.count(Investigation.id))
+        .filter(Investigation.status == InvestigationStatus.HUMAN_REVIEW)
+        .scalar()
+        or 0
+    )
+    closed = (
+        db.query(func.count(Investigation.id))
+        .filter(
+            Investigation.status.in_(
+                (InvestigationStatus.REPORT_READY, InvestigationStatus.CLOSED)
+            )
+        )
+        .scalar()
+        or 0
     )
 
     return [
@@ -318,7 +476,7 @@ async def llm_summary(
 ):
     """LLM token, cost, fallback, and latency totals."""
     del user
-    rows = _llm_rows(
+    query = _llm_query(
         db,
         date_from=date_from,
         date_to=date_to,
@@ -326,7 +484,7 @@ async def llm_summary(
         model=model,
         request_type=request_type,
     )
-    return _llm_summary(rows)
+    return _llm_summary_from_query(query)
 
 
 @router.get("/llm/by-provider")
@@ -339,8 +497,8 @@ async def llm_by_provider(
 ):
     """LLM usage and cost grouped by provider."""
     del user
-    rows = _llm_rows(db, date_from=date_from, date_to=date_to, request_type=request_type)
-    return _aggregate_llm(rows, "provider_name")
+    query = _llm_query(db, date_from=date_from, date_to=date_to, request_type=request_type)
+    return _aggregate_llm_from_query(query, "provider_name")
 
 
 @router.get("/llm/by-model")
@@ -354,14 +512,14 @@ async def llm_by_model(
 ):
     """LLM usage and cost grouped by model."""
     del user
-    rows = _llm_rows(
+    query = _llm_query(
         db,
         date_from=date_from,
         date_to=date_to,
         provider=provider,
         request_type=request_type,
     )
-    return _aggregate_llm(rows, "model_name")
+    return _aggregate_llm_from_query(query, "model_name")
 
 
 @router.get("/llm/recent-calls")
@@ -409,6 +567,7 @@ async def llm_cost_trends(
         provider=provider,
         model=model,
         request_type=request_type,
+        limit=5000,
     )
     grouped: dict[str, list[LLMCallLog]] = defaultdict(list)
     for row in rows:

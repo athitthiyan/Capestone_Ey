@@ -14,8 +14,8 @@ import {
 } from "@/services/analytics.service";
 import type { LLMAnalyticsFilters } from "@/types/domain";
 
-// Poll cost/LLM telemetry so the panel updates live while a case is running.
-const LIVE_REFETCH_MS = 5_000;
+// Poll cost/LLM telemetry as a production-friendly safety net.
+const LIVE_REFETCH_MS = 30_000;
 
 export function useAnalyticsTrend() {
   return useQuery({
@@ -50,6 +50,7 @@ export function useLlmSummary(filters: LLMAnalyticsFilters) {
     queryKey: ["llm-analytics-summary", filters],
     queryFn: () => getLlmSummary(filters),
     refetchInterval: LIVE_REFETCH_MS,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }
@@ -59,6 +60,7 @@ export function useLlmByProvider(filters: LLMAnalyticsFilters) {
     queryKey: ["llm-analytics-by-provider", filters],
     queryFn: () => getLlmByProvider(filters),
     refetchInterval: LIVE_REFETCH_MS,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }
@@ -68,6 +70,7 @@ export function useLlmByModel(filters: LLMAnalyticsFilters) {
     queryKey: ["llm-analytics-by-model", filters],
     queryFn: () => getLlmByModel(filters),
     refetchInterval: LIVE_REFETCH_MS,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }
@@ -77,6 +80,7 @@ export function useLlmRecentCalls(filters: LLMAnalyticsFilters) {
     queryKey: ["llm-analytics-recent", filters],
     queryFn: () => getLlmRecentCalls(filters),
     refetchInterval: LIVE_REFETCH_MS,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }
@@ -86,6 +90,7 @@ export function useLlmCostTrends(filters: LLMAnalyticsFilters) {
     queryKey: ["llm-analytics-cost-trends", filters],
     queryFn: () => getLlmCostTrends(filters),
     refetchInterval: LIVE_REFETCH_MS,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }

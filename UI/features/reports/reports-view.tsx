@@ -9,22 +9,16 @@ import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/constants/routes";
-import { useActiveInvestigationId } from "@/hooks/use-active-investigation-id";
 import { useReports } from "@/hooks/use-reports";
 import { downloadReportsPdf } from "@/lib/report-export";
 
 export function ReportsView({ caseId: explicitCaseId }: { caseId?: string }) {
-  const activeCase = useActiveInvestigationId(explicitCaseId);
-  const caseId = activeCase.caseId;
-  const { data, error, isLoading, refetch } = useReports();
+  const caseId = explicitCaseId?.trim() || undefined;
+  const { data, error, isLoading, refetch } = useReports({ caseId });
   const workspaceHref = caseId ? routes.caseWorkspace(caseId) : routes.investigations;
 
-  if (activeCase.isLoading || isLoading) {
+  if (isLoading) {
     return <LoadingState label="Loading reports" />;
-  }
-
-  if (activeCase.error) {
-    return <ErrorState error={activeCase.error} onRetry={() => void activeCase.refetch()} />;
   }
 
   if (error || !data) {

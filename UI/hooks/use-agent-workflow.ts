@@ -10,7 +10,8 @@ export function useAgentWorkflow(caseId?: string) {
     enabled: Boolean(caseId),
     // Poll so the workflow diagram advances live while a case runs, even if the
     // websocket is unavailable.
-    refetchInterval: 5_000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
     staleTime: 0,
   });
 }

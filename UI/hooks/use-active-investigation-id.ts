@@ -3,7 +3,7 @@
 import { useInvestigations } from "@/hooks/use-cases";
 
 export function useActiveInvestigationId(explicitCaseId?: string) {
-  const investigationsQuery = useInvestigations({ enabled: !explicitCaseId });
+  const investigationsQuery = useInvestigations({ enabled: !explicitCaseId, limit: 1 });
   const resolvedCaseId = explicitCaseId ?? investigationsQuery.data?.[0]?.id;
 
   return {
