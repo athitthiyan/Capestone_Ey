@@ -41,7 +41,6 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any
 
 from sqlalchemy.orm import Session
 
