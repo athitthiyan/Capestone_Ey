@@ -69,6 +69,11 @@ def execute_investigation_task(self, investigation_id: str) -> dict:
             # loop), unlike the deprecated get_event_loop().
             result = asyncio.run(executor.execute_investigation(investigation_id))
             logger.info(f"Investigation {investigation_id} completed: {result}")
+            # execute_investigation catches its own exceptions and returns
+            # {"status": "failed", ...} instead of raising, so without this
+            # check Celery would consider the task a success and never retry.
+            if result.get("status") == "failed":
+                raise RuntimeError(result.get("error") or "Investigation execution failed")
             return result
         finally:
             db.close()

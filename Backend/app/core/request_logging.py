@@ -1,5 +1,6 @@
 """Request logging middleware for production telemetry."""
 
+import asyncio
 import logging
 import time
 import uuid
@@ -46,7 +47,10 @@ class RequestLoggingMiddleware:
             duration_ms = round((time.perf_counter() - started_at) * 1000, 2)
             path = request.url.path
             if settings.REQUEST_LOGGING_ENABLED and path not in self.excluded_paths:
-                self._record(request, request_id, status_code, duration_ms)
+                # Persisting is a synchronous DB write; keep it off the event
+                # loop so it doesn't add latency to (or block) every request,
+                # including health checks under concurrent load.
+                await asyncio.to_thread(self._record, request, request_id, status_code, duration_ms)
 
     def _record(
         self,

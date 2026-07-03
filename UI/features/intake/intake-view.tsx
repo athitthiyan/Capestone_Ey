@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { TypedConfirmDialog } from "@/components/shared/typed-confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -102,14 +103,6 @@ export function IntakeView() {
   }
 
   async function handleDeleteImportedCases() {
-    const confirmed = window.confirm(
-      "Delete all cases created from intake uploads? This removes their evidence, debate, verification, audit, and review data from the database.",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     setCreateError(null);
     setRunStatus("Deleting imported intake cases from the backend...");
 
@@ -123,14 +116,6 @@ export function IntakeView() {
   }
 
   async function handleDeleteAllCases() {
-    const confirmed = window.confirm(
-      "Delete EVERY case and all of its data? This wipes all investigations (manual and imported) plus their evidence, debate, verification, audit, and review records. This cannot be undone.",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     setCreateError(null);
     setRunStatus("Deleting all cases and related data from the backend...");
 
@@ -258,22 +243,40 @@ export function IntakeView() {
               <Play className="h-4 w-4" aria-hidden="true" />
               {createCases.isPending ? "Creating cases..." : runCases.isPending ? "Starting crew..." : "Create cases & run crew"}
             </Button>
-            <Button
-              variant="danger"
-              disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending}
-              onClick={() => void handleDeleteImportedCases()}
-            >
-              <Trash2 className="h-4 w-4" aria-hidden="true" />
-              {deleteImportedCases.isPending ? "Deleting..." : "Delete imported data"}
-            </Button>
-            <Button
-              variant="danger"
-              disabled={deleteAllCases.isPending || deleteImportedCases.isPending || createCases.isPending || runCases.isPending}
-              onClick={() => void handleDeleteAllCases()}
-            >
-              <Trash2 className="h-4 w-4" aria-hidden="true" />
-              {deleteAllCases.isPending ? "Deleting everything..." : "Delete everything"}
-            </Button>
+            <TypedConfirmDialog
+              title="Delete imported intake data?"
+              description="This removes the evidence, debate, verification, audit, and review data for every case created from intake uploads."
+              confirmPhrase="DELETE IMPORTED"
+              confirmLabel="Delete imported data"
+              onConfirm={() => void handleDeleteImportedCases()}
+              trigger={
+                <Button
+                  variant="danger"
+                  disabled={deleteImportedCases.isPending || createCases.isPending || runCases.isPending}
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  {deleteImportedCases.isPending ? "Deleting..." : "Delete imported data"}
+                </Button>
+              }
+            />
+            <TypedConfirmDialog
+              title="Delete every case?"
+              description="This wipes all investigations (manual and imported) plus their evidence, debate, verification, audit, and review records. This cannot be undone."
+              confirmPhrase="DELETE EVERYTHING"
+              confirmLabel="Delete everything"
+              onConfirm={() => void handleDeleteAllCases()}
+              trigger={
+                <Button
+                  variant="danger"
+                  disabled={
+                    deleteAllCases.isPending || deleteImportedCases.isPending || createCases.isPending || runCases.isPending
+                  }
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  {deleteAllCases.isPending ? "Deleting everything..." : "Delete everything"}
+                </Button>
+              }
+            />
           </>
         }
       />

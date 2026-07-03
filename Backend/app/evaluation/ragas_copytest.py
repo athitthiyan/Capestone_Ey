@@ -152,20 +152,4 @@ def compute_ragas_summary(
 
     scores: dict[str, float] = {
         "Context Precision": mean_relevance,
-        "Context Recall": _ratio(len(ids_with_evidence), total),
-        "Context Entity Recall": _ratio(evidence_with_citations, len(evidence)),
-        "Faithfulness": _ratio(grounded_claims, len(claims)),
-        "Response Relevancy": mean_confidence,
-        "Factual Correctness": _ratio(not_failed, total),
-        "Semantic Similarity": mean_confidence,
-        "Tool Call Accuracy": _ratio(len(ids_with_evidence), total),
-        "Topic Adherence": _ratio(len(ids_with_debate), total),
-        "Agent Goal Accuracy": _ratio(completed, total),
-    }
-
-    metrics = [_metric_row(definition, scores.get(definition.metric, 0.0))
-               for definition in METRIC_CATALOG]
-    passing = sum(1 for m in metrics if m["pass"])
-    scope = "for this case" if investigation_id is not None else f"across {total} scored case(s)"
-    conclusion = f"{passing}/{len(metrics)} RAGAS metrics meet target {scope}."
-    return {"cases": total, "metrics": metrics, "conclusion": conclusion}
+        "Context Recall": _ratio(len(ids_with_evidenc

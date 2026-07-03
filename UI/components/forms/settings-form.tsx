@@ -15,7 +15,7 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const updateSettings = useUpdateSettings();
   const {
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     handleSubmit,
     register,
     reset,
@@ -25,13 +25,20 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
   });
 
   useEffect(() => {
-    reset(settings);
-  }, [reset, settings]);
+    // `settings` gets a new object reference on every refetch (including the
+    // one triggered by our own successful save below), even when nothing
+    // changed. Resetting unconditionally there would blow away any edit the
+    // user is mid-typing; only sync from the server while the form is clean.
+    if (!isDirty) {
+      reset(settings);
+    }
+  }, [reset, settings, isDirty]);
 
   async function onSubmit(values: SettingsFormValues) {
     setSaveError(null);
     try {
       await updateSettings.mutateAsync(values);
+      reset(values);
       setSavedAt(new Date().toLocaleTimeString());
     } catch (error) {
       setSavedAt(null);

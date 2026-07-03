@@ -3,6 +3,7 @@ Application configuration management.
 Environment-aware settings for development, testing, and production.
 """
 
+import secrets
 from typing import Annotated, Literal
 
 from pydantic import field_validator, model_validator
@@ -195,6 +196,12 @@ class Settings(BaseSettings):
     def _production_safety_checks(self):
         if self.AUTH_REQUIRED and not self.SECRET_KEY.strip():
             raise ValueError("SECRET_KEY is required when AUTH_REQUIRED=true")
+
+        if not self.SECRET_KEY.strip():
+            # Never sign a JWT with an empty string, even while AUTH_REQUIRED=false
+            # (e.g. local dev where /auth/token is still reachable). Generated once
+            # per process start; restarting invalidates any tokens issued before it.
+            self.SECRET_KEY = secrets.token_urlsafe(48)
 
         if self.USE_REAL_AGENTS:
             provider_key_env = {

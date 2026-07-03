@@ -39,7 +39,8 @@ def hash_password(password: str) -> str:
 def verify_password(plain: str, hashed: str) -> bool:
     try:
         return bcrypt.checkpw(_password_bytes(plain), hashed.encode("utf-8"))
-    except ValueError:
+    except (ValueError, TypeError, AttributeError):
+        # A malformed/None hash (e.g. corrupted row) must fail closed, not 500.
         return False
 
 
@@ -120,4 +121,21 @@ def get_current_user(
     if user is None or not user.is_active:
         raise credentials_exc
     request.state.user = user
+    return user
+
+
+# Roles allowed to run irreversible, cross-case operations (bulk delete, etc).
+# When AUTH_REQUIRED is false, get_current_user returns None for everyone and
+# this check is skipped so local/dev deployments keep working unauthenticated.
+ELEVATED_ROLES = {"partner", "admin"}
+
+
+def require_elevated_role(user: Optional[User] = Depends(get_current_user)) -> Optional[User]:
+    if not settings.AUTH_REQUIRED:
+        return user
+    if user is None or (user.role or "").lower() not in ELEVATED_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This action requires an elevated role (partner/admin).",
+        )
     return user

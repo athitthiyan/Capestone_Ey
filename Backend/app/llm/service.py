@@ -7,6 +7,8 @@ import time
 from dataclasses import replace
 
 from sqlalchemy.orm import sessionmaker
+from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
+from tenacity import Retrying
 
 from app.core.config import settings
 from app.core.metrics import (
@@ -40,6 +42,19 @@ from app.llm.types import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Kinds worth a same-provider retry before giving up and moving to fallback -
+# transient network/provider hiccups, not auth/quota/context failures that
+# will just fail identically again.
+_RETRYABLE_ON_SAME_PROVIDER = {
+    LLMFailureKind.TIMEOUT,
+    LLMFailureKind.NETWORK,
+    LLMFailureKind.PROVIDER_ERROR,
+}
+
+
+def _is_transient_provider_error(exc: BaseException) -> bool:
+    return isinstance(exc, LLMProviderError) and exc.kind in _RETRYABLE_ON_SAME_PROVIDER
 
 
 class LLMService:
@@ -139,7 +154,14 @@ class LLMService:
 
             started = time.perf_counter()
             try:
-                provider_response = self.providers[provider].complete(
+                retrying = Retrying(
+                    stop=stop_after_attempt(3),
+                    wait=wait_exponential(multiplier=0.5, max=4),
+                    retry=retry_if_exception(_is_transient_provider_error),
+                    reraise=True,
+                )
+                provider_response = retrying(
+                    self.providers[provider].complete,
                     prepared,
                     model=model,
                     api_key=key,

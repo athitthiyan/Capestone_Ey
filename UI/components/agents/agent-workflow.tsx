@@ -104,13 +104,20 @@ function AgentWorkflowCanvas({ steps, className }: { steps: PipelineStep[]; clas
 
   const edges = useMemo<Edge[]>(
     () =>
-      steps.slice(1).map((step, index) => ({
-        id: `${steps[index].id}-${step.id}`,
-        source: steps[index].id,
-        target: step.id,
-        animated: step.state === "running" || step.state === "queued",
-        style: { stroke: "hsl(var(--primary))" },
-      })),
+      // Pair each step with its immediate predecessor by zipping the array
+      // against itself offset by one, rather than cross-referencing through
+      // a separately-sliced array's index - keeps the predecessor lookup
+      // correct even if `steps` is ever filtered/reordered upstream.
+      steps.slice(1).map((step, index) => {
+        const previous = steps[index];
+        return {
+          id: `${previous.id}-${step.id}`,
+          source: previous.id,
+          target: step.id,
+          animated: step.state === "running" || step.state === "queued",
+          style: { stroke: "hsl(var(--primary))" },
+        };
+      }),
     [steps],
   );
 

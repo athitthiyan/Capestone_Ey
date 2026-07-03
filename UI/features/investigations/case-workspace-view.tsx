@@ -184,13 +184,27 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
   const auditEvents = workspace?.auditEvents ?? [];
   const evaluation = workspace?.evaluation;
   useInvestigationRealtime(caseId, { onMessage: setRunMessage });
+  // Keyed on the specific primitive fields workflowFromInvestigation reads,
+  // not the `investigation` object itself - React Query hands back a new
+  // object reference on every poll/WS-triggered refetch even when none of
+  // these values actually changed, which would otherwise defeat the memo.
   const workflowSteps = useMemo(() => {
     if (!investigation) {
       return [];
     }
 
     return workflowQuery.data?.length ? workflowQuery.data : workflowFromInvestigation(investigation);
-  }, [investigation, workflowQuery.data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    investigation?.status,
+    investigation?.risk,
+    investigation?.confidence,
+    investigation?.reviewer,
+    investigation?.transactionId,
+    investigation?.vendor,
+    investigation?.description,
+    workflowQuery.data,
+  ]);
 
   const hasActiveWorkflow = workflowSteps.some(
     (step) =>
@@ -241,9 +255,13 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
       return undefined;
     }
 
+    // Fallback safety net only - the WebSocket subscription above already
+    // invalidates these queries on every pipeline/debate/verification event.
+    // This interval exists for when the socket drops and hasn't reconnected
+    // yet, so it runs at a much lower frequency than a primary refresh loop.
     const interval = window.setInterval(() => {
       void refreshWorkspace();
-    }, 10_000);
+    }, 45_000);
 
     return () => window.clearInterval(interval);
   }, [isPipelineRunning, refreshWorkspace]);
@@ -406,7 +424,7 @@ export function CaseWorkspaceView({ caseId }: { caseId: string }) {
 
       <section className="space-y-3">
         <EvidenceVerificationCard
-          error={null}
+          error={verifyEvidence.error ?? workspaceQuery.error}
           isLoading={workspaceQuery.isFetching && !workspace}
           isReverifying={verifyEvidence.isPending}
           onReverify={() => void handleReverifyEvidence()}

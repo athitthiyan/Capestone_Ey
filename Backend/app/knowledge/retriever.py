@@ -117,6 +117,11 @@ def knowledge_sources() -> list[dict[str, Any]]:
     return sources
 
 
+@lru_cache(maxsize=256)
+def _chunk_terms_cached(chunk_id: str, searchable: str) -> frozenset[str]:
+    return frozenset(_tokens(searchable))
+
+
 def _rank_chunks(query: str, chunks: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
     query_terms = _tokens(query)
     query_vector = embed_text(query)
@@ -126,7 +131,9 @@ def _rank_chunks(query: str, chunks: list[dict[str, Any]], limit: int) -> list[d
     ranked: list[tuple[float, float, float, dict[str, Any]]] = []
     for chunk in chunks:
         searchable = _chunk_text(chunk, chunk.get("source_title", ""))
-        chunk_terms = _tokens(searchable)
+        # Corpus chunks are static within a process; re-tokenizing the same
+        # chunk text on every retrieval call is pure waste.
+        chunk_terms = _chunk_terms_cached(str(chunk.get("id", "")), searchable)
         overlap = len(query_terms & chunk_terms)
         keyword_hits = sum(
             1 for keyword in chunk.get("keywords", []) if keyword.lower() in query.lower()
@@ -145,6 +152,16 @@ def _rank_chunks(query: str, chunks: list[dict[str, Any]], limit: int) -> list[d
             "score": round(score, 4),
             "lexical_score": round(lexical_score, 4),
             "vector_score": round(vector_score, 4),
+            # Bounded 0..1 relevance for RAGAS Context Precision, so that score
+            # reflects genuine retrieval quality instead of a constant. vector_score
+            # is already a clamped cosine similarity; lexical_score is an unbounded
+            # word-overlap count, so it's squashed with a saturating curve (roughly
+            # 3 overlapping terms, or fewer plus a keyword hit, reaches the cap)
+            # rather than normalized against the batch's own top score, which
+            # would make the top hit always read as "1.0" regardless of quality.
+            "relevance": round(
+                min(1.0, (vector_score * 0.6) + (min(lexical_score, 6.0) / 6.0 * 0.4)), 4
+            ),
         }
         for score, lexical_score, vector_score, chunk in ranked[:limit]
     ]

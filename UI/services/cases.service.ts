@@ -307,13 +307,16 @@ export async function createInvestigation(input: CreateInvestigationInput): Prom
 }
 
 export async function createInvestigations(inputs: CreateInvestigationInput[]): Promise<Investigation[]> {
-  const created: Investigation[] = [];
+  // Run concurrently and keep whatever succeeds instead of serializing the
+  // batch: sequential awaits meant one failed row aborted every row after it.
+  const settled = await Promise.allSettled(inputs.map(createInvestigation));
+  settled
+    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+    .forEach((result) => console.warn("Failed to create investigation:", result.reason));
 
-  for (const input of inputs) {
-    created.push(await createInvestigation(input));
-  }
-
-  return created;
+  return settled
+    .filter((result): result is PromiseFulfilledResult<Investigation> => result.status === "fulfilled")
+    .map((result) => result.value);
 }
 
 export type ExecuteInvestigationResponse = {
@@ -349,11 +352,12 @@ export async function executeInvestigation(caseId: string): Promise<ExecuteInves
 }
 
 export async function executeInvestigations(caseIds: string[]): Promise<ExecuteInvestigationResponse[]> {
-  const results: ExecuteInvestigationResponse[] = [];
+  const settled = await Promise.allSettled(caseIds.map(executeInvestigation));
+  settled
+    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+    .forEach((result) => console.warn("Failed to execute investigation:", result.reason));
 
-  for (const caseId of caseIds) {
-    results.push(await executeInvestigation(caseId));
-  }
-
-  return results;
+  return settled
+    .filter((result): result is PromiseFulfilledResult<ExecuteInvestigationResponse> => result.status === "fulfilled")
+    .map((result) => result.value);
 }

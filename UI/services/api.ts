@@ -28,7 +28,7 @@ export function isApiConfigured() {
   return apiBaseUrl.length > 0;
 }
 
-export function apiWebSocketUrl(path: string) {
+export async function apiWebSocketUrl(path: string) {
   if (!isApiConfigured()) {
     return "";
   }
@@ -37,6 +37,12 @@ export function apiWebSocketUrl(path: string) {
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   url.pathname = `${url.pathname.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
   url.search = "";
+
+  const token = await getAccessToken();
+  if (token) {
+    url.searchParams.set("token", token);
+  }
+
   return url.toString();
 }
 
@@ -81,7 +87,10 @@ async function requestPasswordToken() {
   return payload.access_token ?? null;
 }
 
-async function getAccessToken() {
+const TOKEN_FAILURE_COOLDOWN_MS = 15_000;
+let tokenFailureUntil = 0;
+
+export async function getAccessToken() {
   const staticToken = getStaticToken();
 
   if (staticToken) {
@@ -89,6 +98,12 @@ async function getAccessToken() {
   }
 
   if (!getPasswordCredentials()) {
+    return null;
+  }
+
+  if (Date.now() < tokenFailureUntil) {
+    // Avoid re-paying a full token round trip on every request while the
+    // auth server (or configured credentials) is known-bad.
     return null;
   }
 
@@ -100,6 +115,7 @@ async function getAccessToken() {
 
   if (!token) {
     tokenPromise = null;
+    tokenFailureUntil = Date.now() + TOKEN_FAILURE_COOLDOWN_MS;
   }
 
   return token;

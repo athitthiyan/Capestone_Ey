@@ -1,7 +1,7 @@
 """Analytics routes - aggregates derived from investigation and request telemetry."""
 
 from collections import Counter, defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import case, func
@@ -273,9 +273,18 @@ async def analytics_trend(
     db: Session = Depends(get_db_session),
     user=Depends(get_current_user),
 ):
-    """Weekly confidence + verifier-grounding trend."""
-    investigations = db.query(Investigation.created_at, Investigation.confidence).all()
-    claims = db.query(VerificationClaim.created_at, VerificationClaim.is_grounded).all()
+    """Weekly confidence + verifier-grounding trend (last 26 weeks)."""
+    since = datetime.utcnow() - timedelta(weeks=26)
+    investigations = (
+        db.query(Investigation.created_at, Investigation.confidence)
+        .filter(Investigation.created_at >= since)
+        .all()
+    )
+    claims = (
+        db.query(VerificationClaim.created_at, VerificationClaim.is_grounded)
+        .filter(VerificationClaim.created_at >= since)
+        .all()
+    )
     if not investigations:
         return []
 

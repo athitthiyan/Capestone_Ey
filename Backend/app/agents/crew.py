@@ -9,7 +9,7 @@ module can be imported in environments where they are not installed.
 import json
 import logging
 import re
-from typing import Any, Callable, Optional, TypedDict
+from typing import Callable, Optional, TypedDict
 
 from app.core.config import settings
 
@@ -238,13 +238,24 @@ Policy/data context:
             state,
             prompt,
             request_type="evidence_collection",
-            complexity="complex",
+            # Extraction/summarization, not the final verdict - "standard" lets
+            # route_model send short prompts to the lightweight model tier
+            # instead of always paying reasoning-model prices (see routing.py).
+            complexity="standard",
         )
         summary = response.content
         if attempt > 1 and previous_summary not in ("", "None yet"):
             state["evidence_summary"] = f"{previous_summary}\n\nFollow-up corroboration query: {summary}"
         else:
             state["evidence_summary"] = summary
+        # Prefer the retriever's own relevance score for this query (set in
+        # executor.py right before this node runs) so Context Precision reflects
+        # real retrieval quality. Only fall back to the flat per-attempt constant
+        # when nothing was actually retrieved (rag_relevance == 0.0) - there's no
+        # retrieval to score in that case, but the agent still produced a
+        # grounded summary from the ledger/prior context alone.
+        rag_relevance = state.get("rag_relevance") or 0.0
+        relevance_score = rag_relevance if rag_relevance > 0.0 else (0.75 if attempt == 1 else 0.85)
         state.setdefault("evidence", []).append(
             {
                 "source": f"{response.provider}_analysis"
@@ -252,7 +263,7 @@ Policy/data context:
                 else f"{response.provider}_corroboration_query",
                 "content": summary,
                 "citations": state.get("rag_citations", []),
-                "relevance_score": 0.75 if attempt == 1 else 0.85,
+                "relevance_score": relevance_score,
             }
         )
         state.setdefault("messages", []).append(
@@ -277,7 +288,10 @@ Defender's last rebuttal: {prior_defender[-1] if prior_defender else 'None yet'}
             state,
             prompt,
             request_type="challenger_argument",
-            complexity="complex",
+            # Debate argument, not the final verdict - route to the lightweight
+            # tier by default (routing.py falls back to reasoning automatically
+            # if the prompt is long, so quality on hard cases is unaffected).
+            complexity="standard",
         )
         state.setdefault("challenger_arguments", []).append(response.content)
         state.setdefault("debate_transcript", []).append(
@@ -304,7 +318,8 @@ Your previous rebuttal: {prior_defender[-1] if prior_defender else 'None yet'}
             state,
             prompt,
             request_type="defender_argument",
-            complexity="complex",
+            # Same reasoning as the Challenger call above.
+            complexity="standard",
         )
         state.setdefault("defender_arguments", []).append(response.content)
         state.setdefault("debate_transcript", []).append(
@@ -394,24 +409,10 @@ def route_debate(state: InvestigationState) -> str:
     return "adjudicator"
 
 
-def create_investigation_graph() -> Any:
-    from langgraph.graph import END, StateGraph
-
-    graph = StateGraph(InvestigationState)
-    graph.add_node("supervisor", create_supervisor_agent())
-    graph.add_node("evidence", create_evidence_agent())
-    graph.add_node("challenger", create_challenger_agent())
-    graph.add_node("defender", create_defender_agent())
-    graph.add_node("adjudicator", create_adjudicator_agent())
-    graph.add_node("verifier", create_verifier_agent())
-
-    graph.add_edge("supervisor", "evidence")
-    graph.add_edge("evidence", "challenger")
-    graph.add_edge("challenger", "defender")
-    graph.add_conditional_edges(
-        "defender", route_debate, {"challenger": "challenger", "adjudicator": "adjudicator"}
-    )
-    graph.add_edge("adjudicator", "verifier")
-    graph.add_edge("verifier", END)
-    graph.set_entry_point("supervisor")
-    return graph.compile()
+# NOTE: there used to be a `create_investigation_graph()` here that compiled a
+# LangGraph StateGraph over these same node factories, but nothing ever called
+# it - it was dead code. app/agents/executor.py's InvestigationExecutor is the
+# actual runtime orchestrator: it calls these node functions directly and adds
+# control flow the simple linear graph above didn't have (bounded supervisor
+# retries with corroboration re-queries when the Verifier rejects a verdict).
+# Removed rather than left in place so it can't be mistaken for the live path.

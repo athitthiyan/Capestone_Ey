@@ -1,10 +1,11 @@
 """Authentication routes."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import enforce_rate_limit
 from app.core.security import (
     authenticate_user,
     create_access_token,
@@ -20,9 +21,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/token", response_model=Token)
 async def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db_session),
 ):
+    enforce_rate_limit(request, bucket="auth_token", max_requests=10)
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -36,9 +39,11 @@ async def login(
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def register(
+    request: Request,
     payload: UserCreate,
     db: Session = Depends(get_db_session),
 ):
+    enforce_rate_limit(request, bucket="auth_register", max_requests=5)
     existing = db.query(User).filter(User.username == payload.username).first()
     if existing:
         raise HTTPException(status_code=409, detail="Username already exists")

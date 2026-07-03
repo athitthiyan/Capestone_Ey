@@ -164,16 +164,15 @@ export function useInvestigationRealtime(
       return undefined;
     }
 
-    const url = apiWebSocketUrl(`/ws/investigations/${caseId}`);
-
-    if (!url) {
-      return undefined;
-    }
-
     let socket: WebSocket | null = null;
     let closedByEffect = false;
     let reconnectAttempt = 0;
     let reconnectTimer: number | undefined;
+    const MAX_RECONNECT_ATTEMPTS = 8;
+    // 1000 = normal closure (server intentionally ended the stream, e.g. case
+    // complete) and 1008 = policy violation (unauthorized) - neither should
+    // trigger an infinite reconnect loop.
+    const NO_RETRY_CLOSE_CODES = new Set([1000, 1008]);
 
     const refreshCaseQueries = (payload?: Record<string, unknown>) => {
       if (payload) {
@@ -215,7 +214,12 @@ export function useInvestigationRealtime(
       ]);
     };
 
-    const connect = () => {
+    const connect = async () => {
+      const url = await apiWebSocketUrl(`/ws/investigations/${caseId}`);
+      if (!url || closedByEffect) {
+        return;
+      }
+
       socket = new WebSocket(url);
 
       socket.onopen = () => {
@@ -239,18 +243,22 @@ export function useInvestigationRealtime(
       socket.onerror = () => {
         onMessage?.("Realtime connection interrupted; reconnecting.");
       };
-      socket.onclose = () => {
-        if (closedByEffect) {
+      socket.onclose = (event) => {
+        if (closedByEffect || NO_RETRY_CLOSE_CODES.has(event.code)) {
+          return;
+        }
+        if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
+          onMessage?.("Realtime connection lost; giving up after repeated retries.");
           return;
         }
 
         const delayMs = Math.min(1000 * 2 ** reconnectAttempt, 10_000);
         reconnectAttempt += 1;
-        reconnectTimer = window.setTimeout(connect, delayMs);
+        reconnectTimer = window.setTimeout(() => void connect(), delayMs);
       };
     };
 
-    connect();
+    void connect();
 
     return () => {
       closedByEffect = true;

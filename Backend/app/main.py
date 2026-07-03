@@ -7,9 +7,10 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.routes import (
@@ -130,6 +131,22 @@ def create_app() -> FastAPI:
     app.include_router(intake.router, prefix=settings.API_ROOT_PATH)
     app.include_router(settings_routes.router, prefix=settings.API_ROOT_PATH)
     app.include_router(websocket.router, prefix=settings.API_ROOT_PATH)
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(request: Request, exc: Exception):
+        request_id = getattr(request.state, "request_id", None)
+        logger.error(
+            "Unhandled exception on %s %s: %s",
+            request.method,
+            request.url.path,
+            exc,
+            exc_info=True,
+        )
+        detail = str(exc) if settings.DEBUG else "Internal server error"
+        return JSONResponse(
+            status_code=500,
+            content={"detail": detail, "request_id": request_id},
+        )
 
     @app.get(f"{settings.API_ROOT_PATH}/")
     async def root():

@@ -324,6 +324,14 @@ class InvestigationExecutor:
             policy_chunks = retrieve_knowledge_context(query, limit=4)
         state["rag_context"] = format_context(policy_chunks)
         state["rag_citations"] = [chunk["id"] for chunk in policy_chunks]
+        # Mean of the retriever's own per-chunk relevance, so the evidence
+        # artifact's relevance_score (and therefore RAGAS Context Precision)
+        # reflects this call's actual retrieval quality instead of a constant.
+        state["rag_relevance"] = (
+            round(sum(c.get("relevance", 0.0) for c in policy_chunks) / len(policy_chunks), 4)
+            if policy_chunks
+            else 0.0
+        )
 
         new_items: list[dict] = []
         if settings.USE_REAL_AGENTS:
@@ -365,7 +373,10 @@ class InvestigationExecutor:
                         "source": "policy_kb",
                         "content": state["rag_context"],
                         "citations": state["rag_citations"],
-                        "relevance_score": 0.82,
+                        # Real per-query retrieval relevance (see rag_relevance
+                        # above), not a fixed constant - varies with how well
+                        # the corpus actually matches this transaction.
+                        "relevance_score": state["rag_relevance"],
                     }
                 )
             state["evidence"] = list(new_items)
@@ -610,7 +621,9 @@ class InvestigationExecutor:
             state["adjudication"] = adjudication
 
         risk_level = adjudication.get("risk_level", "medium")
-        confidence = float(adjudication.get("confidence", 0.5) or 0.5)
+        # A malformed LLM JSON response (e.g. confidence: 150) must not leak an
+        # out-of-range value into the confidence-gate thresholds below.
+        confidence = max(0.0, min(1.0, float(adjudication.get("confidence", 0.5) or 0.5)))
 
         investigation = self.db.get(Investigation, investigation_id)
         investigation.risk = _risk_from_str(risk_level)

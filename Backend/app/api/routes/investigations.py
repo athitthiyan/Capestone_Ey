@@ -1,5 +1,6 @@
 """Investigation CRUD + execution routes."""
 
+import asyncio
 import logging
 from datetime import datetime, timedelta
 
@@ -8,7 +9,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import get_current_user
+from app.core.security import get_current_user, require_elevated_role
 from app.db.models import (
     AuditLog,
     DebateTranscript,
@@ -143,7 +144,11 @@ async def create_investigation(
         from app.api.routes.claims import record_evidence_verification_event
         from app.evidence_verification import EvidenceVerificationService
 
-        verification = EvidenceVerificationService().verify_investigation(db, investigation)
+        # verify_investigation makes synchronous HTTP calls to FX/benchmark
+        # providers; keep them off the event loop.
+        verification = await asyncio.to_thread(
+            EvidenceVerificationService().verify_investigation, db, investigation
+        )
         await record_evidence_verification_event(
             verification,
             actor=getattr(user, "username", None) or payload.owner or "system",
@@ -170,7 +175,7 @@ async def list_investigations(
     user=Depends(get_current_user),
 ):
     limit = max(1, min(limit, 500))
-    query = db.query(Investigation)
+    query = db.query(Investigation, func.count(Investigation.id).over().label("total_count"))
     if status_filter:
         query = query.filter(Investigation.status == status_filter)
     if risk:
@@ -183,8 +188,31 @@ async def list_investigations(
             .exists()
         )
 
-    total = query.count()
-    rows = query.order_by(Investigation.created_at.desc()).offset(skip).limit(limit).all()
+    # One round trip: a window-function total alongside the page instead of a
+    # separate COUNT(*) query.
+    page = query.order_by(Investigation.created_at.desc()).offset(skip).limit(limit).all()
+    rows = [row for row, _ in page]
+    if page:
+        total = page[0][1]
+    elif skip == 0:
+        total = 0
+    else:
+        # Empty page beyond the last row (skip too large) - the window
+        # function has nothing to attach a count to, so ask separately.
+        # Rare path (only hit when the caller pages past the end).
+        count_query = db.query(func.count(Investigation.id))
+        if status_filter:
+            count_query = count_query.filter(Investigation.status == status_filter)
+        if risk:
+            count_query = count_query.filter(Investigation.risk == risk)
+        if has_debate:
+            count_query = count_query.filter(
+                db.query(DebateTranscript.id)
+                .filter(DebateTranscript.investigation_id == Investigation.id)
+                .exists()
+            )
+        total = count_query.scalar() or 0
+
     return InvestigationList(
         total=total,
         skip=skip,
@@ -196,7 +224,7 @@ async def list_investigations(
 @router.delete("/all", response_model=InvestigationDeleteResponse)
 async def delete_all_investigations(
     db: Session = Depends(get_db_session),
-    user=Depends(get_current_user),
+    user=Depends(require_elevated_role),
 ):
     """Wipe every investigation and all related data, regardless of source.
 
@@ -254,7 +282,7 @@ async def delete_all_investigations(
 @router.delete("/imported", response_model=InvestigationDeleteResponse)
 async def delete_imported_investigations(
     db: Session = Depends(get_db_session),
-    user=Depends(get_current_user),
+    user=Depends(require_elevated_role),
 ):
     """Delete cases created from ledger intake uploads and their generated data."""
     investigations = (
@@ -358,28 +386,35 @@ async def get_investigation_workspace(
         .all()
     )
 
-    try:
-        from app.audit.eventstore import get_audit_log
+    async def _load_audit_events() -> list:
+        try:
+            from app.audit.eventstore import get_audit_log
 
-        log = await get_audit_log()
-        audit_events = await log.get_events(investigation_id, limit=50)
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Workspace audit load failed for %s: %s", investigation_id, exc)
-        audit_events = []
+            log = await get_audit_log()
+            return await log.get_events(investigation_id, limit=50)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Workspace audit load failed for %s: %s", investigation_id, exc)
+            return []
 
-    try:
-        from app.evidence_verification import EvidenceVerificationService
+    def _load_evidence_verification():
+        try:
+            from app.evidence_verification import EvidenceVerificationService
 
-        latest_evidence_verification = EvidenceVerificationService().get_latest(
-            db, investigation_id
-        )
-    except Exception as exc:  # noqa: BLE001
-        logger.warning(
-            "Workspace evidence verification load failed for %s: %s",
-            investigation_id,
-            exc,
-        )
-        latest_evidence_verification = None
+            return EvidenceVerificationService().get_latest(db, investigation_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Workspace evidence verification load failed for %s: %s",
+                investigation_id,
+                exc,
+            )
+            return None
+
+    # Two independent reads (event store + a sync ORM query) - run them
+    # concurrently instead of serially awaiting one after the other.
+    audit_events, latest_evidence_verification = await asyncio.gather(
+        _load_audit_events(),
+        asyncio.to_thread(_load_evidence_verification),
+    )
 
     return {
         "investigation": _dump(InvestigationOut.model_validate(investigation)),
@@ -415,7 +450,19 @@ async def get_investigation_workspace(
         "audit": [_dump(AuditEventOut(**event)) for event in audit_events],
         "reports": _case_report_payloads(investigation),
         "evaluation": _dump(
-            EvaluationSummaryOut(**compute_ragas_summary(db, investigation_id=investigation_id))
+            EvaluationSummaryOut(
+                **compute_ragas_summary(
+                    db,
+                    investigation_id=investigation_id,
+                    # Already loaded above for this same response - skip the
+                    # 4 duplicate SELECTs compute_ragas_summary would otherwise
+                    # issue against the same rows.
+                    preloaded_investigations=[investigation],
+                    preloaded_claims=verification_rows,
+                    preloaded_evidence=evidence_rows,
+                    preloaded_debates=debate_rows,
+                )
+            )
         ),
     }
 
@@ -667,7 +714,7 @@ async def execute_investigation(
             status="running",
             message="Investigation running in-process",
         )
-    if not _celery_broker_available():
+    if not await asyncio.to_thread(_celery_broker_available):
         logger.info(f"Investigation {investigation_id} running inline (Celery broker unavailable)")
         background_tasks.add_task(_run_investigation_inline, investigation_id)
         return ExecuteResponse(
