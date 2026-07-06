@@ -6,25 +6,35 @@ Built with FastAPI, PostgreSQL, LangGraph, Celery, and EventStoreDB for immutabl
 
 ---
 
+<!-- Updated 2026-07-06: structure corrected to the real app/ package (was a pre-refactor flat layout). See docs/STRUCTURE and docs/ARCHITECTURE.md. -->
 ## 🏗️ Project Structure
 
 ```
-backend/
-├── main.py                      # FastAPI app entry point + WebSocket routes
-├── config.py                    # Environment settings & configuration
-├── db_session.py               # Database connection pooling
-├── db_models.py                # SQLAlchemy ORM models
-├── websocket_manager.py        # WebSocket connection & event management
-├── agent_crew.py               # LangGraph multi-agent orchestration
-├── investigation_executor.py   # Investigation execution engine
-├── celery_config.py            # Celery task queue & workers
-├── eventstore_client.py        # EventStoreDB audit trail
-├── requirements.txt            # Python dependencies
-├── Dockerfile                  # Container image
-├── docker-compose.yml          # Local dev stack (7 services)
-├── k8s-deployment.yaml         # Kubernetes manifests
-├── .env.example                # Environment template
-└── README.md                   # This file
+Backend/
+├── app/                         # application package
+│   ├── main.py                  # FastAPI app factory (create_app) + lifespan
+│   ├── core/                    # config.py (Settings), security.py, request_logging.py
+│   ├── api/routes/              # HTTP/WS routers (health, auth, investigations, ...)
+│   ├── schemas/                 # Pydantic request/response models
+│   ├── db/                      # models.py (ORM), session.py (engine/pool)
+│   ├── agents/                  # crew.py (LangGraph), executor.py (pipeline)
+│   ├── llm/                     # provider gateway (anthropic/groq/openai/gemini/deepseek)
+│   ├── knowledge/               # RAG retriever + embeddings sync
+│   ├── realtime/                # websocket_manager.py + redis_bus.py (cross-process)
+│   ├── tasks/                   # celery_app.py (tasks + beat schedule)
+│   ├── evaluation/              # RAGAS real-time judge
+│   ├── evidence_verification/   # third-party benchmark checks
+│   └── audit/                   # eventstore.py (+ Postgres hash-chain fallback)
+├── migrations/                  # Alembic (env.py wired to app.db.models.Base)
+├── tests/                       # pytest (sqlite + stub agents)
+├── main.py                      # compat shim -> `from app.main import app`
+├── Dockerfile                   # CMD: uvicorn app.main:app
+├── docker-compose.yml           # local dev stack (7 services)
+├── docker-compose.local-infra.yml  # Redis + EventStoreDB only (local-prod path)
+├── k8s-deployment.yaml          # Kubernetes manifests
+├── railway.{api,worker,beat}.json  # Railway config-as-code
+├── requirements.txt · pyproject.toml · alembic.ini · .env.example
+└── README.md                    # this file
 ```
 
 ---

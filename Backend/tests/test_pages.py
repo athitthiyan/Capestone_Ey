@@ -1,6 +1,8 @@
 """Endpoint tests for the pages that previously had no backing API:
 analytics, reports, knowledge base, global audit, and replay."""
 
+from datetime import datetime, timedelta
+
 from app.db.models import Investigation, InvestigationStatus, VerificationClaim
 
 
@@ -37,6 +39,30 @@ def test_analytics_endpoints_return_lists(client):
         r = client.get(f"/api/v1/analytics/{path}")
         assert r.status_code == 200, r.text
         assert isinstance(r.json(), list)
+
+
+def test_analytics_trend_limit_bounds_rows_before_grouping(client, db):
+    now = datetime.utcnow().replace(microsecond=0)
+    created_dates = [now + timedelta(days=7), now + timedelta(days=14), now + timedelta(days=21)]
+    for index, created_at in enumerate(created_dates):
+        db.add(
+            Investigation(
+                transaction_id=f"AN-LIMIT-{index}",
+                vendor="Bounded Analytics",
+                category="ops",
+                amount=1000.0 + index,
+                confidence=0.7 + (index / 100),
+                created_at=created_at,
+            )
+        )
+    db.commit()
+
+    r = client.get("/api/v1/analytics/trend?limit=2")
+
+    assert r.status_code == 200, r.text
+    weeks = {item["week"] for item in r.json()}
+    oldest = created_dates[0].isocalendar()
+    assert f"{oldest[0]}-W{oldest[1]:02d}" not in weeks
 
 
 def test_global_audit_recent(client):

@@ -3,7 +3,7 @@
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
@@ -270,19 +270,25 @@ def _llm_call_payload(row: LLMCallLog) -> dict:
 
 @router.get("/trend")
 async def analytics_trend(
+    limit: int = Query(5000, ge=1, le=20000),
     db: Session = Depends(get_db_session),
     user=Depends(get_current_user),
 ):
     """Weekly confidence + verifier-grounding trend (last 26 weeks)."""
+    del user
     since = datetime.utcnow() - timedelta(weeks=26)
     investigations = (
         db.query(Investigation.created_at, Investigation.confidence)
         .filter(Investigation.created_at >= since)
+        .order_by(Investigation.created_at.desc())
+        .limit(limit)
         .all()
     )
     claims = (
         db.query(VerificationClaim.created_at, VerificationClaim.is_grounded)
         .filter(VerificationClaim.created_at >= since)
+        .order_by(VerificationClaim.created_at.desc())
+        .limit(limit)
         .all()
     )
     if not investigations:

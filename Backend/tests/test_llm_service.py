@@ -1,10 +1,12 @@
 """LLM provider routing, fallback, token, and cost tests."""
 
 import pytest
+from tenacity import wait_none
 
 from app.core.config import settings
 from app.db.models import LLMCallLog, RuntimeSetting
 from app.db.session import SessionLocal
+from app.llm import service as service_module
 from app.llm.pricing import estimate_cost_usd
 from app.llm.routing import route_model
 from app.llm.service import LLMService
@@ -26,6 +28,29 @@ class FakeProvider:
             raise self.error
         return ProviderResponse(
             content=self.response_text,
+            model=model,
+            prompt_tokens=10,
+            completion_tokens=5,
+        )
+
+
+class FlakyProvider:
+    name = "anthropic"
+
+    def __init__(self):
+        self.calls = 0
+
+    def complete(self, request, *, model, api_key, timeout_seconds):
+        self.calls += 1
+        if self.calls < 3:
+            raise LLMProviderError(
+                "temporary timeout",
+                provider="anthropic",
+                kind=LLMFailureKind.TIMEOUT,
+                retryable=True,
+            )
+        return ProviderResponse(
+            content="ok after retry",
             model=model,
             prompt_tokens=10,
             completion_tokens=5,
@@ -112,6 +137,26 @@ def test_provider_fallback_tracks_failed_and_successful_calls(monkeypatch, db, c
     assert rows[1].provider_name == "groq"
     assert rows[1].success is True
     assert rows[1].fallback_used is True
+
+
+def test_transient_provider_error_retries_same_provider_before_success(monkeypatch):
+    monkeypatch.setattr(service_module, "wait_exponential", lambda *args, **kwargs: wait_none())
+    monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "anthropic-key")
+    monkeypatch.setattr(settings, "DEFAULT_LLM_PROVIDER", "anthropic")
+    monkeypatch.setattr(settings, "ENABLE_LLM_FALLBACK", False)
+    provider = FlakyProvider()
+    service = LLMService(providers={"anthropic": provider}, session_factory=None)
+
+    response = service.complete(
+        LLMRequest(
+            prompt="Evaluate this audit case.",
+            request_type="adjudication",
+            complexity="critical",
+        )
+    )
+
+    assert response.content == "ok after retry"
+    assert provider.calls == 3
 
 
 def test_fallback_disabled_surfaces_provider_error(monkeypatch, db, clean_llm_tables):

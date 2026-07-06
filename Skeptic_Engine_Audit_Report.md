@@ -1,4 +1,7 @@
 # Skeptic Engine — Bug & Optimization Audit
+
+> **[Historical snapshot - 2026-07-03]** This bug/optimization audit is a point-in-time report. Several findings have since been fixed (global exception handler, real LangGraph invocation, production auth/secret safety checks). Do not read it as current status. Live status: `docs/KNOWN_ISSUES.md`; what changed: `docs/AUDIT_REPORT.md` section 3.
+
 Date: 2026-07-03
 
 Scope: `Backend/` (FastAPI + SQLAlchemy + Celery + Redis + LangGraph) and `UI/` (Next.js 15 / React 19 App Router). Findings are cited with file:line and grouped by severity. "Bugs" break correctness/security; "Optimizations" hurt latency, scalability, or bundle size but aren't outright broken.
