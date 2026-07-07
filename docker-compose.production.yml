@@ -85,7 +85,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: alembic upgrade head
+    command: python -m scripts.ensure_schema
 
   api:
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE}

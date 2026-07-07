@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Target,
   UserCheck,
+  Wallet,
 } from "lucide-react";
 import { routes } from "@/constants/routes";
 
@@ -45,6 +46,7 @@ export const navigationSections = [
       { label: "Analytics", href: routes.analytics, icon: BarChart3 },
       { label: "Quality scores", href: routes.evaluation, icon: FlaskConical },
       { label: "Knowledge base", href: routes.knowledgeBase, icon: BookOpen },
+      { label: "Employee transactions", href: routes.employeeTransactions, icon: Wallet },
       { label: "Settings", href: routes.settings, icon: Settings },
     ],
   },

@@ -679,3 +679,7 @@ MIT License - See LICENSE file
 ---
 
 **Built with ❤️ for enterprise audit investigation**
+
+## Employee transactions
+
+Financial transactions linked to an employee (`employee_id` -> `users.id`). See [`Docs/EMPLOYEE_TRANSACTIONS.md`](../Docs/EMPLOYEE_TRANSACTIONS.md) for the data model, API, RBAC, migration, and testing steps.

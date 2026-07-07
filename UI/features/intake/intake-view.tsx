@@ -39,12 +39,15 @@ function toInvestigationInput(row: FlaggedRow, summary: IntakeSummary, materiali
     category: row.account,
     amount: parseCurrencyAmount(row.amount),
     materiality,
-    owner: "intake",
+    owner: row.employee ?? "intake",
     description: [
       `Created from intake file ${summary.fileName}.`,
       `Rules fired: ${row.rules.join(", ")}.`,
       `Source account: ${row.account}.`,
-    ].join(" "),
+      row.employee ? `Employee: ${row.employee}.` : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
   };
 }
 
@@ -260,8 +263,8 @@ export function IntakeView() {
               }
             />
             <TypedConfirmDialog
-              title="Delete every case?"
-              description="This wipes all investigations (manual and imported) plus their evidence, debate, verification, audit, and review records. This cannot be undone."
+              title="Delete everything?"
+              description="Full data reset. This permanently deletes ALL investigations, employee transactions, telemetry, audit, and review records, plus the knowledge-base index. Your user accounts and settings are kept. This cannot be undone."
               confirmPhrase="DELETE EVERYTHING"
               confirmLabel="Delete everything"
               onConfirm={() => void handleDeleteAllCases()}

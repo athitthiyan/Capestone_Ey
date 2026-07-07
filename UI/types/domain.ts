@@ -413,6 +413,8 @@ export type FlaggedRow = {
   account: string;
   amount: string;
   rules: string[];
+  /** Employee this transaction is attributed to (from the intake file), if present. */
+  employee?: string;
 };
 
 export type IntakeSummary = {
@@ -451,4 +453,40 @@ export type EvaluationSummary = {
   /** RAGAS metric scores across all categories. */
   metrics: RagasMetric[];
   conclusion: string;
+};
+
+export type EmployeeTransactionType =
+  | "credit"
+  | "debit"
+  | "reimbursement"
+  | "payroll"
+  | "bonus"
+  | "deduction"
+  | "adjustment";
+
+export type EmployeeTransactionStatus =
+  | "pending"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "archived";
+
+export type EmployeeTransaction = {
+  id: string;
+  employeeId: string;
+  transactionType: EmployeeTransactionType;
+  amount: number;
+  currency: string;
+  status: EmployeeTransactionStatus;
+  description: string | null;
+  referenceId: string | null;
+  transactionDate: string;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+export type EmployeeTransactionList = {
+  total: number;
+  transactions: EmployeeTransaction[];
 };

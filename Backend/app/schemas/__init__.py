@@ -393,3 +393,82 @@ class LlmMetricBreakdownOut(BaseModel):
     metric: str
     mean_score: float = Field(..., ge=0.0, le=1.0)
     cases_scored: int
+
+
+# --- Employee transactions -------------------------------------------------
+
+EmployeeTransactionType = Literal[
+    "credit",
+    "debit",
+    "reimbursement",
+    "payroll",
+    "bonus",
+    "deduction",
+    "adjustment",
+]
+EmployeeTransactionStatus = Literal[
+    "pending",
+    "completed",
+    "failed",
+    "cancelled",
+    "archived",
+]
+
+
+class EmployeeTransactionCreate(BaseModel):
+    # employee_id is optional; when omitted the transaction is created for the
+    # authenticated user. Non-elevated users may only create their own.
+    employee_id: Optional[str] = Field(default=None, max_length=36)
+    transaction_type: EmployeeTransactionType = "debit"
+    amount: float = Field(..., gt=0)
+    currency: str = Field(default="USD", min_length=3, max_length=3)
+    status: EmployeeTransactionStatus = "pending"
+    description: Optional[str] = Field(default=None, max_length=2000)
+    reference_id: Optional[str] = Field(default=None, max_length=100)
+    transaction_date: Optional[datetime] = None
+
+    @field_validator("currency")
+    @classmethod
+    def _upper_currency(cls, value: str) -> str:
+        return value.upper()
+
+
+class EmployeeTransactionUpdate(BaseModel):
+    """Partial update; only provided fields are changed."""
+
+    transaction_type: Optional[EmployeeTransactionType] = None
+    amount: Optional[float] = Field(default=None, gt=0)
+    currency: Optional[str] = Field(default=None, min_length=3, max_length=3)
+    status: Optional[EmployeeTransactionStatus] = None
+    description: Optional[str] = Field(default=None, max_length=2000)
+    reference_id: Optional[str] = Field(default=None, max_length=100)
+    transaction_date: Optional[datetime] = None
+
+    @field_validator("currency")
+    @classmethod
+    def _upper_currency(cls, value: Optional[str]) -> Optional[str]:
+        return value.upper() if value else value
+
+
+class EmployeeTransactionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    employee_id: str
+    transaction_type: str
+    amount: float
+    currency: str
+    status: str
+    description: Optional[str] = None
+    reference_id: Optional[str] = None
+    transaction_date: datetime
+    is_archived: bool = False
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+
+class EmployeeTransactionList(BaseModel):
+    total: int
+    skip: int
+    limit: int
+    transactions: list[EmployeeTransactionOut]

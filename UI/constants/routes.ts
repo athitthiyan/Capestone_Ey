@@ -21,5 +21,6 @@ export const routes = {
   analytics: "/analytics",
   evaluation: "/evaluation",
   knowledgeBase: "/knowledge-base",
+  employeeTransactions: "/employee-transactions",
   settings: "/settings",
 } as const;

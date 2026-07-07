@@ -4,7 +4,7 @@ Handles connection pooling, session lifecycle, and transaction management.
 """
 
 import logging
-from typing import Iterable, Iterator
+from typing import Iterator
 
 from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
@@ -58,67 +58,87 @@ def init_db() -> None:
     logger.info("Database initialized")
 
 
-def _compile_column_type(table_name: str, column_name: str) -> str:
-    column = Base.metadata.tables[table_name].c[column_name]
-    return column.type.compile(dialect=engine.dialect)
+def _server_default_ddl(column) -> str | None:
+    """Best-effort SQL literal for a column's server_default (for ADD COLUMN)."""
+    server_default = getattr(column, "server_default", None)
+    arg = getattr(server_default, "arg", None)
+    if arg is None:
+        return None
+    try:
+        return str(arg.compile(dialect=engine.dialect, compile_kwargs={"literal_binds": True}))
+    except Exception:  # noqa: BLE001
+        text_value = getattr(arg, "text", None)
+        return str(text_value) if text_value is not None else None
 
 
-def _add_missing_columns(table_name: str, column_names: Iterable[str]) -> None:
-    inspector = inspect(engine)
-    if not inspector.has_table(table_name):
-        return
+def _add_missing_columns(connection, inspector, table) -> None:
+    """ALTER TABLE ADD COLUMN for every model column absent from the live table.
 
-    existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
-    missing_columns = [
-        column_name for column_name in column_names if column_name not in existing_columns
-    ]
-    if not missing_columns:
-        return
-
-    with engine.begin() as connection:
-        for column_name in missing_columns:
-            column_type = _compile_column_type(table_name, column_name)
-            logger.warning(
-                "Adding missing schema column %s.%s at startup",
-                table_name,
-                column_name,
-            )
-            connection.execute(
-                text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
-            )
-
-
-def _ensure_indexes(table_name: str) -> None:
-    table = Base.metadata.tables.get(table_name)
-    inspector = inspect(engine)
-    if table is None or not inspector.has_table(table_name):
-        return
-    existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
-    for index in table.indexes:
-        if any(column.name not in existing_columns for column in index.columns):
+    Additive and safe: a NOT NULL column with no default is added as NULLABLE
+    (with a warning) so the statement cannot fail on an already-populated table.
+    """
+    existing = {col["name"] for col in inspector.get_columns(table.name)}
+    for column in table.columns:
+        if column.name in existing:
             continue
-        index.create(bind=engine, checkfirst=True)
+        col_type = column.type.compile(dialect=engine.dialect)
+        pieces = [f"ALTER TABLE {table.name} ADD COLUMN {column.name} {col_type}"]
+        default_ddl = _server_default_ddl(column)
+        nullable = column.nullable
+        if not nullable and default_ddl is None:
+            logger.warning(
+                "ensure_schema: adding %s.%s as NULLABLE (model is NOT NULL but has "
+                "no server_default); backfill + a migration are needed to enforce it",
+                table.name,
+                column.name,
+            )
+            nullable = True
+        if default_ddl is not None:
+            pieces.append(f"DEFAULT {default_ddl}")
+        if not nullable:
+            pieces.append("NOT NULL")
+        connection.execute(text(" ".join(pieces)))
+        logger.warning("ensure_schema: added missing column %s.%s", table.name, column.name)
+
+
+def ensure_schema() -> None:
+    """Idempotent, global schema bootstrap for deployment.
+
+    Additive only: creates any missing TABLES, COLUMNS, and INDEXES declared on
+    the SQLAlchemy models (``Base.metadata``). Safe to run repeatedly and against
+    any database state (empty, partially built, or fully migrated). It never
+    drops, renames, or retypes existing objects - those still require an explicit
+    Alembic migration.
+    """
+    logger.info("ensure_schema: syncing database to models (additive)")
+
+    # 1) Missing tables. checkfirst leaves existing tables untouched.
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+
+    # 2) Missing columns on already-existing tables (create_all won't ALTER them).
+    inspector = inspect(engine)
+    with engine.begin() as connection:
+        for table in Base.metadata.sorted_tables:
+            if inspector.has_table(table.name):
+                _add_missing_columns(connection, inspector, table)
+
+    # 3) Missing indexes (checkfirst avoids duplicates).
+    inspector = inspect(engine)
+    for table in Base.metadata.sorted_tables:
+        if not inspector.has_table(table.name):
+            continue
+        for index in table.indexes:
+            try:
+                index.create(bind=engine, checkfirst=True)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("ensure_schema: index %s not created: %s", index.name, exc)
+
+    logger.info("ensure_schema: database is in sync with the models")
 
 
 def ensure_schema_compatibility() -> None:
-    """Patch additive columns/tables missed by older create_all bootstraps.
-
-    Alembic is still the source of truth. This exists for local/test databases
-    that were originally created with SQLAlchemy create_all(), because create_all
-    will create new tables but will not ALTER existing tables when models gain
-    nullable columns.
-    """
-
-    _add_missing_columns(
-        "investigations",
-        ("ground_truth_verdict", "ground_truth_set_at"),
-    )
-    _add_missing_columns("llm_call_logs", ("investigation_id",))
-
-    ragas_table = Base.metadata.tables["ragas_evaluation_results"]
-    ragas_table.create(bind=engine, checkfirst=True)
-    _ensure_indexes("llm_call_logs")
-    _ensure_indexes("ragas_evaluation_results")
+    """Backwards-compatible name; now runs the generic, global sync."""
+    ensure_schema()
 
 
 def drop_db() -> None:
