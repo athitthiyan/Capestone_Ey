@@ -415,3 +415,60 @@ class User(Base):
     role = Column(String(50), default="analyst")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# Canonical values for employee-transaction type/status. Stored as validated
+# strings (see app/schemas) rather than DB enums, matching review_queue.status
+# and keeping the schema portable across SQLite (tests) and Postgres.
+EMPLOYEE_TRANSACTION_TYPES = (
+    "credit",
+    "debit",
+    "reimbursement",
+    "payroll",
+    "bonus",
+    "deduction",
+    "adjustment",
+)
+EMPLOYEE_TRANSACTION_STATUSES = (
+    "pending",
+    "completed",
+    "failed",
+    "cancelled",
+    "archived",
+)
+
+
+class EmployeeTransaction(Base):
+    """A financial transaction linked to a specific employee.
+
+    ``employee_id`` references ``users.id`` - the application's person entity.
+    This is intentionally distinct from the audited general-ledger
+    ``transaction_id`` carried on :class:`Investigation`.
+    """
+
+    __tablename__ = "employee_transactions"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    employee_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    transaction_type = Column(String(50), nullable=False, default="debit", index=True)
+    amount = Column(Float, nullable=False)
+    currency = Column(String(3), nullable=False, default="USD")
+    status = Column(String(50), nullable=False, default="pending", index=True)
+    description = Column(Text, nullable=True)
+    reference_id = Column(String(100), nullable=True, index=True)
+    transaction_date = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    is_archived = Column(Boolean, nullable=False, default=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    employee = relationship("User")
+
+    __table_args__ = (
+        Index("idx_emptx_employee_date", "employee_id", "transaction_date"),
+        Index("idx_emptx_status_type", "status", "transaction_type"),
+    )

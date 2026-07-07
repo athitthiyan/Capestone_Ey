@@ -139,3 +139,22 @@ def require_elevated_role(user: Optional[User] = Depends(get_current_user)) -> O
             detail="This action requires an elevated role (partner/admin).",
         )
     return user
+
+
+# Roles allowed to view/manage every employee's transactions. "manager" is
+# included for forward compatibility even though the seeded role vocabulary is
+# analyst/reviewer/partner/admin.
+MANAGER_ROLES = {"manager", "partner", "admin"}
+
+
+def can_view_all_transactions(user: Optional[User]) -> bool:
+    """True if the user may see/manage transactions for any employee.
+
+    When AUTH_REQUIRED is false, get_current_user returns None for everyone and
+    access is unrestricted, matching the rest of the app's dev behaviour.
+    """
+    if not settings.AUTH_REQUIRED:
+        return True
+    if user is None:
+        return False
+    return (user.role or "").lower() in MANAGER_ROLES

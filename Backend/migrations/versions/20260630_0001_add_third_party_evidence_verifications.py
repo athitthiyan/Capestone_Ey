@@ -16,7 +16,15 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+
+def _table_exists(table: str) -> bool:
+    return sa.inspect(op.get_bind()).has_table(table)
+
+
 def upgrade() -> None:
+    if _table_exists("third_party_evidence_verifications"):
+        # Already present (e.g. created by an earlier create_all bootstrap).
+        return
     op.create_table(
         "third_party_evidence_verifications",
         sa.Column("id", sa.String(length=36), nullable=False),

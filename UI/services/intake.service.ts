@@ -331,6 +331,13 @@ export async function parseLedgerFile(
         account: getValue(row, ["account", "category", "gl_account"]) || "Unmapped account",
         amount: formatAmount(amount, config.displayCurrency),
         rules: ruleLabelsForRow(row, duplicates, config),
+        employee:
+          [
+            getValue(row, ["employee_name", "emp_name", "employee"]),
+            getValue(row, ["employee_id", "emp_id"]),
+          ]
+            .filter(Boolean)
+            .join(" - ") || undefined,
       };
     })
     .filter((row) => row.rules.length > 0);

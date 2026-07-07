@@ -19,6 +19,7 @@ from app.api.routes import (
     audit,
     auth,
     claims,
+    employee_transactions,
     evaluation,
     health,
     intake,
@@ -129,6 +130,7 @@ def create_app() -> FastAPI:
     app.include_router(knowledge.router, prefix=settings.API_ROOT_PATH)
     app.include_router(audit.router, prefix=settings.API_ROOT_PATH)
     app.include_router(intake.router, prefix=settings.API_ROOT_PATH)
+    app.include_router(employee_transactions.router, prefix=settings.API_ROOT_PATH)
     app.include_router(settings_routes.router, prefix=settings.API_ROOT_PATH)
     app.include_router(websocket.router, prefix=settings.API_ROOT_PATH)
 

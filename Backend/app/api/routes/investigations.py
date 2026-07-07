@@ -244,35 +244,28 @@ async def delete_all_investigations(
     db: Session = Depends(get_db_session),
     user=Depends(require_elevated_role),
 ):
-    """Wipe every investigation and all related data, regardless of source.
+    """Full data reset: delete ALL business and telemetry data.
 
-    Destructive and irreversible. Removes cases created manually and from intake,
-    plus their evidence, debate transcripts, verification claims, third-party
-    checks, review queue items, and audit rows.
+    Destructive and irreversible. Wipes every table EXCEPT ``users`` and
+    ``runtime_settings`` - so operator accounts and configuration survive.
+    Removes investigations and all their children, employee transactions,
+    telemetry logs (LLM calls, RAGAS results, request logs), the audit trail,
+    the review queue, and the knowledge-base index (which is re-synced on the
+    next startup). Iterating the model metadata means any future table is
+    included automatically, so "delete everything" stays comprehensive.
     """
+    from app.db.models import Base
+
     investigation_ids = [row.id for row in db.query(Investigation.id).all()]
 
-    if not investigation_ids:
-        return InvestigationDeleteResponse(
-            deleted_count=0,
-            investigation_ids=[],
-            message="No investigations were found to delete.",
-        )
-
-    # Clear child tables first to satisfy foreign-key constraints, then the
-    # investigations themselves. ThirdPartyEvidenceVerification keys off claim_id.
-    for model in (
-        EvidenceArtifact,
-        DebateTranscript,
-        VerificationClaim,
-        DBInvestigationState,
-        ReviewQueueItem,
-        AuditLog,
-    ):
-        db.query(model).delete(synchronize_session=False)
-
-    db.query(ThirdPartyEvidenceVerification).delete(synchronize_session=False)
-    db.query(Investigation).delete(synchronize_session=False)
+    # Wipe every table except the two we preserve, in reverse dependency order
+    # (children before parents) so foreign keys are never violated. Driving this
+    # off Base.metadata means new tables are covered without touching this code.
+    preserved_tables = {"users", "runtime_settings"}
+    for table in reversed(Base.metadata.sorted_tables):
+        if table.name in preserved_tables:
+            continue
+        db.execute(table.delete())
     db.commit()
 
     try:
@@ -293,7 +286,11 @@ async def delete_all_investigations(
     return InvestigationDeleteResponse(
         deleted_count=len(investigation_ids),
         investigation_ids=investigation_ids,
-        message=f"Deleted all {len(investigation_ids)} investigation(s) and related data.",
+        message=(
+            f"Full reset complete. Deleted all data including {len(investigation_ids)} "
+            "investigation(s), employee transactions, telemetry, audit, review queue, and "
+            "the knowledge-base index. Users and settings were preserved."
+        ),
     )
 
 

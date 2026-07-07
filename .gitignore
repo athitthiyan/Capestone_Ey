@@ -1,0 +1,12 @@
+# Python/generated files outside Backend/
+__pycache__/
+*.py[cod]
+
+# Load-test output
+load-tests/reports/*.json
+
+# Local SQLite journal files
+*.db-journal
+
+# Local pnpm cache/store noise. Existing tracked files remain tracked.
+.pnpm-store/
