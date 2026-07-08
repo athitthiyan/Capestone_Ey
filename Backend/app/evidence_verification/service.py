@@ -560,6 +560,46 @@ class EvidenceVerificationService:
             from app.evidence_verification.providers import FrankfurterFxProvider
 
             return FrankfurterFxProvider()
+        # Fuel uses the IndianAPI native adapter (x-api-key header, GET endpoint)
+        # whenever an API key is configured.
+        if category == "fuel" and settings.FUEL_PRICE_PROVIDER_API_KEY:
+            from app.evidence_verification.providers import IndianApiFuelProvider
+
+            return IndianApiFuelProvider()
+        # Flight fares: Duffel (real offers) takes precedence when enabled.
+        if (
+            category == "flight"
+            and settings.DUFFEL_API_KEY
+            and settings.DUFFEL_FLIGHTS_ENABLED
+        ):
+            from app.evidence_verification.providers import DuffelFlightProvider
+
+            return DuffelFlightProvider()
+        # Hotel rates: Duffel Stays (real per-stay rates) when enabled.
+        if (
+            category == "hotel"
+            and settings.DUFFEL_API_KEY
+            and settings.DUFFEL_STAYS_ENABLED
+        ):
+            from app.evidence_verification.providers import DuffelStaysProvider
+
+            return DuffelStaysProvider()
+        # Flight existence fallback: Aviationstack route validator (not a price
+        # benchmark). Used when no Duffel fares and no configured price URL.
+        if (
+            category == "flight"
+            and settings.FLIGHT_VALIDATION_API_KEY
+            and not settings.FLIGHT_PRICE_PROVIDER_URL
+        ):
+            from app.evidence_verification.providers import AviationstackFlightProvider
+
+            return AviationstackFlightProvider()
+        # GST uses the GSTINCheck native adapter (path-based key, validity check)
+        # whenever an API key is configured.
+        if category == "gst" and settings.GST_VERIFICATION_PROVIDER_API_KEY:
+            from app.evidence_verification.providers import GstinCheckProvider
+
+            return GstinCheckProvider()
         url, api_key = self._configured_provider(category)
         if url:
             return ConfiguredHttpBenchmarkProvider(category, url, api_key)

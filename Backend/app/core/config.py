@@ -162,6 +162,11 @@ class Settings(BaseSettings):
     EVIDENCE_VERIFICATION_FX_TOLERANCE: float = 0.02
     FLIGHT_PRICE_PROVIDER_URL: str = ""
     FLIGHT_PRICE_PROVIDER_API_KEY: str = ""
+    # Aviationstack flight *existence* validator (schedules/tracking, NOT fares).
+    # Uses an access_key query param. Confirms a route is real; does not price it.
+    FLIGHT_VALIDATION_PROVIDER_URL: str = "https://api.aviationstack.com/v1"
+    FLIGHT_VALIDATION_API_KEY: str = ""
+    FLIGHT_VALIDATION_ROUTES_PATH: str = "/routes"
     HOTEL_PRICE_PROVIDER_URL: str = ""
     HOTEL_PRICE_PROVIDER_API_KEY: str = ""
     FOOD_BENCHMARK_PROVIDER_URL: str = ""
@@ -170,8 +175,28 @@ class Settings(BaseSettings):
     CAB_FARE_PROVIDER_API_KEY: str = ""
     FUEL_PRICE_PROVIDER_URL: str = ""
     FUEL_PRICE_PROVIDER_API_KEY: str = ""
+    # IndianAPI fuel provider uses an "x-api-key" header (not Bearer auth).
+    FUEL_PRICE_PROVIDER_HEADER: str = "x-api-key"
+    FUEL_PRICE_LIVE_PATH: str = "/live_fuel_price"
+    # Default fuel type assumed when a claim does not specify petrol/diesel/cng.
+    FUEL_PRICE_DEFAULT_TYPE: str = "petrol"
     GST_VERIFICATION_PROVIDER_URL: str = ""
     GST_VERIFICATION_PROVIDER_API_KEY: str = ""
+    # GSTINCheck native provider: path-based key, GET /check/{key}/{gstin}.
+    # Validity/identity check (not a price benchmark).
+    GST_VERIFICATION_BASE_URL: str = "https://sheet.gstincheck.co.in"
+    GST_VERIFICATION_CHECK_PATH: str = "/check"
+    # Duffel real-fares provider (flights) and Duffel Stays (hotels). Bearer auth
+    # + Duffel-Version header. Prices return in the supplier currency and are
+    # FX-converted to the claim currency via the Frankfurter provider.
+    DUFFEL_API_BASE_URL: str = "https://api.duffel.com"
+    DUFFEL_API_KEY: str = ""
+    DUFFEL_API_VERSION: str = "v2"
+    DUFFEL_FLIGHTS_ENABLED: bool = True
+    DUFFEL_STAYS_ENABLED: bool = True
+    DUFFEL_SUPPLIER_TIMEOUT_MS: int = 15000
+    # Duffel search is slower than the default 3s provider timeout; use its own.
+    DUFFEL_HTTP_TIMEOUT_SECONDS: float = 25.0
 
     model_config = SettingsConfigDict(
         env_file=".env",
