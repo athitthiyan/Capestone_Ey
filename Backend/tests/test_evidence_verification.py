@@ -224,23 +224,23 @@ def test_gstin_invalid_format_is_flagged_without_provider_call(client, monkeypat
         called = True
         return _ProviderResponse({})
 
+    monkeypatch.setattr("app.evidence_verification.service.requests.post", fake_post)
 
-def test_food_without_realtime_provider_is_api_unavailable(client):
     response = client.post(
         "/api/v1/claims/verify-preview",
         json={
-            "category": "food",
-            "claimed_amount": 1500,
-            "vendor": "Cafe Example",
-            "location": "Bengaluru",
+            "category": "gst",
+            "claimed_amount": 5000,
+            "vendor": "Example Supplier",
+            "gstin": "not-a-valid-gstin",
         },
     )
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["verification_status"] == "API_UNAVAILABLE"
+    assert body["verification_status"] == "FLAGGED"
     assert body["fetched_amount"] is None
-tion"
+    assert body["provider_name"] == "local_gstin_validation"
     assert "GSTIN format is invalid" in body["reason"]
     assert called is False
 
@@ -260,3 +260,4 @@ def test_food_without_realtime_provider_is_api_unavailable(client):
     body = response.json()
     assert body["verification_status"] == "API_UNAVAILABLE"
     assert body["fetched_amount"] is None
+    assert "No real-time third-party provider URL is configured" in body["reason"]
