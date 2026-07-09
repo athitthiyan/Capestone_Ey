@@ -1,4 +1,4 @@
-# Multi-stage build for FastAPI Skeptic Engine Backend
+# Multi-stage build for FastAPI GL Guardian Backend
 
 # Stage 1: Builder
 FROM python:3.11-slim as builder

@@ -1,6 +1,6 @@
 """
 FastAPI application factory.
-Wires middleware, lifespan, and routers for the Skeptic Engine backend.
+Wires middleware, lifespan, and routers for the GL Guardian backend.
 """
 
 import logging
@@ -62,7 +62,7 @@ _configure_langsmith_tracing()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting Skeptic Engine Backend (env=%s)", settings.ENV)
+    logger.info("Starting GL Guardian Backend (env=%s)", settings.ENV)
     if settings.ENV == "production":
         # Schema is managed exclusively by Alembic in production
         # (`alembic upgrade head` in the start command). create_all() here
@@ -92,7 +92,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:  # noqa: BLE001
         logger.warning("EventStoreDB unavailable, using Postgres audit fallback: %s", e)
     yield
-    logger.info("Shutting down Skeptic Engine Backend")
+    logger.info("Shutting down GL Guardian Backend")
     engine.dispose()
 
 
@@ -153,7 +153,7 @@ def create_app() -> FastAPI:
     @app.get(f"{settings.API_ROOT_PATH}/")
     async def root():
         return {
-            "message": "Skeptic Engine Backend API",
+            "message": "GL Guardian Backend API",
             "version": settings.APP_VERSION,
             "docs": "/docs",
         }

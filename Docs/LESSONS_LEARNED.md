@@ -2,7 +2,7 @@
 
 **Version:** `0.1.0`. Every entry below is **evidence-backed** by the repository
 (`Backend/BACKEND_FIXES.md`, git history, Dockerfile/config comments,
-`Skeptic_Engine_Audit_Report.md`). Reasonable inferences are labelled **[Inference]**;
+`GL_Guardian_Audit_Report.md`). Reasonable inferences are labelled **[Inference]**;
 everything else is verified from those sources.
 
 ## How to read this
@@ -65,7 +65,7 @@ Alternatives -> Decision -> Lesson -> Prevention.
 - **Solution:** The executor now invokes the real agent nodes when `USE_REAL_AGENTS=true`
   (off-thread via `asyncio.to_thread`) and persists evidence/transcripts/claims.
 - **Lesson:** Compiling a graph is not running it; wire and test the real invocation.
-- **Note:** The 2026-07-03 `Skeptic_Engine_Audit_Report.md` still describes this as dead
+- **Note:** The 2026-07-03 `GL_Guardian_Audit_Report.md` still describes this as dead
   code - that description is now **stale** (see [Audit Report](AUDIT_REPORT.md#3)).
 
 ## 6. Non-root container could not run its entrypoints (verified via git)

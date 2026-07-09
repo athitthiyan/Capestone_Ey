@@ -1,4 +1,4 @@
-# Skeptic Engine — Demo Storytelling: Requirements
+# GL Guardian — Demo Storytelling: Requirements
 
 **Spec version:** 1.0  
 **Date:** 2026-07-06  
@@ -10,11 +10,11 @@
 
 ## 1. Overview
 
-This spec governs the interactive, animated, and cinematic elements of the Skeptic Engine product demo. The demo is not a feature tour — it is a story: an internal auditor's journey from anxious sampling to confident, full-coverage investigation.
+This spec governs the interactive, animated, and cinematic elements of the GL Guardian product demo. The demo is not a feature tour — it is a story: an internal auditor's journey from anxious sampling to confident, full-coverage investigation.
 
 ### 1.1 The story in one sentence
 
-> Traditional audit samples ~5% of transactions and hopes. Skeptic Engine investigates 100% — giving every flagged transaction an adversarial trial, a cited evidence file, a human sign-off, and a tamper-evident record.
+> Traditional audit samples ~5% of transactions and hopes. GL Guardian investigates 100% — giving every flagged transaction an adversarial trial, a cited evidence file, a human sign-off, and a tamper-evident record.
 
 ### 1.2 Emotional throughline
 
@@ -42,7 +42,7 @@ Each scene must move the audience one step along that arc. No scene is neutral.
 
 ### 2.1 Primary audience: enterprise audit/finance buyer
 
-**US-01** As an audit director, I want to see that Skeptic Engine covers 100% of flagged transactions so that I can understand the coverage gap vs. my current process.
+**US-01** As an audit director, I want to see that GL Guardian covers 100% of flagged transactions so that I can understand the coverage gap vs. my current process.
 
 **US-02** As a compliance officer, I want to see an immutable, hash-chained audit trail so that I can be confident we can "show our work" to regulators.
 
@@ -111,7 +111,7 @@ All 14 scenes from the narration script and storyboard bible, with act, timing, 
 
 **REQ-04-01** Implement a "day-break wipe" transition from dark (Scene 03) to light that is reusable as a named Tailwind / CSS animation.
 
-**REQ-04-02** The Skeptic Engine wordmark assembles from the particle field over 1.5s — the same particles that were "lost transactions" in Scene 01 converge to form the logo.
+**REQ-04-02** The GL Guardian wordmark assembles from the particle field over 1.5s — the same particles that were "lost transactions" in Scene 01 converge to form the logo.
 
 **REQ-04-03** A soft radial bloom effect follows the wordmark assembly.
 

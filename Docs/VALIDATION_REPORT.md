@@ -43,13 +43,13 @@ New (20): `README`, `AUDIT_REPORT`, `ARCHITECTURE`, `API_REFERENCE`,
 `BACKUP_RESTORE`, `DISASTER_RECOVERY`, `MAINTENANCE`, `KNOWN_ISSUES`, `LESSONS_LEARNED`,
 `VALIDATION_REPORT`.
 
-Updated in place: `Backend/README.md` (structure section), `Skeptic_Engine_Audit_Report.md`
+Updated in place: `Backend/README.md` (structure section), `GL_Guardian_Audit_Report.md`
 (staleness banner).
 
 ## 4. Improvement recommendations (documentation)
 
 1. **Retire or clearly date historical notes.** `SETUP_COMPLETE.md`, `BACKEND_FIXES.md`,
-   and `Skeptic_Engine_Audit_Report.md` are useful history but read as current. Keep them
+   and `GL_Guardian_Audit_Report.md` are useful history but read as current. Keep them
    under a `Backend/history/` (or add dated banners) and point live status to `docs/`.
 2. **Auto-generate the API table.** Add a small script to emit `API_REFERENCE.md` from the
    OpenAPI schema in CI so it never drifts.

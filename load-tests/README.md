@@ -1,4 +1,4 @@
-# Skeptic Engine Load Tests
+# GL Guardian Load Tests
 
 This folder contains a standard-library Python load runner for the backend API
 and agent workflow.
@@ -27,7 +27,7 @@ Start the backend first. For local deterministic agent load testing, keep
 `USE_REAL_AGENTS=false` so the agent crew runs without external LLM calls.
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine"
+cd "C:\Users\athit\GL Guardian"
 python load-tests/comprehensive_api_agents_load_test.py `
   --base-url http://localhost:8000/api/v1 `
   --users 4 `
@@ -73,9 +73,9 @@ It marks the run failed when:
 - `/metrics` is unavailable or unparsable.
 - Prometheus output has no HTTP metrics.
 - For terminal agent cases, these app counters do not increase enough:
-  - `skeptic_investigations_total`
-  - `skeptic_debate_rounds_total`
-  - `skeptic_verification_results_total`
+  - `gl_guardian_investigations_total`
+  - `gl_guardian_debate_rounds_total`
+  - `gl_guardian_verification_results_total`
 - Any Prometheus metric value is negative.
 - `/analytics/requests` is missing key fields or reports an error rate above the threshold.
 - LLM analytics token accounting is inconsistent:
@@ -92,7 +92,7 @@ Interpreting results:
 - If `employee_transactions` is `0`, inspect `employee_transaction_skips` to see whether production is missing the route, rejecting the role, or failing to resolve the authenticated user as an employee.
 - With `USE_REAL_AGENTS=false`, LLM metrics may remain zero. That is expected. With `USE_REAL_AGENTS=true`, LLM call, token, latency, and cost metrics should increase.
 
-# Skeptic Engine Load-Test Runbook
+# GL Guardian Load-Test Runbook
 
 This runbook is designed for a presentation rehearsal. It proves the API can
 handle concurrent dashboard and investigation traffic without triggering costly
@@ -141,12 +141,12 @@ k6 version
 
 Official docs: https://grafana.com/docs/k6/latest/set-up/install-k6/
 
-## 3. Start Skeptic Engine
+## 3. Start GL Guardian
 
 Terminal 1:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 docker-compose up -d
 ```
 
@@ -160,7 +160,7 @@ curl.exe http://localhost:8000/metrics
 Optional UI for the presentation:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\UI"
+cd "C:\Users\athit\GL Guardian\UI"
 npm.cmd run dev
 ```
 
@@ -176,44 +176,44 @@ Open:
 From the repository root:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine"
+cd "C:\Users\athit\GL Guardian"
 New-Item -ItemType Directory -Force load-tests\reports
 ```
 
 Smoke test:
 
 ```powershell
-k6 run -e PROFILE=smoke -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=smoke -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 Baseline test:
 
 ```powershell
-k6 run -e PROFILE=baseline -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=baseline -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 Presentation burst:
 
 ```powershell
-k6 run -e PROFILE=presentation -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=presentation -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 Stress test:
 
 ```powershell
-k6 run -e PROFILE=stress -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=stress -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 Optional synthetic write test:
 
 ```powershell
-k6 run -e PROFILE=smoke -e WRITE_CASES=true -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=smoke -e WRITE_CASES=true -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 If auth is enabled, pass a bearer token:
 
 ```powershell
-k6 run -e PROFILE=baseline -e BASE_URL=http://localhost:8000 -e TOKEN="YOUR_TOKEN" load-tests/k6/skeptic-engine-api.js
+k6 run -e PROFILE=baseline -e BASE_URL=http://localhost:8000 -e TOKEN="YOUR_TOKEN" load-tests/k6/gl-guardian-api.js
 ```
 
 Export a shareable HTML report:
@@ -221,8 +221,8 @@ Export a shareable HTML report:
 ```powershell
 New-Item -ItemType Directory -Force load-tests\reports
 $env:K6_WEB_DASHBOARD="true"
-$env:K6_WEB_DASHBOARD_EXPORT="load-tests/reports/skeptic-engine-load-report.html"
-k6 run -e PROFILE=presentation -e BASE_URL=http://localhost:8000 load-tests/k6/skeptic-engine-api.js
+$env:K6_WEB_DASHBOARD_EXPORT="load-tests/reports/gl-guardian-load-report.html"
+k6 run -e PROFILE=presentation -e BASE_URL=http://localhost:8000 load-tests/k6/gl-guardian-api.js
 ```
 
 ## 5. What to Capture for Slides
@@ -253,7 +253,7 @@ docker stats
 
 Use this concise version:
 
-> We ran controlled API load tests against Skeptic Engine using k6. The test
+> We ran controlled API load tests against GL Guardian using k6. The test
 > exercised health, investigation listing, KPI analytics, and trend analytics.
 > We intentionally kept LLM execution out of the benchmark so the result shows
 > platform responsiveness rather than provider latency or token spend. Under the

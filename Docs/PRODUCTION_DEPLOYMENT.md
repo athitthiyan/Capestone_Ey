@@ -34,7 +34,7 @@ Required for production deploy:
 - `PROD_USER`: SSH user.
 - `PROD_SSH_KEY`: private key with access to the host.
 - `PROD_PORT`: SSH port, optional, defaults to `22`.
-- `PROD_DEPLOY_PATH`: host path for the compose file, optional, defaults to `~/skeptic-engine`.
+- `PROD_DEPLOY_PATH`: host path for the compose file, optional, defaults to `~/gl-guardian`.
 - `GHCR_DEPLOY_USER`: GHCR user for host pulls, optional.
 - `GHCR_DEPLOY_TOKEN`: GHCR token for private package pulls, optional when the host can pull public images.
 
@@ -43,8 +43,8 @@ Required for production deploy:
 Install Docker Engine with the Compose plugin. Create the deploy directory and copy `production.env.example` to `.env.production`:
 
 ```bash
-mkdir -p ~/skeptic-engine
-cd ~/skeptic-engine
+mkdir -p ~/gl-guardian
+cd ~/gl-guardian
 cp production.env.example .env.production
 ```
 

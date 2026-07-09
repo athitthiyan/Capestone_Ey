@@ -9,7 +9,7 @@ agents.
 Docker path:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 docker compose -f docker-compose.local-infra.yml up -d
 ```
 
@@ -24,7 +24,7 @@ EventStoreDB natively and expose:
 Copy the production-like local template:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 Copy-Item .env.local-production.example .env
 ```
 
@@ -52,7 +52,7 @@ USE_REAL_AGENTS=true
 ## 3. Run the preflight check
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 .\.venv\Scripts\python.exe scripts\check_local_stack.py
 ```
 
@@ -63,7 +63,7 @@ All rows should show `OK` before you run real-agent investigations.
 Terminal 1:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 .\.venv\Scripts\Activate.ps1
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -73,7 +73,7 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 Terminal 2:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 .\.venv\Scripts\Activate.ps1
 celery -A app.tasks.celery_app worker --loglevel=info --pool=solo
 ```
@@ -85,7 +85,7 @@ celery -A app.tasks.celery_app worker --loglevel=info --pool=solo
 Terminal 3:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Backend"
+cd "C:\Users\athit\GL Guardian\Backend"
 .\.venv\Scripts\Activate.ps1
 celery -A app.tasks.celery_app flower --port=5555
 ```
@@ -97,7 +97,7 @@ Open `http://localhost:5555`.
 Terminal 4:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\Ui"
+cd "C:\Users\athit\GL Guardian\Ui"
 pnpm dev
 ```
 

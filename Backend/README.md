@@ -1,4 +1,4 @@
-# Skeptic Engine - Real-Time Backend
+# GL Guardian - Real-Time Backend
 
 **Production-grade real-time multi-agent AI audit investigation platform backend**
 
@@ -279,7 +279,7 @@ All settings via `.env` file (see `.env.example`):
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/skeptic_engine
+DATABASE_URL=postgresql://user:pass@localhost:5432/gl_guardian
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -419,14 +419,14 @@ export SECRET_KEY=$(openssl rand -hex 32)
 export DATABASE_PASSWORD=$(openssl rand -hex 16)
 
 # Create secrets in cluster
-kubectl create secret generic skeptic-secrets \
+kubectl create secret generic gl-guardian-secrets \
   --from-literal=DEFAULT_LLM_PROVIDER=$DEFAULT_LLM_PROVIDER \
   --from-literal=ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   --from-literal=GROQ_API_KEY=$GROQ_API_KEY \
   --from-literal=OPENAI_API_KEY=$OPENAI_API_KEY \
   --from-literal=SECRET_KEY=$SECRET_KEY \
   --from-literal=DATABASE_PASSWORD=$DATABASE_PASSWORD \
-  -n skeptic-engine
+  -n gl-guardian
 
 # Apply manifests
 kubectl apply -f k8s-deployment.yaml
@@ -436,23 +436,23 @@ kubectl apply -f k8s-deployment.yaml
 
 ```bash
 # Watch rollout
-kubectl get pods -n skeptic-engine -w
+kubectl get pods -n gl-guardian -w
 
 # Check service status
-kubectl get svc -n skeptic-engine
+kubectl get svc -n gl-guardian
 
 # View logs
-kubectl logs -n skeptic-engine deployment/skeptic-api -f
+kubectl logs -n gl-guardian deployment/gl-guardian-api -f
 
 # Port forward
-kubectl port-forward -n skeptic-engine svc/skeptic-api 8000:80
+kubectl port-forward -n gl-guardian svc/gl-guardian-api 8000:80
 ```
 
 ### Scaling
 
 - **API**: Auto-scales 3-10 replicas on CPU/memory
 - **Workers**: Auto-scales 2-5 replicas on CPU
-- Manual scaling: `kubectl scale deployment skeptic-api -n skeptic-engine --replicas=5`
+- Manual scaling: `kubectl scale deployment gl-guardian-api -n gl-guardian --replicas=5`
 
 ---
 
@@ -595,7 +595,7 @@ docker-compose logs postgres
 python -c "from db_session import init_db; init_db()"
 
 # Reinitialize
-docker-compose exec postgres psql -U skeptic -d skeptic_engine -c "SELECT 1"
+docker-compose exec postgres psql -U gl_guardian -d gl_guardian -c "SELECT 1"
 ```
 
 ---

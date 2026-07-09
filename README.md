@@ -1,4 +1,6 @@
-# Skeptic Engine
+<img src="Docs/branding/gl_guardian_logo.svg" alt="GL Guardian - Automated Audit" width="420" />
+
+# GL Guardian - Automated Audit
 
 Enterprise audit investigation platform powered by a multi-agent AI crew. It automates fraud
 detection and risk assessment through an adversarial debate framework (Challenger vs. Defender),
@@ -25,11 +27,16 @@ pre-filter                agent (RAG + live         rounds) → Adjudicator     
 ## Repository layout
 
 ```
-Skeptic Engine/
-├── Backend/     FastAPI service: agent orchestration, DB, audit log, LLM routing
-├── Ui/          Next.js 15 / React 19 frontend
-├── Docs/        PRD, architecture, HLD/LLD documents
-├── Prototype/   Early static HTML prototype
+GL Guardian/
+├── Backend/          FastAPI service: agent orchestration, DB, audit log, LLM routing
+│   └── history/      Historical engineering notes (BACKEND_FIXES, SETUP_COMPLETE)
+├── UI/               Next.js 15 / React 19 frontend (live-API driven, no mock data)
+├── Docs/             PRD, architecture, ops handbook, LIVE_DATA_VALIDATION
+├── load-tests/       k6 profiles + comprehensive Python API/agent load runner
+├── presentation/     Story assets: storyboard bible, scripts, brand guide, POV deck
+├── archive/          Historical artifacts: early HTML prototype, dated audit report
+├── GL_Guardian_Presentation.pptx            14-scene demo deck (+ live evidence)
+├── GL_Guardian_Executive_Presentation.pptx  Executive/technical review deck
 └── docker-compose.production.yml, DEPLOYMENT_GUIDE.md
 ```
 
@@ -78,6 +85,15 @@ pnpm dev
 ```
 
 Open `http://localhost:3000/dashboard`.
+
+## Live deployment
+
+- **UI:** https://capestone-ey.vercel.app
+- **API:** https://capestoneey-production.up.railway.app (`/health`, `/health/detailed`, `/metrics`)
+
+All UI pages consume the live API — there is no mock data layer. See
+[Docs/LIVE_DATA_VALIDATION.md](Docs/LIVE_DATA_VALIDATION.md) for the audit, live-data
+evidence, measured latency, and remaining limitations (validated 2026-07-08).
 
 ## Production deployment
 

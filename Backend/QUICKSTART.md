@@ -1,4 +1,4 @@
-# Quick Start Guide - Skeptic Engine Backend
+# Quick Start Guide - GL Guardian Backend
 
 Get the real-time backend running in **5 minutes**.
 
@@ -208,7 +208,7 @@ docker-compose up -d postgres
 docker-compose exec api /bin/bash
 
 # Database
-docker-compose exec postgres psql -U skeptic -d skeptic_engine
+docker-compose exec postgres psql -U gl_guardian -d gl_guardian
 ```
 
 ---

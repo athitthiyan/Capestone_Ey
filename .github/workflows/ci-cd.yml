@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 concurrency:
-  group: skeptic-engine-${{ github.ref }}
+  group: gl-guardian-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -171,7 +171,7 @@ jobs:
           PROD_USER: ${{ secrets.PROD_USER }}
           PROD_HOST: ${{ secrets.PROD_HOST }}
           PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
-          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/skeptic-engine' }}
+          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
         run: |
           ssh -i ~/.ssh/prod_key -p "$PROD_PORT" "$PROD_USER@$PROD_HOST" "mkdir -p $PROD_DEPLOY_PATH"
           scp -i ~/.ssh/prod_key -P "$PROD_PORT" docker-compose.production.yml "$PROD_USER@$PROD_HOST:$PROD_DEPLOY_PATH/docker-compose.production.yml"
@@ -181,7 +181,7 @@ jobs:
           PROD_USER: ${{ secrets.PROD_USER }}
           PROD_HOST: ${{ secrets.PROD_HOST }}
           PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
-          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/skeptic-engine' }}
+          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
           GHCR_DEPLOY_USER: ${{ secrets.GHCR_DEPLOY_USER || github.actor }}
           GHCR_DEPLOY_TOKEN: ${{ secrets.GHCR_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
           BACKEND_IMAGE: ${{ needs.docker.outputs.backend_image }}

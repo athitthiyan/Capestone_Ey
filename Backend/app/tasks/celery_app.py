@@ -13,7 +13,7 @@ from app.core.config import settings
 
 # Initialize Celery app
 app = Celery(
-    "skeptic_engine",
+    "gl_guardian",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
 )

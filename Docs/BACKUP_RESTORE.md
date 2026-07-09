@@ -17,9 +17,9 @@ Redis is transient; do not rely on it for durable state. The system of record is
 ## PostgreSQL backup
 
 ```bash
-# logical dump (compose service name: postgres, db: skeptic_engine, user: skeptic)
+# logical dump (compose service name: postgres, db: gl_guardian, user: gl_guardian)
 docker compose -f docker-compose.production.yml exec -T postgres \
-  pg_dump -U skeptic -d skeptic_engine -Fc > skeptic_$(date +%Y%m%d_%H%M%S).dump
+  pg_dump -U gl_guardian -d gl_guardian -Fc > gl_guardian_$(date +%Y%m%d_%H%M%S).dump
 ```
 
 Schedule nightly (cron/systemd timer or the platform's managed backup). Encrypt at rest,
@@ -30,11 +30,11 @@ store off-host, and keep >= 30 days plus a monthly long-term copy (align retenti
 
 ```bash
 # into a running postgres (destructive to the target DB)
-cat skeptic_YYYYMMDD_HHMMSS.dump | docker compose -f docker-compose.production.yml \
-  exec -T postgres pg_restore -U skeptic -d skeptic_engine --clean --if-exists
+cat gl_guardian_YYYYMMDD_HHMMSS.dump | docker compose -f docker-compose.production.yml \
+  exec -T postgres pg_restore -U gl_guardian -d gl_guardian --clean --if-exists
 # re-enable pgvector if restoring into a fresh instance
 docker compose -f docker-compose.production.yml exec -T postgres \
-  psql -U skeptic -d skeptic_engine -c "CREATE EXTENSION IF NOT EXISTS vector;"
+  psql -U gl_guardian -d gl_guardian -c "CREATE EXTENSION IF NOT EXISTS vector;"
 # confirm schema version
 docker compose --env-file .env.production -f docker-compose.production.yml run --rm migrate alembic current
 ```
@@ -45,7 +45,7 @@ Back up the `eventstore_data` volume (stop the container or use a filesystem sna
 consistency):
 
 ```bash
-docker run --rm -v skeptic-engine-production_eventstore_data:/data \
+docker run --rm -v gl-guardian-production_eventstore_data:/data \
   -v "$PWD":/backup alpine tar czf /backup/eventstore_$(date +%Y%m%d).tgz -C /data .
 ```
 

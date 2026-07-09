@@ -1,4 +1,4 @@
-# Skeptic Engine — Free-Tier Production Deployment Guide
+# GL Guardian — Free-Tier Production Deployment Guide
 
 A practical, step-by-step guide to get the whole app (FastAPI backend + Next.js UI +
 Postgres) live on free hosting, with every third-party API key sourced for free.
@@ -136,8 +136,8 @@ That's it. Migrations run in the next step.
    FLIGHT_PRICE_PROVIDER_API_KEY=<aviationstack key>
    ```
    Generate `SECRET_KEY` with: `python -c "import secrets; print(secrets.token_hex(32))"`.
-5. Deploy. When it's live, note the URL, e.g. `https://skeptic-api.onrender.com`.
-6. Verify: open `https://skeptic-api.onrender.com/health` → should return healthy.
+5. Deploy. When it's live, note the URL, e.g. `https://gl-guardian-api.onrender.com`.
+6. Verify: open `https://gl-guardian-api.onrender.com/health` → should return healthy.
 
 > You can fill `CORS_ORIGINS`/`ALLOWED_HOSTS` after step 5 once you know the UI URL —
 > just redeploy the backend after setting them.
@@ -152,14 +152,14 @@ That's it. Migrations run in the next step.
    - Framework preset: **Next.js** (auto-detected). Build/install commands auto.
 3. **Environment variables:**
    ```
-   NEXT_PUBLIC_API_BASE_URL=https://skeptic-api.onrender.com/api/v1
+   NEXT_PUBLIC_API_BASE_URL=https://gl-guardian-api.onrender.com/api/v1
    NEXT_PUBLIC_API_USERNAME=admin
    NEXT_PUBLIC_API_PASSWORD=<the DEFAULT_ADMIN_PASSWORD you set on the backend>
    ```
    (Or issue a bearer token and set `NEXT_PUBLIC_API_TOKEN` instead of user/pass.)
-4. Deploy. Note the URL, e.g. `https://skeptic-engine.vercel.app`.
-5. **Go back to Render** and set `CORS_ORIGINS=["https://skeptic-engine.vercel.app"]`
-   and `ALLOWED_HOSTS=["skeptic-api.onrender.com"]`, then redeploy the backend.
+4. Deploy. Note the URL, e.g. `https://gl-guardian.vercel.app`.
+5. **Go back to Render** and set `CORS_ORIGINS=["https://gl-guardian.vercel.app"]`
+   and `ALLOWED_HOSTS=["gl-guardian-api.onrender.com"]`, then redeploy the backend.
 
 ---
 

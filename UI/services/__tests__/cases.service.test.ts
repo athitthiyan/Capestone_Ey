@@ -13,7 +13,7 @@ describe("cases service", () => {
   it("returns dashboard summary with recent investigations", async () => {
     const summary = await getDashboardSummary();
 
-    expect(summary.engagement).toBe("Skeptic Engine");
+    expect(summary.engagement).toBe("GL Guardian");
     expect(summary.recentInvestigations.length).toBeGreaterThan(0);
     expect(summary.metrics.some((metric) => metric.label === "Average confidence")).toBe(true);
   });

@@ -3,7 +3,7 @@ import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 
 export const metadata: Metadata = {
-  title: "Professional Skepticism Engine",
+  title: "GL Guardian - Automated Audit",
   description: "Enterprise audit AI workspace for investigation, evidence, verification, and review.",
 };
 

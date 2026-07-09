@@ -22,7 +22,7 @@ From `_production_safety_checks`:
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `APP_NAME` | `Skeptic Engine Backend` | |
+| `APP_NAME` | `GL Guardian Backend` | |
 | `APP_VERSION` | `0.1.0` | |
 | `ENV` | `development` | `development` \| `testing` \| `production` |
 | `DEBUG` | `false` | Leaks error detail in responses when true |
@@ -43,7 +43,7 @@ From `_production_safety_checks`:
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `DATABASE_URL` | `postgresql://skeptic:skeptic_dev_password@localhost:5432/skeptic_engine` | |
+| `DATABASE_URL` | `postgresql://gl_guardian:gl_guardian_dev_password@localhost:5432/gl_guardian` | |
 | `DATABASE_ECHO` | `false` | SQL echo |
 | `DATABASE_POOL_SIZE` | `20` | |
 | `DATABASE_MAX_OVERFLOW` | `10` | |
@@ -122,7 +122,7 @@ From `_production_safety_checks`:
 | `METRICS_ENABLED` | `true` | Exposes `/metrics` |
 | `LANGSMITH_TRACING` | `false` | Requires `LANGSMITH_API_KEY` when true |
 | `LANGSMITH_API_KEY` | `""` | |
-| `LANGSMITH_PROJECT` | `skeptic-engine` | |
+| `LANGSMITH_PROJECT` | `gl-guardian` | |
 | `LANGSMITH_ENDPOINT` | `https://api.smith.langchain.com` | |
 
 ## Authentication

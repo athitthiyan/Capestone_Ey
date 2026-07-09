@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 48 48" fill="none">
+  <!-- GL Guardian mark: shield (guardian) + ledger lines resolving into a verified check (automated audit) -->
+  <path d="M24 3 L42 9.8 V23 C42 34.6 34.4 42.4 24 45.5 C13.6 42.4 6 34.6 6 23 V9.8 Z" fill="#101830" stroke="#3EC6A0" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M15 16.5 H33" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M15 22.5 H27" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M15.5 28.5 L21.5 34.5 L33.5 21" stroke="#3EC6A0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

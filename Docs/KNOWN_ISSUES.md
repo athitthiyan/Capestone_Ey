@@ -1,8 +1,8 @@
 # Known Issues and Workarounds
 
 **Version:** `0.1.0`. Live status of open items. Supersedes the point-in-time
-`Skeptic_Engine_Audit_Report.md` (2026-07-03). Items there that are **fixed** are listed in
-[Audit Report - section 3](AUDIT_REPORT.md#3-stale-claims-in-skeptic_engine_audit_reportmd-verified-against-current-code)
+`GL_Guardian_Audit_Report.md` (2026-07-03). Items there that are **fixed** are listed in
+[Audit Report - section 3](AUDIT_REPORT.md#3-stale-claims-in-gl_guardian_audit_reportmd-verified-against-current-code)
 and [Lessons Learned](LESSONS_LEARNED.md).
 
 Legend: **Verified-open** (confirmed this pass), **Maturity** (known product stage).

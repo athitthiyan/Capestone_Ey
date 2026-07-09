@@ -1,4 +1,4 @@
-# Skeptic Engine — Bug & Optimization Audit
+# GL Guardian — Bug & Optimization Audit
 
 > **[Historical snapshot - 2026-07-03]** This bug/optimization audit is a point-in-time report. Several findings have since been fixed (global exception handler, real LangGraph invocation, production auth/secret safety checks). Do not read it as current status. Live status: `docs/KNOWN_ISSUES.md`; what changed: `docs/AUDIT_REPORT.md` section 3.
 

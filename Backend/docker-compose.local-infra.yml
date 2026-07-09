@@ -1,29 +1,29 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: skeptic_local_postgres
+    container_name: gl_guardian_local_postgres
     environment:
-      POSTGRES_USER: skeptic
-      POSTGRES_PASSWORD: skeptic_dev_password
-      POSTGRES_DB: skeptic_engine
+      POSTGRES_USER: gl_guardian
+      POSTGRES_PASSWORD: gl_guardian_dev_password
+      POSTGRES_DB: gl_guardian
     ports:
       - "5432:5432"
     volumes:
-      - skeptic_local_postgres_data:/var/lib/postgresql/data
+      - gl_guardian_local_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U skeptic -d skeptic_engine"]
+      test: ["CMD-SHELL", "pg_isready -U gl_guardian -d gl_guardian"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: skeptic_local_redis
+    container_name: gl_guardian_local_redis
     command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
-      - skeptic_local_redis_data:/data
+      - gl_guardian_local_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -32,7 +32,7 @@ services:
 
   eventstore:
     image: eventstore/eventstore:23.10.0-bookworm-slim
-    container_name: skeptic_local_eventstore
+    container_name: gl_guardian_local_eventstore
     environment:
       EVENTSTORE_CLUSTER_SIZE: "1"
       EVENTSTORE_RUN_PROJECTIONS: "All"
@@ -42,9 +42,9 @@ services:
     ports:
       - "2113:2113"
     volumes:
-      - skeptic_local_eventstore_data:/var/lib/eventstore
+      - gl_guardian_local_eventstore_data:/var/lib/eventstore
 
 volumes:
-  skeptic_local_postgres_data:
-  skeptic_local_redis_data:
-  skeptic_local_eventstore_data:
+  gl_guardian_local_postgres_data:
+  gl_guardian_local_redis_data:
+  gl_guardian_local_eventstore_data:

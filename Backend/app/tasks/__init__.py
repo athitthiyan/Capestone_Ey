@@ -1,1 +1,1 @@
-"""Skeptic Engine backend package."""
+"""GL Guardian backend package."""

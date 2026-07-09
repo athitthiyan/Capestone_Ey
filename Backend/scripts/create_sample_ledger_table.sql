@@ -1,4 +1,4 @@
--- Run this in pgAdmin while connected to the skeptic_engine database.
+-- Run this in pgAdmin while connected to the gl_guardian database.
 
 DROP TABLE IF EXISTS sample_general_ledger;
 

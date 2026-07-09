@@ -1,6 +1,6 @@
-# Skeptic Engine - Documentation
+# GL Guardian - Documentation
 
-Enterprise documentation set for the Skeptic Engine multi-agent AI audit-investigation
+Enterprise documentation set for the GL Guardian multi-agent AI audit-investigation
 platform. Every document here was written by verifying the running source code as the
 single source of truth (Backend `app/` package, `UI/`, infra manifests, and CI/CD),
 not by trusting prior prose.

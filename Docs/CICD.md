@@ -48,7 +48,7 @@ flowchart LR
 
 **Secrets:**
 - `PROD_HOST`, `PROD_USER`, `PROD_SSH_KEY` (required for deploy)
-- `PROD_PORT` (default 22), `PROD_DEPLOY_PATH` (default `~/skeptic-engine`)
+- `PROD_PORT` (default 22), `PROD_DEPLOY_PATH` (default `~/gl-guardian`)
 - `GHCR_DEPLOY_USER`, `GHCR_DEPLOY_TOKEN` (optional; for private image pulls on the host)
 - `NEXT_PUBLIC_API_TOKEN` / `NEXT_PUBLIC_API_USERNAME` / `NEXT_PUBLIC_API_PASSWORD` (UI build)
 

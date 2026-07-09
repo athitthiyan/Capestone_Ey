@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="96" viewBox="0 0 420 96" fill="none" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <!-- GL Guardian - Automated Audit : horizontal lockup -->
+  <g transform="translate(8,4) scale(1.833)">
+    <path d="M24 3 L42 9.8 V23 C42 34.6 34.4 42.4 24 45.5 C13.6 42.4 6 34.6 6 23 V9.8 Z" fill="#101830" stroke="#3EC6A0" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M15 16.5 H33" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M15 22.5 H27" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M15.5 28.5 L21.5 34.5 L33.5 21" stroke="#3EC6A0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="108" y="50" font-size="34" font-weight="700" fill="#101830">GL <tspan fill="#3EC6A0">Guardian</tspan></text>
+  <text x="110" y="76" font-size="14" letter-spacing="4.5" fill="#8B97B5">AUTOMATED AUDIT</text>
+</svg>

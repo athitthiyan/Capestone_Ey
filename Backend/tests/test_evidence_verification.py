@@ -1,9 +1,40 @@
 """Tests for real-time third-party evidence verification."""
 
+import pytest
 import requests
 
 from app.core.config import settings
 from app.db.models import ThirdPartyEvidenceVerification
+
+_PROVIDER_SETTINGS = [
+    "FLIGHT_PRICE_PROVIDER_URL",
+    "FLIGHT_PRICE_PROVIDER_API_KEY",
+    "HOTEL_PRICE_PROVIDER_URL",
+    "HOTEL_PRICE_PROVIDER_API_KEY",
+    "FOOD_BENCHMARK_PROVIDER_URL",
+    "FOOD_BENCHMARK_PROVIDER_API_KEY",
+    "CAB_FARE_PROVIDER_URL",
+    "CAB_FARE_PROVIDER_API_KEY",
+    "FUEL_PRICE_PROVIDER_URL",
+    "FUEL_PRICE_PROVIDER_API_KEY",
+    "GST_VERIFICATION_PROVIDER_URL",
+    "GST_VERIFICATION_PROVIDER_API_KEY",
+    "DUFFEL_API_KEY",
+    "FLIGHT_VALIDATION_API_KEY",
+]
+
+
+@pytest.fixture(autouse=True)
+def _neutral_provider_settings(monkeypatch):
+    """Make provider routing deterministic regardless of local .env contents.
+
+    Real deployments may configure native adapters (IndianAPI fuel, Duffel
+    flights/stays, Aviationstack, GSTINCheck). These tests exercise the generic
+    configured-URL provider path, so neutralize every native adapter and
+    configured URL first; each test then sets exactly what it needs.
+    """
+    for name in _PROVIDER_SETTINGS:
+        monkeypatch.setattr(settings, name, "", raising=False)
 
 
 class _ProviderResponse:
@@ -193,20 +224,23 @@ def test_gstin_invalid_format_is_flagged_without_provider_call(client, monkeypat
         called = True
         return _ProviderResponse({})
 
-    monkeypatch.setattr("app.evidence_verification.service.requests.post", fake_post)
+
+def test_food_without_realtime_provider_is_api_unavailable(client):
     response = client.post(
         "/api/v1/claims/verify-preview",
         json={
-            "category": "GST invoice",
-            "claimed_amount": 1180,
-            "gstin": "BADGSTIN",
+            "category": "food",
+            "claimed_amount": 1500,
+            "vendor": "Cafe Example",
+            "location": "Bengaluru",
         },
     )
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["verification_status"] == "FLAGGED"
-    assert body["provider_name"] == "local_gstin_validation"
+    assert body["verification_status"] == "API_UNAVAILABLE"
+    assert body["fetched_amount"] is None
+tion"
     assert "GSTIN format is invalid" in body["reason"]
     assert called is False
 

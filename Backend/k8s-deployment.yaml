@@ -3,15 +3,15 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: skeptic-engine
+  name: gl-guardian
 
 ---
 # ConfigMap for non-sensitive configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: skeptic-config
-  namespace: skeptic-engine
+  name: gl-guardian-config
+  namespace: gl-guardian
 data:
   ENV: production
   DEBUG: "false"
@@ -30,10 +30,10 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: skeptic-api
-  namespace: skeptic-engine
+  name: gl-guardian-api
+  namespace: gl-guardian
   labels:
-    app: skeptic-api
+    app: gl-guardian-api
 spec:
   replicas: 3
   strategy:
@@ -43,31 +43,31 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: skeptic-api
+      app: gl-guardian-api
   template:
     metadata:
       labels:
-        app: skeptic-api
+        app: gl-guardian-api
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8000"
     spec:
-      serviceAccountName: skeptic-api
+      serviceAccountName: gl-guardian-api
       containers:
       - name: api
-        image: skeptic-engine/api:latest
+        image: gl-guardian/api:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
           name: http
         envFrom:
         - configMapRef:
-            name: skeptic-config
+            name: gl-guardian-config
         - secretRef:
-            name: skeptic-secrets
+            name: gl-guardian-secrets
         env:
         - name: DATABASE_URL
-          value: "postgresql://skeptic:$(DATABASE_PASSWORD)@postgres:5432/skeptic_engine"
+          value: "postgresql://gl_guardian:$(DATABASE_PASSWORD)@postgres:5432/gl_guardian"
         - name: REDIS_URL
           value: "redis://redis:6379/0"
         - name: CELERY_BROKER_URL
@@ -112,14 +112,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: skeptic-api
-  namespace: skeptic-engine
+  name: gl-guardian-api
+  namespace: gl-guardian
   labels:
-    app: skeptic-api
+    app: gl-guardian-api
 spec:
   type: LoadBalancer
   selector:
-    app: skeptic-api
+    app: gl-guardian-api
   ports:
   - protocol: TCP
     port: 80
@@ -132,31 +132,31 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: skeptic-api
-  namespace: skeptic-engine
+  name: gl-guardian-api
+  namespace: gl-guardian
 
 ---
 # Celery Worker Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: skeptic-worker
-  namespace: skeptic-engine
+  name: gl-guardian-worker
+  namespace: gl-guardian
   labels:
-    app: skeptic-worker
+    app: gl-guardian-worker
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: skeptic-worker
+      app: gl-guardian-worker
   template:
     metadata:
       labels:
-        app: skeptic-worker
+        app: gl-guardian-worker
     spec:
       containers:
       - name: worker
-        image: skeptic-engine/api:latest
+        image: gl-guardian/api:latest
         imagePullPolicy: Always
         command:
         - celery
@@ -167,12 +167,12 @@ spec:
         - --concurrency=4
         envFrom:
         - configMapRef:
-            name: skeptic-config
+            name: gl-guardian-config
         - secretRef:
-            name: skeptic-secrets
+            name: gl-guardian-secrets
         env:
         - name: DATABASE_URL
-          value: "postgresql://skeptic:$(DATABASE_PASSWORD)@postgres:5432/skeptic_engine"
+          value: "postgresql://gl_guardian:$(DATABASE_PASSWORD)@postgres:5432/gl_guardian"
         - name: REDIS_URL
           value: "redis://redis:6379/0"
         - name: CELERY_BROKER_URL
@@ -198,13 +198,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: skeptic-api-hpa
-  namespace: skeptic-engine
+  name: gl-guardian-api-hpa
+  namespace: gl-guardian
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: skeptic-api
+    name: gl-guardian-api
   minReplicas: 3
   maxReplicas: 10
   metrics:
@@ -226,13 +226,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: skeptic-worker-hpa
-  namespace: skeptic-engine
+  name: gl-guardian-worker-hpa
+  namespace: gl-guardian
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: skeptic-worker
+    name: gl-guardian-worker
   minReplicas: 2
   maxReplicas: 5
   metrics:

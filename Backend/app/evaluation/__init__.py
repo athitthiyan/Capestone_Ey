@@ -1,4 +1,4 @@
-"""RAGAS evaluation package for the Skeptic Engine crew."""
+"""RAGAS evaluation package for the GL Guardian crew."""
 
 from app.evaluation.ragas import METRIC_CATALOG, compute_ragas_summary, metric_catalog
 

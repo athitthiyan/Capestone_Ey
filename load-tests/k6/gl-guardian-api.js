@@ -8,8 +8,8 @@ const TOKEN = __ENV.TOKEN || "";
 const WRITE_CASES = (__ENV.WRITE_CASES || "false").toLowerCase() === "true";
 const PROFILE = (__ENV.PROFILE || "baseline").toLowerCase();
 
-const failures = new Rate("skeptic_failed_checks");
-const createdCases = new Counter("skeptic_created_cases");
+const failures = new Rate("gl_guardian_failed_checks");
+const createdCases = new Counter("gl_guardian_created_cases");
 
 const profiles = {
   smoke: {
@@ -18,7 +18,7 @@ const profiles = {
     thresholds: {
       http_req_failed: ["rate<0.01"],
       http_req_duration: ["p(95)<750"],
-      skeptic_failed_checks: ["rate<0.01"],
+      gl_guardian_failed_checks: ["rate<0.01"],
     },
   },
   baseline: {
@@ -30,7 +30,7 @@ const profiles = {
     thresholds: {
       http_req_failed: ["rate<0.02"],
       http_req_duration: ["p(95)<1000"],
-      skeptic_failed_checks: ["rate<0.02"],
+      gl_guardian_failed_checks: ["rate<0.02"],
     },
   },
   presentation: {
@@ -43,7 +43,7 @@ const profiles = {
     thresholds: {
       http_req_failed: ["rate<0.03"],
       http_req_duration: ["p(95)<1500"],
-      skeptic_failed_checks: ["rate<0.03"],
+      gl_guardian_failed_checks: ["rate<0.03"],
     },
   },
   stress: {
@@ -56,7 +56,7 @@ const profiles = {
     thresholds: {
       http_req_failed: ["rate<0.05"],
       http_req_duration: ["p(95)<2500"],
-      skeptic_failed_checks: ["rate<0.05"],
+      gl_guardian_failed_checks: ["rate<0.05"],
     },
   },
 };

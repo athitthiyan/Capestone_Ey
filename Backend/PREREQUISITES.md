@@ -1,4 +1,4 @@
-# Skeptic Engine — Real-Time Backend Prerequisites
+# GL Guardian — Real-Time Backend Prerequisites
 
 What you need in place before (and while) building out the real-time backend.
 

@@ -9,7 +9,7 @@
   <marker id="arrGray" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#566080"/></marker>
 </defs>
 <rect x="40" y="24" width="800" height="72" rx="14" fill="#101830" opacity="1" stroke="#27324f" stroke-width="1.5"/>
-<text x="440" y="55" font-size="24" fill="#ffffff" font-weight="bold" text-anchor="middle">Professional-Skepticism Engine</text>
+<text x="440" y="55" font-size="24" fill="#ffffff" font-weight="bold" text-anchor="middle">GL Guardian - Automated Audit</text>
 <text x="440" y="78" font-size="12" fill="#8b97b5" font-weight="normal" text-anchor="middle">Multi-Agent Audit Investigation Crew  ·  adversarial debate + verification  ·  human-in-the-loop</text>
 <text x="26" y="780.0" font-size="11" fill="#56608a" text-anchor="middle" transform="rotate(-90 26 780.0)" letter-spacing="2">CASE INTAKE  →  EVIDENCE  →  DEBATE + VERIFY  →  DECISION + HITL  →  REPORT</text>
 <rect x="370" y="118" width="140" height="30" rx="15" fill="#ece5cf" opacity="1"/>
@@ -28,7 +28,7 @@
 <line x1="440" y1="302" x2="440" y2="328" stroke="#7e8aa8" stroke-width="2" marker-end="url(#arr)"/>
 <rect x="275" y="328" width="330" height="56" rx="10" fill="#cfeede" opacity="1"/>
 <text x="440" y="346" font-size="12.5" fill="#0a0e1a" font-weight="bold" text-anchor="middle">Rule-based pre-filter  ·  flagged?</text>
-<text x="440" y="362" font-size="9.5" fill="#2c4a3c" font-weight="normal" text-anchor="middle">materiality ≥ $25k · FX outlier · round-number · SoD (posted_by)</text>
+<text x="440" y="362" font-size="9.5" fill="#2c4a3c" font-weight="normal" text-anchor="middle">materiality ≥ $50k · FX outlier · round-number · SoD (posted_by)</text>
 <text x="440" y="375" font-size="9.5" fill="#2c4a3c" font-weight="normal" text-anchor="middle">· duplicate · unknown vendor · off-hours posting</text>
 <rect x="730" y="336" width="78" height="40" rx="9" fill="#141a2e" opacity="1" stroke="#566080" stroke-width="1.2" stroke-dasharray="4 3"/>
 <text x="769" y="352" font-size="9.5" fill="#9aa6c4" font-weight="normal" text-anchor="middle">clean rows</text>
@@ -39,7 +39,7 @@
 <text x="456" y="400" font-size="9.5" fill="#57c98a" font-weight="bold" text-anchor="start">Yes</text>
 <rect x="290" y="410" width="300" height="44" rx="10" fill="#cfeede" opacity="1"/>
 <text x="440" y="428" font-size="12" fill="#0a0e1a" font-weight="bold" text-anchor="middle">Flag → create case → seed InvestigationState</text>
-<text x="440" y="444" font-size="9.5" fill="#2c4a3c" font-weight="normal" text-anchor="middle">flags[] · materiality · status=intake  → checkpoint to SQLite (thread_id)</text>
+<text x="440" y="444" font-size="9.5" fill="#2c4a3c" font-weight="normal" text-anchor="middle">flags[] · materiality · status=intake → PostgreSQL · in-memory checkpoint</text>
 <line x1="440" y1="454" x2="440" y2="494" stroke="#7e8aa8" stroke-width="2" marker-end="url(#arr)"/>
 <rect x="300.0" y="508" width="280" height="50" rx="12" fill="#c9c2f0" opacity="1"/>
 <text x="440" y="531.0" font-size="14" fill="#0a0e1a" font-weight="bold" text-anchor="middle">Supervisor · Planner agent</text>
@@ -83,7 +83,7 @@
 <rect x="660" y="730" width="140" height="50" rx="10" fill="#101a2e" opacity="1" stroke="#d6a55a" stroke-width="1.4"/>
 <text x="730" y="748" font-size="11.5" fill="#ecc587" font-weight="bold" text-anchor="middle">Claude API</text>
 <text x="730" y="764" font-size="9" fill="#b89a64" font-weight="normal" text-anchor="middle">Sonnet — reasoning</text>
-<text x="730" y="776" font-size="9" fill="#b89a64" font-weight="normal" text-anchor="middle">Haiku — report</text>
+<text x="730" y="776" font-size="9" fill="#b89a64" font-weight="normal" text-anchor="middle">Haiku — debate + report</text>
 <line x1="660" y1="755" x2="580.0" y2="755" stroke="#d6a55a" stroke-width="1.3" stroke-dasharray="4 3"/>
 <line x1="440" y1="784" x2="440" y2="808" stroke="#7e8aa8" stroke-width="2" marker-end="url(#arr)"/>
 <rect x="300.0" y="808" width="280" height="50" rx="12" fill="#cfe0f5" opacity="1"/>
@@ -97,7 +97,7 @@
 <text x="458" y="876" font-size="9.5" fill="#57c98a" font-weight="bold" text-anchor="start">Yes · verified</text>
 <polygon points="312.0,886 568.0,886 590.0,909.0 568.0,932 312.0,932 290.0,909.0" fill="#101a2e" stroke="#566080" stroke-width="1.6"/>
 <text x="440" y="904" font-size="13" fill="#dbe4f7" font-weight="bold" text-anchor="middle">Confidence gate  ·  route?</text>
-<text x="440" y="920" font-size="9" fill="#9aa6c4" font-weight="normal" text-anchor="middle">≥0.90 &amp; verified &amp; Low → auto-clear · 0.70–0.90 → review · else manual</text>
+<text x="440" y="920" font-size="9" fill="#9aa6c4" font-weight="normal" text-anchor="middle">Low risk &amp; conf ≥0.70 &amp; 3rd-party verified → auto-clear · else human review</text>
 <rect x="86" y="892" width="168" height="22" rx="11" fill="#3b2f5e" opacity="1"/>
 <text x="170" y="907" font-size="9.5" fill="#cdc3f5" font-weight="bold" text-anchor="middle">PHASE 3 · DECISION + HITL</text>
 <line x1="440" y1="932" x2="440" y2="962" stroke="#e0a24f" stroke-width="2" marker-end="url(#arrOrange)"/>
@@ -126,7 +126,7 @@
 <rect x="370" y="1180" width="140" height="30" rx="15" fill="#ece5cf" opacity="1"/>
 <text x="440" y="1200" font-size="14" fill="#0a0e1a" font-weight="bold" text-anchor="middle">End</text>
 <rect x="70" y="1234" width="740" height="56" rx="12" fill="#101830" opacity="1" stroke="#27324f" stroke-width="1.5"/>
-<text x="440" y="1254" font-size="12.5" fill="#cdd5ea" font-weight="bold" text-anchor="middle">Shared state — InvestigationState (TypedDict, SQLite-checkpointed)</text>
+<text x="440" y="1254" font-size="12.5" fill="#cdd5ea" font-weight="bold" text-anchor="middle">Shared state — InvestigationState (TypedDict, MemorySaver checkpoint · domain data in PostgreSQL)</text>
 <text x="440" y="1274" font-size="8.6" fill="#7e8aa8" font-weight="normal" text-anchor="middle">case · evidence{} · debate_transcript[] · challenger_view · defender_view · adjudication{} · verification{} · routing · review_history[] · audit_history[] · report</text>
 <line x1="78" y1="1312" x2="102" y2="1312" stroke="#57c98a" stroke-width="2.6" stroke-dasharray="6 4"/>
 <text x="108" y="1316" font-size="9.5" fill="#9aa6c4" font-weight="normal" text-anchor="start">Yes / pass</text>
@@ -140,4 +140,25 @@
 <text x="685.5999999999999" y="1316" font-size="9.5" fill="#9aa6c4" font-weight="normal" text-anchor="start">debate back-and-forth</text>
 <line x1="825.1999999999999" y1="1312" x2="849.1999999999999" y2="1312" stroke="#566080" stroke-width="2.6" stroke-dasharray="6 4"/>
 <text x="855.1999999999999" y="1316" font-size="9.5" fill="#9aa6c4" font-weight="normal" text-anchor="start">dropped rows</text>
+<rect x="40" y="1340" width="800" height="196" rx="14" fill="#0d1426" stroke="#27324f" stroke-width="1.5"/>
+<text x="440" y="1364" font-size="13" fill="#cdd5ea" font-weight="bold" text-anchor="middle" letter-spacing="2">RUNTIME &amp; DEPLOYMENT</text>
+<rect x="60" y="1378" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="181" y="1399" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">Next.js 15 / React 19 UI</text>
+<text x="181" y="1416" font-size="9" fill="#8b97b5" text-anchor="middle">TanStack Query · React Flow · WS live updates</text>
+<rect x="318" y="1378" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="439" y="1399" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">FastAPI + WebSocket</text>
+<text x="439" y="1416" font-size="9" fill="#8b97b5" text-anchor="middle">REST /api · pipeline events over WS · Pydantic v2</text>
+<rect x="576" y="1378" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="697" y="1399" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">Redis</text>
+<text x="697" y="1416" font-size="9" fill="#8b97b5" text-anchor="middle">cache · Celery broker · pub/sub fan-out</text>
+<rect x="60" y="1442" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="181" y="1463" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">Celery worker + beat</text>
+<text x="181" y="1480" font-size="9" fill="#8b97b5" text-anchor="middle">async investigations · schedules (USE_CELERY)</text>
+<rect x="318" y="1442" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="439" y="1463" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">PostgreSQL + pgvector</text>
+<text x="439" y="1480" font-size="9" fill="#8b97b5" text-anchor="middle">cases · debate · audit hash-chain · RAG embeddings</text>
+<rect x="576" y="1442" width="243" height="52" rx="8" fill="#101a2e" stroke="#3a4a6e" stroke-width="1.2"/>
+<text x="697" y="1463" font-size="11" fill="#e6ebf5" font-weight="bold" text-anchor="middle">Observability</text>
+<text x="697" y="1480" font-size="9" fill="#8b97b5" text-anchor="middle">Prometheus /metrics · optional LangSmith tracing</text>
+<text x="440" y="1520" font-size="10" fill="#3ec6a0" text-anchor="middle">Deploy: Railway (api · worker · beat · Redis)  ·  Neon PostgreSQL  ·  Vercel (UI)</text>
 </svg>

@@ -1,4 +1,4 @@
-# Skeptic Engine — Demo Storytelling: Implementation Tasks
+# GL Guardian — Demo Storytelling: Implementation Tasks
 
 **Spec version:** 1.0  
 **Date:** 2026-07-06  

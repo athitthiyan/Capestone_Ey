@@ -29,7 +29,7 @@ guards (`${VAR:?...}`) that fail fast if a secret is missing.
 
 ```bash
 # On the production host
-mkdir -p ~/skeptic-engine && cd ~/skeptic-engine
+mkdir -p ~/gl-guardian && cd ~/gl-guardian
 cp /path/to/production.env.example .env.production   # then fill real values
 # Provide the image tags built by CI:
 #   BACKEND_IMAGE=ghcr.io/<owner>/<repo>-backend:<sha>
@@ -85,12 +85,12 @@ the API service URL. The API's `preDeployCommand` runs migrations automatically.
 `Backend/k8s-deployment.yaml` provides manifests for the backend. General flow:
 
 ```bash
-kubectl create namespace skeptic-engine
-kubectl -n skeptic-engine create secret generic skeptic-secrets \
+kubectl create namespace gl-guardian
+kubectl -n gl-guardian create secret generic gl-guardian-secrets \
   --from-literal=SECRET_KEY=... --from-literal=POSTGRES_PASSWORD=... \
   --from-literal=ANTHROPIC_API_KEY=...
-kubectl -n skeptic-engine apply -f Backend/k8s-deployment.yaml
-kubectl -n skeptic-engine rollout status deploy/skeptic-api
+kubectl -n gl-guardian apply -f Backend/k8s-deployment.yaml
+kubectl -n gl-guardian rollout status deploy/gl-guardian-api
 ```
 
 Run migrations as a `Job` (or init container) executing `alembic upgrade head` before the

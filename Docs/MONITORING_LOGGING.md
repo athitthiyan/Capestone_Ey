@@ -14,7 +14,7 @@
 
 ```yaml
 scrape_configs:
-  - job_name: skeptic-api
+  - job_name: gl-guardian-api
     metrics_path: /metrics
     static_configs:
       - targets: ["api.internal:8000"]
@@ -34,7 +34,7 @@ scrape_configs:
 ## Tracing
 
 Optional LangSmith tracing for every LangGraph/LLM call: set `LANGSMITH_TRACING=true` and
-`LANGSMITH_API_KEY` (project `skeptic-engine`). Mirrored into `LANGCHAIN_*` env at startup.
+`LANGSMITH_API_KEY` (project `gl-guardian`). Mirrored into `LANGCHAIN_*` env at startup.
 
 ## Application logs
 
@@ -62,3 +62,19 @@ Optional LangSmith tracing for every LangGraph/LLM call: set `LANGSMITH_TRACING=
 - Verifier rejections / escalations (quality regressions).
 - Worker queue depth and task retries (Flower).
 - Audit-chain continuity (integrity of `audit_log`).
+
+
+## Live measurements (2026-07-08)
+
+Measured against the production deployment (single external client; smoke-level, not a
+load test). Source and method: `Docs/LIVE_DATA_VALIDATION.md` §5.
+
+| Metric | Value |
+|--------|-------|
+| API `/health` availability | 100% over 80 requests (0 errors) |
+| API latency median / avg | 220 ms / 334 ms |
+| API latency p95 / p99 | 1.25 s / 1.26 s |
+| UI `/dashboard` TTFB avg / p95 | 188 ms / 247 ms (10 requests) |
+| `/metrics` exposition | live, 31 metric families |
+| Auth enforcement | `/api/v1/*` returns 401 without JWT |
+| Cloud stress/soak, CPU/RAM, real-agent E2E latency | **Not measured** |

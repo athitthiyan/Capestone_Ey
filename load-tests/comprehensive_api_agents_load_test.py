@@ -1,4 +1,4 @@
-"""Comprehensive API + agent workflow load test for Skeptic Engine.
+"""Comprehensive API + agent workflow load test for GL Guardian.
 
 This runner intentionally uses only the Python standard library so it can run
 anywhere the backend repo can run. It exercises the public API surface,
@@ -787,9 +787,9 @@ class LoadTest:
         delta = report["metrics_delta"]
         if executed:
             expected_agent_metrics = (
-                ("skeptic_investigations_total", "terminal investigations"),
-                ("skeptic_debate_rounds_total", "agent debate rounds"),
-                ("skeptic_verification_results_total", "verification results"),
+                ("gl_guardian_investigations_total", "terminal investigations"),
+                ("gl_guardian_debate_rounds_total", "agent debate rounds"),
+                ("gl_guardian_verification_results_total", "verification results"),
             )
             missing = []
             for metric_name, label in expected_agent_metrics:
@@ -972,7 +972,7 @@ class LoadTest:
     def print_summary(self, report: dict[str, Any]) -> None:
         totals = report["totals"]
         latency = report["latency_ms"]
-        print("\nSkeptic Engine comprehensive load test")
+        print("\nGL Guardian comprehensive load test")
         print(f"  Report: {report['report_path']}")
         print(f"  Requests: {totals['requests']} ({totals['failures']} failures)")
         print(f"  Error rate: {totals['error_rate']:.4f}")
@@ -1047,7 +1047,7 @@ def percentile(values: list[float], ratio: float) -> float:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Load test all major Skeptic Engine APIs plus the agent workflow."
+        description="Load test all major GL Guardian APIs plus the agent workflow."
     )
     parser.add_argument(
         "--base-url",

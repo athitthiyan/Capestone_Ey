@@ -9,7 +9,7 @@ Your production-grade real-time backend is ready!
 ### Backend Folder Structure
 
 ```
-C:\Users\athit\Skeptic Engine\backend\
+C:\Users\athit\GL Guardian\backend\
 │
 ├── Core Application (1800+ lines)
 │   ├── main.py ............................ FastAPI + WebSocket + REST API
@@ -100,18 +100,18 @@ export SECRET_KEY=$(openssl rand -hex 32)
 export DATABASE_PASSWORD=$(openssl rand -hex 16)
 
 # 2. Create Kubernetes secrets
-kubectl create namespace skeptic-engine
-kubectl create secret generic skeptic-secrets \
+kubectl create namespace gl-guardian
+kubectl create secret generic gl-guardian-secrets \
   --from-literal=ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   --from-literal=SECRET_KEY=$SECRET_KEY \
   --from-literal=DATABASE_PASSWORD=$DATABASE_PASSWORD \
-  -n skeptic-engine
+  -n gl-guardian
 
 # 3. Deploy
 kubectl apply -f k8s-deployment.yaml
 
 # 4. Monitor
-kubectl get pods -n skeptic-engine -w
+kubectl get pods -n gl-guardian -w
 ```
 
 ---
@@ -212,7 +212,7 @@ curl http://localhost:8000/api/v1/investigations/$INVESTIGATION_ID
 
 ```env
 # Database
-DATABASE_URL=postgresql://skeptic:password@localhost:5432/skeptic_engine
+DATABASE_URL=postgresql://gl_guardian:password@localhost:5432/gl_guardian
 
 # Cache & Queue
 REDIS_URL=redis://localhost:6379/0
@@ -321,12 +321,12 @@ pytest tests/test_api.py -v
 kubectl apply -f k8s-deployment.yaml
 
 # Monitor
-kubectl get pods -n skeptic-engine
-kubectl logs -n skeptic-engine deployment/skeptic-api -f
-kubectl port-forward -n skeptic-engine svc/skeptic-api 8000:80
+kubectl get pods -n gl-guardian
+kubectl logs -n gl-guardian deployment/gl-guardian-api -f
+kubectl port-forward -n gl-guardian svc/gl-guardian-api 8000:80
 
 # Scale
-kubectl scale deployment skeptic-api -n skeptic-engine --replicas=5
+kubectl scale deployment gl-guardian-api -n gl-guardian --replicas=5
 ```
 
 ---
@@ -385,7 +385,7 @@ docker-compose ps
 docker-compose logs -f api
 
 # Test database
-docker-compose exec postgres psql -U skeptic -d skeptic_engine -c "SELECT 1"
+docker-compose exec postgres psql -U gl_guardian -d gl_guardian -c "SELECT 1"
 
 # Test Redis
 docker-compose exec redis redis-cli ping

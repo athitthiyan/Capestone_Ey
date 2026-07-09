@@ -1,4 +1,4 @@
-# Skeptic Engine — Vertical Slice Implementation Plan
+# GL Guardian — Vertical Slice Implementation Plan
 
 **Spec version:** 1.0  
 **Date:** 2026-07-06  
@@ -465,7 +465,7 @@ export const scene04SpeakerNotes = `
 "So we asked a simple question: what if every flagged transaction got a fair trial?
 [beat] Not one AI with one opinion — because opinions hallucinate.
 A real argument. Evidence. A verdict. And a human with the final say.
-[beat] This is Skeptic Engine."
+[beat] This is GL Guardian."
 (cue) Advance to Scene 05.
 `;
 
@@ -510,7 +510,7 @@ export function Scene04Vision({ isActive }: SceneProps) {
           >
             {/* Replace with actual <Image> logo when available */}
             <span className="text-4xl font-bold tracking-tight text-[#0B1220]">
-              Skeptic Engine
+              GL Guardian
             </span>
           </div>
           <p
@@ -1015,7 +1015,7 @@ import type { SceneProps } from "./scene-registry";
 
 export const scene14SpeakerNotes = `
 9:35–10:00. Back to dark. Logo + CTA. Particles settle.
-"Skeptic Engine.
+"GL Guardian.
 Every transaction gets a fair trial — cited, argued, verified, and signed.
 [beat] Let's run it on your data.
 [beat] Where should we start?"
@@ -1048,7 +1048,7 @@ export function Scene14CTA({ isActive }: SceneProps) {
           phase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
         )}>
           <span className="text-3xl font-bold text-white tracking-tight">
-            Skeptic Engine
+            GL Guardian
           </span>
         </div>
 
@@ -1198,7 +1198,7 @@ Run this before any live demo:
 
 ### Fallback plan
 - Recording fallback: `/demo?demo=1&scene=10` → set `mode="recording"` via a URL param or config
-- If the whole app is down: present `Skeptic_Engine_Presentation.pptx` with recorded Scene 10 embedded
+- If the whole app is down: present `GL_Guardian_Presentation.pptx` with recorded Scene 10 embedded
 - Backup URL on mobile hotspot: keep a hotspot ready
 
 ### Presenter notes

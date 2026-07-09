@@ -66,7 +66,7 @@ describe("feature views render with data", () => {
   it("renders the Dashboard page", async () => {
     render(<DashboardView />, { wrapper: createWrapper() });
 
-    expect((await screen.findAllByText(/Skeptic Engine/i)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/GL Guardian/i)).length).toBeGreaterThan(0);
   });
 
   it("renders the Settings page with LLM provider routing", async () => {

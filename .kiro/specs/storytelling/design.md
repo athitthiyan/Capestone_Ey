@@ -1,4 +1,4 @@
-# Skeptic Engine — Demo Storytelling: Design
+# GL Guardian — Demo Storytelling: Design
 
 **Spec version:** 1.0  
 **Date:** 2026-07-06  
@@ -300,7 +300,7 @@ All components must use the following token mapping. No hex values in TSX files.
 
 | Brand color | Tailwind token | CSS variable | Semantic role |
 |-------------|---------------|--------------|---------------|
-| Skeptic Blue #2563EB | `primary` | `--primary` | Brand, actions, data flow |
+| GL Guardian Blue #2563EB | `primary` | `--primary` | Brand, actions, data flow |
 | Keynote Navy #0B1220 | `background` (dark mode) | `--background` | Dark scenes |
 | Defender Emerald #10B981 | `success` | `--success` | Defender, cleared, verified |
 | Challenger Red #EF4444 | `danger` | `--danger` | Challenger, risk, escalate |

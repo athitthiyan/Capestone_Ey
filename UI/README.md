@@ -1,6 +1,6 @@
-# Professional-Skepticism Engine UI
+# GL Guardian - Automated Audit UI
 
-Enterprise React and Next.js frontend for the Professional-Skepticism Engine, a multi-agent AI audit investigation platform.
+Enterprise React and Next.js frontend for the GL Guardian - Automated Audit, a multi-agent AI audit investigation platform.
 
 The UI covers the full investigation workflow:
 
@@ -59,7 +59,7 @@ npm install -g pnpm@9.15.9
 From the repository root:
 
 ```powershell
-cd "C:\Users\athit\Skeptic Engine\UI"
+cd "C:\Users\athit\GL Guardian\UI"
 pnpm install
 ```
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { Menu, Search, ShieldCheck, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { LogoMark } from "@/components/brand/logo-mark";
 import { Button } from "@/components/ui/button";
 import { commandItems, navigationSections } from "@/constants/navigation";
 import { routes } from "@/constants/routes";
@@ -33,11 +34,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         onClick={onNavigate}
       >
         <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary-border bg-primary-soft text-primary">
-          <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+          <LogoMark className="h-5 w-5" />
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm font-semibold">Skepticism Engine</span>
-          <span className="block truncate text-xs text-muted-foreground">Enterprise audit AI</span>
+          <span className="block truncate text-sm font-semibold">GL Guardian</span>
+          <span className="block truncate text-xs text-muted-foreground">Automated Audit</span>
         </span>
       </Link>
 
@@ -109,7 +110,7 @@ function AppHeader() {
         </Button>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-foreground">Skeptic Engine</p>
+          <p className="truncate text-sm font-medium text-foreground">GL Guardian</p>
           <p className="truncate text-xs text-muted-foreground">Live backend workspace</p>
         </div>
 

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # App
-    APP_NAME: str = "Skeptic Engine Backend"
+    APP_NAME: str = "GL Guardian Backend"
     APP_VERSION: str = "0.1.0"
     ENV: Literal["development", "testing", "production"] = "development"
     DEBUG: bool = False
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: Annotated[list[str], NoDecode] = ["*"]
 
     # Database
-    DATABASE_URL: str = "postgresql://skeptic:skeptic_dev_password@localhost:5432/skeptic_engine"
+    DATABASE_URL: str = "postgresql://gl_guardian:gl_guardian_dev_password@localhost:5432/gl_guardian"
     DATABASE_ECHO: bool = False
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 10
@@ -102,7 +102,7 @@ class Settings(BaseSettings):
     METRICS_ENABLED: bool = True
     LANGSMITH_TRACING: bool = False
     LANGSMITH_API_KEY: str = ""
-    LANGSMITH_PROJECT: str = "skeptic-engine"
+    LANGSMITH_PROJECT: str = "gl-guardian"
     LANGSMITH_ENDPOINT: str = "https://api.smith.langchain.com"
 
     # Authentication

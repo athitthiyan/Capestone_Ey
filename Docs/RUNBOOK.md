@@ -15,7 +15,7 @@ Services: `ui`, `api`, `worker`, `beat`, `postgres`, `redis`, `eventstore` (+ on
 ## Startup procedure
 
 ```bash
-cd ~/skeptic-engine
+cd ~/gl-guardian
 docker compose --env-file .env.production -f docker-compose.production.yml pull
 docker compose --env-file .env.production -f docker-compose.production.yml run --rm migrate
 docker compose --env-file .env.production -f docker-compose.production.yml up -d

@@ -221,7 +221,7 @@ function mapDashboard(
   agentHealth: AgentHealth[],
 ): DashboardSummary {
   return {
-    engagement: "Skeptic Engine",
+    engagement: "GL Guardian",
     period: "Live backend",
     metrics: metricsFromStats(stats),
     riskDistribution: riskDistributionFromStats(stats),

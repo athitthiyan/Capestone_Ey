@@ -2,28 +2,28 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: skeptic_postgres
+    container_name: gl_guardian_postgres
     environment:
-      POSTGRES_USER: skeptic
-      POSTGRES_PASSWORD: skeptic_dev_password
-      POSTGRES_DB: skeptic_engine
+      POSTGRES_USER: gl_guardian
+      POSTGRES_PASSWORD: gl_guardian_dev_password
+      POSTGRES_DB: gl_guardian
       POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U skeptic -d skeptic_engine"]
+      test: ["CMD-SHELL", "pg_isready -U gl_guardian -d gl_guardian"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # Redis (Broker & Cache)
   redis:
     image: redis:7-alpine
-    container_name: skeptic_redis
+    container_name: gl_guardian_redis
     ports:
       - "6379:6379"
     volumes:
@@ -35,16 +35,16 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # pgAdmin (PostgreSQL admin UI)
   pgadmin:
     image: dpage/pgadmin4:8
-    container_name: skeptic_pgadmin
+    container_name: gl_guardian_pgadmin
     profiles:
       - tools
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@skeptic.local}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@gl-guardian.local}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-}
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
@@ -55,12 +55,12 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # EventStoreDB
   eventstore:
     image: eventstore/eventstore:23.10.0-bookworm-slim
-    container_name: skeptic_eventstore
+    container_name: gl_guardian_eventstore
     environment:
       EVENTSTORE_CLUSTER_SIZE: "1"
       EVENTSTORE_RUN_PROJECTIONS: "All"
@@ -78,19 +78,19 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # FastAPI Backend
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: skeptic_api
+    container_name: gl_guardian_api
     environment:
       ENV: development
       DEBUG: "true"
       LOG_LEVEL: INFO
-      DATABASE_URL: postgresql://skeptic:skeptic_dev_password@postgres:5432/skeptic_engine
+      DATABASE_URL: postgresql://gl_guardian:gl_guardian_dev_password@postgres:5432/gl_guardian
       REDIS_URL: redis://redis:6379/0
       USE_REDIS_EVENTS: "true"
       CELERY_BROKER_URL: redis://redis:6379/1
@@ -127,19 +127,19 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # Celery Worker
   worker:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: skeptic_worker
+    container_name: gl_guardian_worker
     environment:
       ENV: development
       DEBUG: "true"
       LOG_LEVEL: INFO
-      DATABASE_URL: postgresql://skeptic:skeptic_dev_password@postgres:5432/skeptic_engine
+      DATABASE_URL: postgresql://gl_guardian:gl_guardian_dev_password@postgres:5432/gl_guardian
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -164,19 +164,19 @@ services:
       - ./:/app
     command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=4
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # Celery Beat (Scheduler)
   beat:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: skeptic_beat
+    container_name: gl_guardian_beat
     environment:
       ENV: development
       DEBUG: "true"
       LOG_LEVEL: INFO
-      DATABASE_URL: postgresql://skeptic:skeptic_dev_password@postgres:5432/skeptic_engine
+      DATABASE_URL: postgresql://gl_guardian:gl_guardian_dev_password@postgres:5432/gl_guardian
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -200,14 +200,14 @@ services:
       - ./:/app
     command: celery -A app.tasks.celery_app beat --loglevel=info
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
   # Flower (Celery Monitoring)
   flower:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: skeptic_flower
+    container_name: gl_guardian_flower
     environment:
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -218,7 +218,7 @@ services:
       - worker
     command: celery -A app.tasks.celery_app flower --port=5555 --broker=redis://redis:6379/1
     networks:
-      - skeptic_network
+      - gl_guardian_network
 
 volumes:
   postgres_data:
@@ -231,5 +231,5 @@ volumes:
     driver: local
 
 networks:
-  skeptic_network:
+  gl_guardian_network:
     driver: bridge

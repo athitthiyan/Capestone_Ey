@@ -17,10 +17,10 @@ incident response, DR, backup, monitoring) required for a production/enterprise 
 - **Documents reviewed:** 11 Markdown files + 5 design PDFs + 1 architecture diagram.
 - **Correct as-is:** 4
 - **Needs update:** 6
-- **Superseded / now misleading:** 1 (`Skeptic_Engine_Audit_Report.md`)
+- **Superseded / now misleading:** 1 (`GL_Guardian_Audit_Report.md`)
 - **Newly created (Phase 4):** 20 files under `docs/`.
 
-The single most important finding: **`Skeptic_Engine_Audit_Report.md` (dated 2026-07-03)
+The single most important finding: **`GL_Guardian_Audit_Report.md` (dated 2026-07-03)
 is now partially stale** and should not be read as current. Several defects it lists have
 since been fixed in code (see section 3).
 
@@ -44,13 +44,13 @@ Legend for Status: **Correct** (matches code), **Update** (drifted, fixed or nee
 | `DEPLOYMENT_GUIDE.md` (root) | Update | Free-tier oriented and still valid, but pre-flight says API keys are "committed to the repo" (a historical warning) and predates `docker-compose.production.yml` / Railway configs / the CI deploy job. | Superseded for production by `docs/DEPLOYMENT.md`; keep as the free-tier quickstart and cross-link. | Medium |
 | `Docs/PRODUCTION_DEPLOYMENT.md` | Correct | Accurately describes `.github/workflows/ci-cd.yml` and the production compose flow (SSH, GHCR, `alembic upgrade head`). | Cross-link `docs/CICD.md` + `docs/DEPLOYMENT.md`. | Low |
 | `UI/README.md` | Update | Verify against `UI/package.json` scripts and `NEXT_PUBLIC_*` env; ensure it documents the token vs username/password auth options. | Reconcile with `docs/LOCAL_DEVELOPMENT.md`. | Medium |
-| `Skeptic_Engine_Audit_Report.md` | **Superseded** | Bug/optimization audit dated 2026-07-03; several findings are now fixed (see section 3). Reading it as current is misleading. | Add a banner noting it is a point-in-time snapshot; live status lives in `docs/KNOWN_ISSUES.md`. | **High** |
+| `GL_Guardian_Audit_Report.md` | **Superseded** | Bug/optimization audit dated 2026-07-03; several findings are now fixed (see section 3). Reading it as current is misleading. | Add a banner noting it is a point-in-time snapshot; live status lives in `docs/KNOWN_ISSUES.md`. | **High** |
 | `Docs/*.pdf` (PRD, HLD, LLD, Design, Sample output) | Correct (design intent) | Design-time artifacts; not code-verified but not contradicted. | Leave as-is; `docs/ARCHITECTURE.md` is the code-verified companion. | Low |
-| `Docs/Architecture/Skeptic_Engine_Architecture.(png|svg)` | Correct | Architecture image; keep. `docs/ARCHITECTURE.md` adds Mermaid equivalents. | None. | Low |
+| `Docs/Architecture/GL_Guardian_Architecture.(png|svg)` | Correct | Architecture image; keep. `docs/ARCHITECTURE.md` adds Mermaid equivalents. | None. | Low |
 
 ---
 
-## 3. Stale claims in `Skeptic_Engine_Audit_Report.md` (verified against current code)
+## 3. Stale claims in `GL_Guardian_Audit_Report.md` (verified against current code)
 
 These items from the 2026-07-03 audit no longer reflect the code and must not be quoted
 as current:
@@ -107,7 +107,7 @@ edited. Each edit is marked in-file with an HTML comment `<!-- Updated 2026-07-0
 
 - `Backend/README.md` - "Project Structure" rewritten to the real `app/` package; quick
   start reconciled with `docker-compose.yml`.
-- `Skeptic_Engine_Audit_Report.md` - banner added noting it is a 2026-07-03 snapshot and
+- `GL_Guardian_Audit_Report.md` - banner added noting it is a 2026-07-03 snapshot and
   pointing to `docs/KNOWN_ISSUES.md` for live status.
 
 See [VALIDATION_REPORT.md](VALIDATION_REPORT.md) for the final reproducibility check.

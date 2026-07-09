@@ -4,7 +4,7 @@
 
 ## 1. Overview (for all audiences)
 
-Skeptic Engine is an audit-investigation platform. Flagged general-ledger transactions
+GL Guardian is an audit-investigation platform. Flagged general-ledger transactions
 are investigated by a crew of six specialized AI agents that run an adversarial debate
 (Challenger vs. Defender), grounded in retrieved evidence and third-party checks, gated
 by a confidence threshold, routed to human review when needed, and recorded to an

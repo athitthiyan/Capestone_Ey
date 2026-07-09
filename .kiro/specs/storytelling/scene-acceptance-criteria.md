@@ -1,4 +1,4 @@
-# Skeptic Engine — Scene-by-Scene Acceptance Criteria
+# GL Guardian — Scene-by-Scene Acceptance Criteria
 
 **Spec version:** 1.0  
 **Date:** 2026-07-06  
@@ -116,7 +116,7 @@
 **Given** the day-break wipe completes  
 **When** the light scene is fully revealed  
 **Then** particles visually converge toward the center of the viewport over 1.5s  
-**And** the Skeptic Engine wordmark assembles/fades in at the convergence point
+**And** the GL Guardian wordmark assembles/fades in at the convergence point
 
 ### AC-04-03 — Logo and tagline ✓
 **Given** particle convergence completes  
@@ -128,7 +128,7 @@
 ### AC-04-04 — Music note in speaker notes ✓
 **Given** notes mode is active  
 **When** Scene 04 is visible  
-**Then** the speaker notes read: "Music lifts. Particles converge into the logo. This is Skeptic Engine."
+**Then** the speaker notes read: "Music lifts. Particles converge into the logo. This is GL Guardian."
 
 ---
 
@@ -471,7 +471,7 @@ This scene must generate a "Have you ever seen AI do this?" reaction. Every crit
 ### AC-14-02 — CTA text sequence ✓
 **Given** Scene 14 is active  
 **When** the text enters  
-**Then** "Skeptic Engine." appears first  
+**Then** "GL Guardian." appears first  
 **And** "Every transaction gets a fair trial — cited, argued, verified, and signed." fades in 400ms later  
 **And** "Let's run it on your data." appears 600ms after the tagline at large size (40pt equiv)  
 **And** "Where should we start?" appears 800ms after the CTA text, slightly smaller
