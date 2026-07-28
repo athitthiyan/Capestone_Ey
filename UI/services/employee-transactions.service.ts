@@ -46,7 +46,8 @@ export type EmployeeTransactionFilters = {
 };
 
 export type CreateEmployeeTransactionInput = {
-  employeeId: string;
+  /** Omit to create the transaction for the authenticated user. */
+  employeeId?: string;
   transactionType: EmployeeTransactionType;
   amount: number;
   currency: string;
@@ -130,7 +131,7 @@ export async function createEmployeeTransaction(
   const row = await apiRequest<ApiEmployeeTransaction>("/employee-transactions", {
     method: "POST",
     body: JSON.stringify({
-      employee_id: input.employeeId,
+      employee_id: input.employeeId || undefined,
       transaction_type: input.transactionType,
       amount: input.amount,
       currency: input.currency,

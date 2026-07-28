@@ -427,6 +427,19 @@ export type IntakeSummary = {
   columns: string[];
   ruleStats: IntakeRuleStat[];
   flaggedRows: FlaggedRow[];
+  /** Employee-linked rows from the upload, importable into Employee Transactions. */
+  employeeSeeds?: EmployeeTransactionSeed[];
+};
+
+/** An employee transaction candidate extracted from an uploaded ledger row. */
+export type EmployeeTransactionSeed = {
+  referenceId: string;
+  employee: string;
+  transactionType: string;
+  amount: number;
+  currency: string;
+  transactionDate?: string;
+  description: string;
 };
 
 // --- RAGAS evaluation: retrieval, generation, and agentic quality ---

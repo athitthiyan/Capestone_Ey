@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1660" height="1382" viewBox="0 0 1660 1382" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect width="1660" height="1382" fill="#0a0e1a"/>
+<g transform="translate(40,26) scale(1.15)">
+  <path d="M24 3 L42 9.8 V23 C42 34.6 34.4 42.4 24 45.5 C13.6 42.4 6 34.6 6 23 V9.8 Z" fill="#101830" stroke="#3EC6A0" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M15 16.5 H33" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M15 22.5 H27" stroke="#8B97B5" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M15.5 28.5 L21.5 34.5 L33.5 21" stroke="#3EC6A0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="112" y="56" font-size="27" fill="#ffffff" font-weight="bold">GL Guardian - Automated Audit</text>
+<text x="112" y="80" font-size="14" fill="#8b97b5">Folder-level map - what the backend and frontend do</text>
+<rect x="40" y="112" width="780" height="46" rx="10" fill="#0f2c23" stroke="#3ec6a0" stroke-width="1.4"/>
+<text x="430.0" y="136" font-size="17" fill="#9fe7c6" font-weight="bold" text-anchor="middle">BACKEND - Backend/ (FastAPI + LangGraph investigation engine)</text>
+<text x="430.0" y="152" font-size="11.5" fill="#79a395" text-anchor="middle">ingests flagged transactions -> six-agent trial -> verified evidence -> hash-chained record -> REST + WebSocket</text>
+<rect x="840" y="112" width="780" height="46" rx="10" fill="#12253d" stroke="#5b9bd5" stroke-width="1.4"/>
+<text x="1230.0" y="136" font-size="17" fill="#a8cdf0" font-weight="bold" text-anchor="middle">FRONTEND - UI/ (Next.js 15 / React 19 workspace)</text>
+<text x="1230.0" y="152" font-size="11.5" fill="#7d9ec2" text-anchor="middle">auditor's workspace - uploads ledgers, watches the trial live, drives the human review that closes each case</text>
+<rect x="40" y="178" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="178" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="203" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/core/</text>
+<text x="58" y="224" font-size="12" fill="#8b97b5">Config + flags · JWT/RBAC · rate limit · request logs · Prometheus · governance store</text>
+<rect x="40" y="250" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="250" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="275" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/db/</text>
+<text x="58" y="296" font-size="12" fill="#8b97b5">PostgreSQL layer - 14 SQLAlchemy models + session management</text>
+<rect x="40" y="322" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="322" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="347" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/schemas/</text>
+<text x="58" y="368" font-size="12" fill="#8b97b5">Pydantic request/response contracts for the whole API</text>
+<rect x="40" y="394" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="394" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="419" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/api/routes/</text>
+<text x="58" y="440" font-size="12" fill="#8b97b5">REST surface - 16 modules: cases, reviews, analytics, auth, intake, WS...</text>
+<rect x="40" y="466" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="466" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="491" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/agents/</text>
+<text x="58" y="512" font-size="12" fill="#8b97b5">The AI crew - LangGraph state machine (6 agents) + end-to-end executor</text>
+<rect x="40" y="538" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="538" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="563" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/llm/</text>
+<text x="58" y="584" font-size="12" fill="#8b97b5">LLM gateway - routing, retry->fallback across 5 providers, cost metering</text>
+<rect x="40" y="610" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="610" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="635" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/evidence_verification/</text>
+<text x="58" y="656" font-size="12" fill="#8b97b5">Live 3rd-party checks - FX, GSTIN, fuel, flights, hotels</text>
+<rect x="40" y="682" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="682" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="707" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/knowledge/</text>
+<text x="58" y="728" font-size="12" fill="#8b97b5">Policy KB corpus + hybrid retriever (RAG for the Evidence agent)</text>
+<rect x="40" y="754" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="754" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="779" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/audit/</text>
+<text x="58" y="800" font-size="12" fill="#8b97b5">Tamper-evident trail - SHA-256 hash chain (EventStoreDB optional)</text>
+<rect x="40" y="826" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="826" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="851" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/evaluation/</text>
+<text x="58" y="872" font-size="12" fill="#8b97b5">RAGAS quality scoring incl. real-time LLM judge</text>
+<rect x="40" y="898" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="898" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="923" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/realtime/</text>
+<text x="58" y="944" font-size="12" fill="#8b97b5">WebSocket manager + Redis pub/sub fan-out</text>
+<rect x="40" y="970" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="970" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="995" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/tasks/</text>
+<text x="58" y="1016" font-size="12" fill="#8b97b5">Celery worker/beat for async runs (flag-gated)</text>
+<rect x="40" y="1042" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="1042" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="1067" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/employee_transactions/</text>
+<text x="58" y="1088" font-size="12" fill="#8b97b5">Employee ledger domain - RBAC, filters, soft archive</text>
+<rect x="40" y="1114" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40" y="1114" width="4" height="62" rx="2" fill="#3ec6a0"/>
+<text x="58" y="1139" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">tests/ · migrations/ · scripts/ · sample_data/</text>
+<text x="58" y="1160" font-size="12" fill="#8b97b5">95 tests · 6 Alembic migrations · ops/seed scripts · demo ledgers</text>
+<rect x="840" y="178" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="178" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="203" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">app/</text>
+<text x="858" y="224" font-size="12" fill="#8b97b5">App Router - thin route pages, root layout, favicon, error boundaries</text>
+<rect x="840" y="250" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="250" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="275" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">features/</text>
+<text x="858" y="296" font-size="12" fill="#8b97b5">The 17 screens - intake, case workspace, debate, review, analytics...</text>
+<rect x="840" y="322" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="322" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="347" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">components/</text>
+<text x="858" y="368" font-size="12" fill="#8b97b5">App shell + logo, domain widgets, generic table, UI primitives</text>
+<rect x="840" y="394" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="394" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="419" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">services/</text>
+<text x="858" y="440" font-size="12" fill="#8b97b5">Typed API client per domain + CSV/TSV/XLSX ledger parser + rules</text>
+<rect x="840" y="466" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="466" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="491" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">hooks/</text>
+<text x="858" y="512" font-size="12" fill="#8b97b5">TanStack Query bindings incl. realtime WebSocket -> cache merge</text>
+<rect x="840" y="538" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="538" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="563" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">lib/</text>
+<text x="858" y="584" font-size="12" fill="#8b97b5">XLSX reader · report/PDF export · error humanizer · formatting</text>
+<rect x="840" y="610" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="610" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="635" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">store/ · providers/</text>
+<text x="858" y="656" font-size="12" fill="#8b97b5">UI state context + QueryClient wiring</text>
+<rect x="840" y="682" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="682" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="707" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">constants/ · types/</text>
+<text x="858" y="728" font-size="12" fill="#8b97b5">Navigation/routes + domain.ts single type source of truth</text>
+<rect x="840" y="754" width="780" height="62" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="840" y="754" width="4" height="62" rx="2" fill="#5b9bd5"/>
+<text x="858" y="779" font-size="14.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">data/ · tests/</text>
+<text x="858" y="800" font-size="12" fill="#8b97b5">Mock fixtures for unwired views · vitest setup</text>
+<text x="40" y="1218" font-size="15" fill="#e0a24f" font-weight="bold" letter-spacing="2">SHARED / REPO-LEVEL</text>
+<rect x="40.0" y="1232" width="304.8" height="66" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="40.0" y="1232" width="4" height="66" rx="2" fill="#e0a24f"/>
+<text x="56.0" y="1258" font-size="13.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">Docs/</text>
+<text x="56.0" y="1279" font-size="11" fill="#8b97b5">24-doc ops handbook + diagrams + branding</text>
+<rect x="358.8" y="1232" width="304.8" height="66" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="358.8" y="1232" width="4" height="66" rx="2" fill="#e0a24f"/>
+<text x="374.8" y="1258" font-size="13.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">load-tests/</text>
+<text x="374.8" y="1279" font-size="11" fill="#8b97b5">k6 profiles + Python API/agent runner</text>
+<rect x="677.6" y="1232" width="304.8" height="66" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="677.6" y="1232" width="4" height="66" rx="2" fill="#e0a24f"/>
+<text x="693.6" y="1258" font-size="13.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">.github/</text>
+<text x="693.6" y="1279" font-size="11" fill="#8b97b5">CI/CD: lint -> test -> images -> deploy</text>
+<rect x="996.4000000000001" y="1232" width="304.8" height="66" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="996.4000000000001" y="1232" width="4" height="66" rx="2" fill="#e0a24f"/>
+<text x="1012.4000000000001" y="1258" font-size="13.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">presentation/</text>
+<text x="1012.4000000000001" y="1279" font-size="11" fill="#8b97b5">Decks, scripts, brand style guide</text>
+<rect x="1315.2" y="1232" width="304.8" height="66" rx="9" fill="#101a2e" stroke="#2a3752" stroke-width="1.2"/>
+<rect x="1315.2" y="1232" width="4" height="66" rx="2" fill="#e0a24f"/>
+<text x="1331.2" y="1258" font-size="13.5" fill="#e6ebf5" font-weight="bold" font-family="Consolas, Menlo, monospace">.kiro/specs/</text>
+<text x="1331.2" y="1279" font-size="11" fill="#8b97b5">Spec-first requirements, design, tasks</text>
+<text x="830.0" y="1356" font-size="11.5" fill="#56608a" text-anchor="middle">96 Python files (~16.5k LOC) · 170 TypeScript files (~13.2k LOC) · PostgreSQL + pgvector · Redis · 5 LLM providers · full detail in Docs/CODEBASE_REPORT.md</text>
+</svg>

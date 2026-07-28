@@ -23,8 +23,9 @@ import {
 } from "@/hooks/use-cases";
 import { useIntakeSummary } from "@/hooks/use-intake";
 import { useSettings } from "@/hooks/use-settings";
+import { createEmployeeTransaction } from "@/services/employee-transactions.service";
 import { defaultIntakeParseOptions, parseLedgerFile } from "@/services/intake.service";
-import type { FlaggedRow, IntakeSummary } from "@/types/domain";
+import type { EmployeeTransactionType, FlaggedRow, IntakeSummary } from "@/types/domain";
 
 function parseCurrencyAmount(value: string) {
   const parsed = Number(value.replace(/[^0-9.-]/g, ""));
@@ -65,7 +66,7 @@ export function IntakeView() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [showPastRuns, setShowPastRuns] = useState(false);
-  const [runStatus, setRunStatus] = useState("Upload a CSV or TSV ledger extract to run the pre-filter.");
+  const [runStatus, setRunStatus] = useState("Upload a CSV, TSV, or Excel ledger extract to run the pre-filter.");
   const parserOptions = useMemo(
     () => ({
       materialityThreshold: settingsQuery.data?.materiality ?? defaultIntakeParseOptions.materialityThreshold,
@@ -82,8 +83,8 @@ export function IntakeView() {
       return;
     }
 
-    if (!/\.(csv|tsv)$/i.test(file.name)) {
-      setUploadError("Upload a CSV or TSV ledger extract.");
+    if (!/\.(csv|tsv|xlsx|xls)$/i.test(file.name)) {
+      setUploadError("Upload a CSV, TSV, or Excel (.xlsx) ledger extract.");
       return;
     }
 
@@ -168,7 +169,34 @@ export function IntakeView() {
       const limitMessage = skippedRows > 0 ? ` ${skippedRows} additional flagged row(s) were held for the next run.` : "";
       setRunStatus(`Created ${created.length} cases.${limitMessage} Starting the agent crew...`);
       await runCases.mutateAsync(created.map((item) => item.id));
-      setRunStatus(`Started the crew for ${created.length} cases. Opening the first workspace...`);
+
+      // Import employee-linked rows from the upload into Employee Transactions.
+      // Failures here should never block the investigation flow.
+      let importedTransactions = 0;
+      const seeds = summary.employeeSeeds ?? [];
+      if (seeds.length > 0) {
+        setRunStatus(`Started the crew for ${created.length} cases. Importing ${seeds.length} employee transactions...`);
+        const settled = await Promise.allSettled(
+          seeds.map((seed) =>
+            createEmployeeTransaction({
+              transactionType: seed.transactionType as EmployeeTransactionType,
+              amount: seed.amount,
+              currency: seed.currency,
+              status: "completed",
+              description: seed.description,
+              referenceId: seed.referenceId,
+              transactionDate: seed.transactionDate,
+            }),
+          ),
+        );
+        importedTransactions = settled.filter((result) => result.status === "fulfilled").length;
+        settled
+          .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+          .forEach((result) => console.warn("Failed to import employee transaction:", result.reason));
+      }
+
+      const importMessage = importedTransactions > 0 ? ` Imported ${importedTransactions} employee transactions.` : "";
+      setRunStatus(`Started the crew for ${created.length} cases.${importMessage} Opening the first workspace...`);
       router.push(routes.caseWorkspace(created[0].id));
     } catch (creationError) {
       setCreateError(
@@ -292,8 +320,8 @@ export function IntakeView() {
               ref={inputRef}
               className="sr-only"
               type="file"
-              accept=".csv,.tsv,text/csv,text/tab-separated-values"
-              aria-label="Upload general ledger CSV or TSV file"
+              accept=".csv,.tsv,.xlsx,.xls,text/csv,text/tab-separated-values,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              aria-label="Upload general ledger CSV, TSV, or Excel file"
               onChange={(event) => void handleFile(event.target.files?.[0])}
             />
             <button

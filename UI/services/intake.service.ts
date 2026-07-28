@@ -1,5 +1,5 @@
 import { apiRequest } from "@/services/api";
-import type { FlaggedRow, IntakeRuleStat, IntakeSummary } from "@/types/domain";
+import type { EmployeeTransactionSeed, FlaggedRow, IntakeRuleStat, IntakeSummary } from "@/types/domain";
 
 type ApiIntakeRuleStat = {
   rule: string;
@@ -101,6 +101,52 @@ function ruleDefinitions(config: IntakeParseOptions): Array<{ flag: string; rule
     { flag: "unknown vendor", rule: "Unknown vendor", tone: "danger" },
     { flag: "off-hours", rule: "Off-hours posting", tone: "info" },
   ];
+}
+
+function inferTransactionType(account: string, description: string): string {
+  const text = `${account} ${description}`.toLowerCase();
+  if (/payroll|salary/.test(text)) return "payroll";
+  if (/bonus/.test(text)) return "bonus";
+  if (/refund|credit note|reversal/.test(text)) return "credit";
+  if (/travel|airfare|flight|hotel|lodging|stay|fuel|petrol|diesel|cab|taxi|ride|ground|meal|catering|dining|reimburs/.test(text)) {
+    return "reimbursement";
+  }
+  return "debit";
+}
+
+function toEmployeeSeed(row: LedgerRow): EmployeeTransactionSeed | null {
+  const employeeName = getValue(row, ["employee_name", "emp_name", "employee"]);
+  const employeeId = getValue(row, ["employee_id", "emp_id"]);
+  if (!employeeName && !employeeId) {
+    return null;
+  }
+
+  const originalAmount = Math.abs(parseAmount(getValue(row, ["amount_original", "amount"])));
+  const usdAmount = Math.abs(parseAmount(getValue(row, ["amount_usd", "debit", "credit"])));
+  const currencyRaw = getValue(row, ["currency", "ccy"]).toUpperCase();
+  const useOriginal = originalAmount > 0 && /^[A-Z]{3}$/.test(currencyRaw);
+  const amount = useOriginal ? originalAmount : usdAmount;
+  if (!(amount > 0)) {
+    return null;
+  }
+
+  const account = getValue(row, ["account", "category", "gl_account"]);
+  const description = getValue(row, ["description", "memo", "narrative"]);
+  const vendor = getValue(row, ["vendor", "vendor_name", "supplier"]);
+  const date = getValue(row, ["date", "posted_at", "posting_date", "timestamp"]);
+  const employee = [employeeName, employeeId].filter(Boolean).join(" - ");
+
+  return {
+    referenceId: getValue(row, ["txn_id", "transaction_id", "id"]) || "UNMAPPED",
+    employee,
+    transactionType: inferTransactionType(account, description),
+    amount,
+    currency: useOriginal ? currencyRaw : "USD",
+    transactionDate: date ? date.replace(" ", "T") : undefined,
+    description: [description || account, vendor ? `Vendor: ${vendor}.` : "", `Employee: ${employee}.`]
+      .filter(Boolean)
+      .join(" "),
+  };
 }
 
 function parseDelimitedRows(text: string, delimiter: "," | "\t") {
@@ -281,9 +327,18 @@ export async function parseLedgerFile(
   options: Partial<IntakeParseOptions> = {},
 ): Promise<IntakeSummary> {
   const config = normalizeOptions(options);
-  const text = await readFileText(file);
-  const delimiter = file.name.toLowerCase().endsWith(".tsv") ? "\t" : ",";
-  const parsedRows = parseDelimitedRows(text, delimiter);
+  const fileName = file.name.toLowerCase();
+
+  let parsedRows: string[][];
+  if (/\.xlsx?$/.test(fileName)) {
+    const { parseXlsxToRows } = await import("@/lib/xlsx-lite");
+    parsedRows = await parseXlsxToRows(await file.arrayBuffer());
+  } else {
+    const text = await readFileText(file);
+    const delimiter = fileName.endsWith(".tsv") ? "\t" : ",";
+    parsedRows = parseDelimitedRows(text, delimiter);
+  }
+
   const [rawHeaders, ...rawDataRows] = parsedRows;
 
   if (!rawHeaders || rawHeaders.length === 0) {
@@ -352,5 +407,8 @@ export async function parseLedgerFile(
     columns: headers,
     ruleStats: toRuleStats(flaggedRows, config),
     flaggedRows,
+    employeeSeeds: rows
+      .map(toEmployeeSeed)
+      .filter((seed): seed is EmployeeTransactionSeed => seed !== null),
   };
 }
