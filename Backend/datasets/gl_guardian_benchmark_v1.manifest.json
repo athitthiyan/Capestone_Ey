@@ -1,0 +1,25 @@
+{
+  "dataset_version": "1.0.0",
+  "seed": 20260728,
+  "rows": 600,
+  "sha256": "b9c5db808d6c4b8c8d8c144d0e34f00c67e0c35c10eb401e707ed3ac863908f0",
+  "class_distribution": {
+    "1": 300,
+    "0": 300
+  },
+  "category_distribution": {
+    "borderline": 43,
+    "normal": 150,
+    "duplicate": 43,
+    "document_gap": 43,
+    "materiality": 43,
+    "hard_negative": 150,
+    "segregation_of_duties": 43,
+    "hard_positive": 42,
+    "related_party": 43
+  },
+  "split_distribution": {
+    "development": 484,
+    "evaluation": 116
+  }
+}

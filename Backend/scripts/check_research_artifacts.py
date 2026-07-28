@@ -1,0 +1,35 @@
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+import tempfile
+from pathlib import Path
+
+from generate_benchmark_dataset import write_dataset
+
+
+def main() -> None:
+    dataset = Path("datasets/gl_guardian_benchmark_v1.csv")
+    manifest = json.loads(dataset.with_suffix(".manifest.json").read_text(encoding="utf-8"))
+    if hashlib.sha256(dataset.read_bytes()).hexdigest() != manifest["sha256"]:
+        raise SystemExit("dataset digest does not match manifest")
+    with tempfile.TemporaryDirectory() as folder:
+        candidate = Path(folder) / "dataset.csv"; regenerated = write_dataset(candidate)
+        if regenerated["sha256"] != manifest["sha256"]:
+            raise SystemExit("dataset generation is not reproducible")
+    summary = json.loads(Path("experiments/results/summary.json").read_text(encoding="utf-8"))
+    with Path("experiments/results/metrics.csv").open(encoding="utf-8", newline="") as handle:
+        metrics = next(csv.DictReader(handle))
+    if abs(float(metrics["accuracy"]) - summary["classification"]["accuracy"]) > 1e-12:
+        raise SystemExit("metrics.csv and summary.json disagree")
+    if summary["executed_methods"] != ["rule_baseline"]:
+        raise SystemExit("unexpected claim about executed methods")
+    readme = Path("../README.md").read_text(encoding="utf-8")
+    for name in ("accuracy", "precision", "recall", "specificity", "f1", "balanced_accuracy"):
+        if f"{summary['classification'][name]:.4f}" not in readme:
+            raise SystemExit(f"README does not contain generated {name}")
+    print("research artifacts are reproducible and internally consistent")
+
+
+if __name__ == "__main__": main()

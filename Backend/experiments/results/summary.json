@@ -1,0 +1,415 @@
+{
+  "classification": {
+    "accuracy": 0.7155172413793104,
+    "balanced_accuracy": 0.7232142857142857,
+    "brier_score": 0.19594827586206898,
+    "confusion_matrix": {
+      "fn": 3,
+      "fp": 30,
+      "tn": 30,
+      "tp": 53
+    },
+    "expected_calibration_error": 0.05344827586206902,
+    "f1": 0.762589928057554,
+    "false_negative_rate": 0.05357142857142857,
+    "false_positive_rate": 0.5,
+    "mcc": 0.4944536694488364,
+    "n": 116,
+    "negative_predictive_value": 0.9090909090909091,
+    "positive_predictive_value": 0.6385542168674698,
+    "pr_auc": 0.9810906920907898,
+    "precision": 0.6385542168674698,
+    "recall": 0.9464285714285714,
+    "reliability_curve": [
+      {
+        "count": 33,
+        "high": 0.3,
+        "low": 0.2,
+        "mean_confidence": 0.25,
+        "positive_rate": 0.09090909090909091
+      },
+      {
+        "count": 83,
+        "high": 0.7,
+        "low": 0.6,
+        "mean_confidence": 0.65,
+        "positive_rate": 0.6385542168674698
+      }
+    ],
+    "roc_auc": 0.7232142857142857,
+    "specificity": 0.5
+  },
+  "executed_methods": [
+    "rule_baseline"
+  ],
+  "method": "rule_baseline",
+  "not_run": [
+    "single_llm",
+    "full_multi_agent",
+    "no_challenger",
+    "no_verifier",
+    "no_rag",
+    "no_defender",
+    "one_debate_round",
+    "two_debate_rounds"
+  ],
+  "operational": {
+    "confidence_summary": {
+      "mean": 0.5362068965517242,
+      "median": 0.65
+    },
+    "evidence_coverage": 1,
+    "failure_rate": 0.0,
+    "mean_citation_correctness": null,
+    "mean_cost_usd": 0.0,
+    "mean_groundedness": null,
+    "mean_input_tokens": 0.0,
+    "mean_latency_ms": 0.0011198275862068965,
+    "mean_output_tokens": 0.0,
+    "median_cost_usd": 0.0,
+    "median_groundedness": null,
+    "median_latency_ms": 0.0008,
+    "p90_latency_ms": 0.00195,
+    "p95_latency_ms": 0.002275,
+    "p99_latency_ms": 0.006349999999999982,
+    "timeout_rate": 0.0,
+    "unsupported_claim_rate": null
+  },
+  "per_category": {
+    "borderline": {
+      "accuracy": 0.25,
+      "balanced_accuracy": null,
+      "brier_score": 0.4525,
+      "confusion_matrix": {
+        "fn": 3,
+        "fp": 0,
+        "tn": 0,
+        "tp": 1
+      },
+      "expected_calibration_error": 0.65,
+      "f1": 0.4,
+      "false_negative_rate": 0.75,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 4,
+      "negative_predictive_value": 0.0,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 0.25,
+      "reliability_curve": [
+        {
+          "count": 3,
+          "high": 0.3,
+          "low": 0.2,
+          "mean_confidence": 0.25,
+          "positive_rate": 1
+        },
+        {
+          "count": 1,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "document_gap": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 8
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 8,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 8,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "duplicate": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 12
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 12,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 12,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "hard_negative": {
+      "accuracy": 0.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.42250000000000004,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 30,
+        "tn": 0,
+        "tp": 0
+      },
+      "expected_calibration_error": 0.65,
+      "f1": null,
+      "false_negative_rate": null,
+      "false_positive_rate": 1.0,
+      "mcc": null,
+      "n": 30,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 0.0,
+      "pr_auc": null,
+      "precision": 0.0,
+      "recall": null,
+      "reliability_curve": [
+        {
+          "count": 30,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 0
+        }
+      ],
+      "roc_auc": null,
+      "specificity": 0.0
+    },
+    "hard_positive": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 8
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 8,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 8,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "materiality": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 6
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 6,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 6,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "normal": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.0625,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 30,
+        "tp": 0
+      },
+      "expected_calibration_error": 0.25,
+      "f1": null,
+      "false_negative_rate": null,
+      "false_positive_rate": 0.0,
+      "mcc": null,
+      "n": 30,
+      "negative_predictive_value": 1.0,
+      "positive_predictive_value": null,
+      "pr_auc": null,
+      "precision": null,
+      "recall": null,
+      "reliability_curve": [
+        {
+          "count": 30,
+          "high": 0.3,
+          "low": 0.2,
+          "mean_confidence": 0.25,
+          "positive_rate": 0
+        }
+      ],
+      "roc_auc": null,
+      "specificity": 1.0
+    },
+    "related_party": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 11
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 11,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 11,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    },
+    "segregation_of_duties": {
+      "accuracy": 1.0,
+      "balanced_accuracy": null,
+      "brier_score": 0.12249999999999998,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 0,
+        "tp": 7
+      },
+      "expected_calibration_error": 0.35,
+      "f1": 1.0,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": null,
+      "mcc": null,
+      "n": 7,
+      "negative_predictive_value": null,
+      "positive_predictive_value": 1.0,
+      "pr_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "reliability_curve": [
+        {
+          "count": 7,
+          "high": 0.7,
+          "low": 0.6,
+          "mean_confidence": 0.65,
+          "positive_rate": 1
+        }
+      ],
+      "roc_auc": null,
+      "specificity": null
+    }
+  },
+  "uncertainty": {
+    "accuracy_bootstrap_95_ci": {
+      "estimate": 0.7155172413793104,
+      "lower": 0.6293103448275862,
+      "samples": 2000,
+      "seed": 20260728,
+      "upper": 0.7931034482758621
+    },
+    "accuracy_stratified_bootstrap_95_ci": {
+      "estimate": 0.7155172413793104,
+      "lower": 0.7068965517241379,
+      "samples": 2000,
+      "seed": 20260728,
+      "stratified": true,
+      "upper": 0.7327586206896551
+    },
+    "cost_mean_bootstrap_95_ci": {
+      "estimate": 0.0,
+      "lower": 0.0,
+      "samples": 2000,
+      "seed": 20260728,
+      "upper": 0.0
+    },
+    "latency_mean_bootstrap_95_ci": {
+      "estimate": 0.0011198275862068965,
+      "lower": 0.0009241379310344828,
+      "samples": 2000,
+      "seed": 20260728,
+      "upper": 0.0013922413793103449
+    }
+  }
+}

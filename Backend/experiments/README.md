@@ -1,34 +1,34 @@
 # Reproducible experiments
 
-Run the fixed, leakage-controlled evaluation split from `Backend/`:
+This package separates research evaluation from production telemetry. Benchmark labels are
+synthetic audit-risk proxies, never confirmed fraud.
+
+## Pipeline
 
 ```bash
-python scripts/evaluate_experiments.py
+python scripts/generate_benchmark_dataset.py
+python scripts/run_all_experiments.py --dry-run
+python scripts/run_rule_baseline.py
+python scripts/generate_research_report.py
+python scripts/check_research_artifacts.py
 ```
 
-The bundled dataset is synthetic. `risk_hint != normal` is an **anomaly proxy
-label**, not confirmed fraud. The label column is never passed to a method.
-Rows are assigned to an 80% development and 20% held-out evaluation partition
-by SHA-256 of a fixed seed and transaction ID.
+- `configs/`: JSON-compatible YAML with frozen method, provider/model, roles, RAG, debate,
+  thresholds, prompt, dataset, seed, timeout, and retry settings.
+- `runners/`: normalized result schema and strict candidate-file validation.
+- `evaluators/`: label-blind groundedness and citation rubrics plus versioned judge prompts.
+- `annotation/`: reviewer schema, adjudication guide, and agreement statistics.
+- `metrics.py`, `statistics.py`, `reporting.py`: metrics, uncertainty/tests, reports and figures.
+- `results/`: generated artifacts from executed methods only. Missing methods say `Not run`.
 
-To score a single-LLM, multi-agent, or ablation run, export one CSV per method:
+Live output must contain exactly one row per frozen evaluation ID with transaction ID, method,
+binary prediction, confidence, explanation, evidence IDs, citations, groundedness, citation
+correctness, token counts, cost, latency, model, provider, prompt version, run ID, and error.
+Each row also records an experiment timestamp, random seed, and resolved-configuration SHA-256;
+the immutable resolved configuration is saved beside the run output.
+Candidate loading rejects missing/duplicate/unknown IDs and invalid ranges. Groundedness and
+citation scores require the documented independent judge or human protocol; judge reasoning is
+stored separately and requires human review.
 
-```text
-transaction_id,prediction,groundedness,citation_correctness,cost_usd,latency_ms
-TRX-000001,true,0.9,1.0,0.012,8420
-```
-
-Then run:
-
-```bash
-python scripts/evaluate_experiments.py --predictions experiments/runs/multi_agent.csv
-```
-
-Every held-out transaction must have a prediction; this prevents selective
-reporting. `groundedness` and `citation_correctness` must come from a documented
-independent judge or human annotation protocol. Omit unavailable fields rather
-than estimating them. Create separate prediction files for ablations (for
-example, `no_challenger.csv` and `no_verifier.csv`) and score them with the same
-command and split.
-
-`results/latest.json` is generated evidence. Do not hand-edit it.
+Provider credentials are intentionally optional. Dry-run validates configs and never substitutes
+fixture values for live metrics. See `Docs/EXPERIMENT_REPRODUCTION.md` for commands and status.

@@ -1,0 +1,332 @@
+[
+  {
+    "transaction_id": "GLB-000513",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "89220.90",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000349",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "65590.13",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000281",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "80671.67",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000061",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "172153.20",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000217",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "121622.51",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000488",
+    "failure_type": "false_negative",
+    "risk_category": "borderline",
+    "amount_usd": "49445.15",
+    "prediction": 0,
+    "label": 1,
+    "confidence": 0.25,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000509",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "86083.17",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000537",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "146648.93",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000489",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "177665.44",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000133",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "69517.09",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000449",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "160616.93",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000413",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "152204.58",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000337",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "140978.85",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000057",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "139459.64",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000253",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "165844.96",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000040",
+    "failure_type": "false_negative",
+    "risk_category": "borderline",
+    "amount_usd": "48534.92",
+    "prediction": 0,
+    "label": 1,
+    "confidence": 0.25,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000201",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "141502.42",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000597",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "93293.63",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000581",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "73847.25",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000477",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "104237.49",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000313",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "132198.02",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000390",
+    "failure_type": "false_negative",
+    "risk_category": "borderline",
+    "amount_usd": "47878.53",
+    "prediction": 0,
+    "label": 1,
+    "confidence": 0.25,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000457",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "151292.13",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000089",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "60796.53",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000145",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "174047.33",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000389",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "128852.85",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000073",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "68738.58",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000241",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "173915.40",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000585",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "142763.42",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000065",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "156691.61",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000445",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "135998.05",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000021",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "72447.16",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  },
+  {
+    "transaction_id": "GLB-000301",
+    "failure_type": "false_positive",
+    "risk_category": "hard_negative",
+    "amount_usd": "152596.61",
+    "prediction": 1,
+    "label": 0,
+    "confidence": 0.65,
+    "error": ""
+  }
+]

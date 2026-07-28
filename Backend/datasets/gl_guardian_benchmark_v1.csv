@@ -1,0 +1,601 @@
+transaction_id,vendor_id,amount_usd,currency,document_status,po_number,payment_method,posted_by,approved_by,related_party_flag,duplicate_of,risk_label,risk_category,difficulty,evidence_ids,split,generator_version
+GLB-000166,SYN-V-019,49568.47,USD,complete,PO-000166,ACH,user13,approver09,N,,1,borderline,borderline,ledger:166;policy:borderline,development,1.0.0
+GLB-000147,SYN-V-000,42990.94,USD,complete,PO-000147,Corporate card,user13,approver03,N,,0,normal,standard,ledger:147;policy:normal,development,1.0.0
+GLB-000528,SYN-V-016,39437.23,USD,complete,PO-000528,Wire,user14,approver07,N,GLB-000527,1,duplicate,standard,ledger:528;policy:duplicate,evaluation,1.0.0
+GLB-000206,SYN-V-059,7720.51,USD,complete,PO-000206,Corporate card,user15,approver10,N,GLB-000205,1,duplicate,standard,ledger:206;policy:duplicate,evaluation,1.0.0
+GLB-000370,SYN-V-004,35945.21,USD,missing_invoice,,Corporate card,user08,approver05,N,,1,document_gap,standard,ledger:370;policy:document_gap,development,1.0.0
+GLB-000394,SYN-V-028,112133.91,USD,complete,PO-000394,ACH,user13,approver03,N,,1,materiality,standard,ledger:394;policy:materiality,development,1.0.0
+GLB-000333,SYN-V-040,84084.52,USD,complete,PO-000333,Manual journal,user09,approver07,N,,0,hard_negative,hard,ledger:333;policy:hard_negative,development,1.0.0
+GLB-000305,SYN-V-012,147000.64,USD,complete,PO-000305,Manual journal,user00,approver05,N,,0,hard_negative,hard,ledger:305;policy:hard_negative,development,1.0.0
+GLB-000087,SYN-V-013,37653.36,USD,complete,PO-000087,Corporate card,user10,approver08,N,,0,normal,standard,ledger:87;policy:normal,evaluation,1.0.0
+GLB-000555,SYN-V-043,4494.18,USD,complete,PO-000555,Wire,user03,approver08,N,,0,normal,standard,ledger:555;policy:normal,development,1.0.0
+GLB-000205,SYN-V-058,157220.29,USD,complete,PO-000205,Manual journal,user14,approver09,N,,0,hard_negative,hard,ledger:205;policy:hard_negative,development,1.0.0
+GLB-000260,SYN-V-040,40455.20,USD,complete,PO-000260,Corporate card,user12,user12,N,,1,segregation_of_duties,standard,ledger:260;policy:segregation_of_duties,development,1.0.0
+GLB-000474,SYN-V-035,49237.67,USD,complete,PO-000474,Corporate card,user17,approver05,N,,1,borderline,borderline,ledger:474;policy:borderline,development,1.0.0
+GLB-000348,SYN-V-055,48297.03,USD,complete,PO-000348,ACH,user05,approver09,N,,1,borderline,borderline,ledger:348;policy:borderline,development,1.0.0
+GLB-000208,SYN-V-061,51428.74,USD,complete,PO-000208,ACH,user17,approver12,N,,1,borderline,borderline,ledger:208;policy:borderline,development,1.0.0
+GLB-000560,SYN-V-048,530.70,USD,altered,PO-000560,Wire,user08,approver00,N,,1,hard_positive,hard,ledger:560;policy:hard_positive,development,1.0.0
+GLB-000426,SYN-V-060,15030.27,USD,missing_invoice,,Wire,user07,approver09,N,,1,document_gap,standard,ledger:426;policy:document_gap,evaluation,1.0.0
+GLB-000533,SYN-V-021,89932.92,USD,complete,PO-000533,Manual journal,user00,approver12,N,,0,hard_negative,hard,ledger:533;policy:hard_negative,development,1.0.0
+GLB-000018,SYN-V-017,9761.97,USD,complete,PO-000018,Wire,user17,approver04,Y,,1,related_party,standard,ledger:18;policy:related_party,development,1.0.0
+GLB-000334,SYN-V-041,51807.36,USD,complete,PO-000334,ACH,user10,approver08,N,,1,borderline,borderline,ledger:334;policy:borderline,development,1.0.0
+GLB-000138,SYN-V-064,48743.55,USD,complete,PO-000138,ACH,user04,approver07,N,,1,borderline,borderline,ledger:138;policy:borderline,development,1.0.0
+GLB-000456,SYN-V-017,44121.39,USD,complete,PO-000456,Corporate card,user18,user18,N,,1,segregation_of_duties,standard,ledger:456;policy:segregation_of_duties,development,1.0.0
+GLB-000048,SYN-V-047,8673.94,USD,missing_invoice,,Corporate card,user09,approver08,N,,1,document_gap,standard,ledger:48;policy:document_gap,development,1.0.0
+GLB-000122,SYN-V-048,28042.12,USD,complete,PO-000122,Corporate card,user07,approver04,N,GLB-000121,1,duplicate,standard,ledger:122;policy:duplicate,development,1.0.0
+GLB-000418,SYN-V-052,51868.38,USD,complete,PO-000418,ACH,user18,approver01,N,,1,borderline,borderline,ledger:418;policy:borderline,development,1.0.0
+GLB-000013,SYN-V-012,142319.24,USD,complete,PO-000013,Manual journal,user12,approver12,N,,0,hard_negative,hard,ledger:13;policy:hard_negative,development,1.0.0
+GLB-000600,SYN-V-015,50771.77,USD,complete,PO-000600,Wire,user10,approver01,N,,1,borderline,borderline,ledger:600;policy:borderline,development,1.0.0
+GLB-000518,SYN-V-006,1660.70,USD,altered,PO-000518,Corporate card,user04,approver10,N,,1,hard_positive,hard,ledger:518;policy:hard_positive,development,1.0.0
+GLB-000283,SYN-V-063,29889.23,USD,complete,PO-000283,Corporate card,user16,approver09,N,,0,normal,standard,ledger:283;policy:normal,development,1.0.0
+GLB-000417,SYN-V-051,149694.95,USD,complete,PO-000417,Manual journal,user17,approver00,N,,0,hard_negative,hard,ledger:417;policy:hard_negative,development,1.0.0
+GLB-000448,SYN-V-009,1405.56,USD,altered,PO-000448,ACH,user10,approver05,N,,1,hard_positive,hard,ledger:448;policy:hard_positive,evaluation,1.0.0
+GLB-000238,SYN-V-018,807.89,USD,altered,PO-000238,Corporate card,user09,approver03,N,,1,hard_positive,hard,ledger:238;policy:hard_positive,development,1.0.0
+GLB-000475,SYN-V-036,38282.38,USD,complete,PO-000475,Wire,user18,approver06,N,,0,normal,standard,ledger:475;policy:normal,evaluation,1.0.0
+GLB-000317,SYN-V-024,98494.26,USD,complete,PO-000317,Manual journal,user12,approver04,N,,0,hard_negative,hard,ledger:317;policy:hard_negative,development,1.0.0
+GLB-000527,SYN-V-015,36692.66,USD,complete,PO-000527,Wire,user13,approver06,N,,0,normal,standard,ledger:527;policy:normal,development,1.0.0
+GLB-000542,SYN-V-030,31714.47,USD,complete,PO-000542,Corporate card,user09,approver08,N,GLB-000541,1,duplicate,standard,ledger:542;policy:duplicate,development,1.0.0
+GLB-000234,SYN-V-014,11891.78,USD,complete,PO-000234,ACH,user05,approver12,N,GLB-000233,1,duplicate,standard,ledger:234;policy:duplicate,development,1.0.0
+GLB-000254,SYN-V-034,76692.13,USD,complete,PO-000254,Corporate card,user06,approver06,N,,1,materiality,standard,ledger:254;policy:materiality,development,1.0.0
+GLB-000141,SYN-V-067,75647.70,USD,complete,PO-000141,Manual journal,user07,approver10,N,,0,hard_negative,hard,ledger:141;policy:hard_negative,development,1.0.0
+GLB-000098,SYN-V-024,1065.31,USD,altered,PO-000098,Wire,user02,approver06,N,,1,hard_positive,hard,ledger:98;policy:hard_positive,development,1.0.0
+GLB-000170,SYN-V-023,124086.14,USD,complete,PO-000170,Wire,user17,approver00,N,,1,materiality,standard,ledger:170;policy:materiality,development,1.0.0
+GLB-000592,SYN-V-007,13184.99,USD,complete,PO-000592,Corporate card,user02,approver06,Y,,1,related_party,standard,ledger:592;policy:related_party,development,1.0.0
+GLB-000039,SYN-V-038,998.23,USD,complete,PO-000039,Wire,user00,approver12,N,,0,normal,standard,ledger:39;policy:normal,development,1.0.0
+GLB-000081,SYN-V-007,174036.76,USD,complete,PO-000081,Manual journal,user04,approver02,N,,0,hard_negative,hard,ledger:81;policy:hard_negative,development,1.0.0
+GLB-000399,SYN-V-033,39952.66,USD,complete,PO-000399,ACH,user18,approver08,N,,0,normal,standard,ledger:399;policy:normal,development,1.0.0
+GLB-000167,SYN-V-020,3233.91,USD,complete,PO-000167,Corporate card,user14,approver10,N,,0,normal,standard,ledger:167;policy:normal,development,1.0.0
+GLB-000502,SYN-V-063,48638.41,USD,complete,PO-000502,Wire,user07,approver07,N,,1,borderline,borderline,ledger:502;policy:borderline,development,1.0.0
+GLB-000446,SYN-V-007,50720.77,USD,complete,PO-000446,Wire,user08,approver03,N,,1,borderline,borderline,ledger:446;policy:borderline,development,1.0.0
+GLB-000357,SYN-V-064,118069.41,USD,complete,PO-000357,Manual journal,user14,approver05,N,,0,hard_negative,hard,ledger:357;policy:hard_negative,development,1.0.0
+GLB-000115,SYN-V-041,10788.22,USD,complete,PO-000115,Wire,user00,approver10,N,,0,normal,standard,ledger:115;policy:normal,development,1.0.0
+GLB-000231,SYN-V-011,8396.08,USD,complete,PO-000231,ACH,user02,approver09,N,,0,normal,standard,ledger:231;policy:normal,development,1.0.0
+GLB-000154,SYN-V-007,415.60,USD,altered,PO-000154,Wire,user01,approver10,N,,1,hard_positive,hard,ledger:154;policy:hard_positive,development,1.0.0
+GLB-000430,SYN-V-064,39050.90,USD,complete,PO-000430,ACH,user11,approver00,N,GLB-000429,1,duplicate,standard,ledger:430;policy:duplicate,evaluation,1.0.0
+GLB-000078,SYN-V-004,32910.41,USD,complete,PO-000078,ACH,user01,user01,N,,1,segregation_of_duties,standard,ledger:78;policy:segregation_of_duties,development,1.0.0
+GLB-000295,SYN-V-002,23719.08,USD,complete,PO-000295,Corporate card,user09,approver08,N,,0,normal,standard,ledger:295;policy:normal,development,1.0.0
+GLB-000293,SYN-V-000,66155.19,USD,complete,PO-000293,Manual journal,user07,approver06,N,,0,hard_negative,hard,ledger:293;policy:hard_negative,development,1.0.0
+GLB-000001,SYN-V-000,114161.40,USD,complete,PO-000001,Manual journal,user00,approver00,N,,0,hard_negative,hard,ledger:1;policy:hard_negative,development,1.0.0
+GLB-000496,SYN-V-057,36038.51,USD,missing_invoice,,Corporate card,user01,approver01,N,,1,document_gap,standard,ledger:496;policy:document_gap,development,1.0.0
+GLB-000058,SYN-V-057,155484.47,USD,complete,PO-000058,ACH,user00,approver05,N,,1,materiality,standard,ledger:58;policy:materiality,development,1.0.0
+GLB-000515,SYN-V-003,44273.18,USD,complete,PO-000515,Corporate card,user01,approver07,N,,0,normal,standard,ledger:515;policy:normal,evaluation,1.0.0
+GLB-000459,SYN-V-020,34297.69,USD,complete,PO-000459,Wire,user02,approver03,N,,0,normal,standard,ledger:459;policy:normal,evaluation,1.0.0
+GLB-000375,SYN-V-009,27555.23,USD,complete,PO-000375,Wire,user13,approver10,N,,0,normal,standard,ledger:375;policy:normal,development,1.0.0
+GLB-000347,SYN-V-054,36929.74,USD,complete,PO-000347,Wire,user04,approver08,N,,0,normal,standard,ledger:347;policy:normal,development,1.0.0
+GLB-000378,SYN-V-012,665.22,USD,altered,PO-000378,ACH,user16,approver00,N,,1,hard_positive,hard,ledger:378;policy:hard_positive,evaluation,1.0.0
+GLB-000405,SYN-V-039,107514.34,USD,complete,PO-000405,Manual journal,user05,approver01,N,,0,hard_negative,hard,ledger:405;policy:hard_negative,development,1.0.0
+GLB-000338,SYN-V-045,193583.16,USD,complete,PO-000338,Corporate card,user14,approver12,N,,1,materiality,standard,ledger:338;policy:materiality,evaluation,1.0.0
+GLB-000265,SYN-V-045,111981.27,USD,complete,PO-000265,Manual journal,user17,approver04,N,,0,hard_negative,hard,ledger:265;policy:hard_negative,development,1.0.0
+GLB-000391,SYN-V-025,6612.12,USD,complete,PO-000391,ACH,user10,approver00,N,,0,normal,standard,ledger:391;policy:normal,development,1.0.0
+GLB-000323,SYN-V-030,16015.07,USD,complete,PO-000323,ACH,user18,approver10,N,,0,normal,standard,ledger:323;policy:normal,development,1.0.0
+GLB-000230,SYN-V-010,20649.30,USD,missing_invoice,,Corporate card,user01,approver08,N,,1,document_gap,standard,ledger:230;policy:document_gap,development,1.0.0
+GLB-000112,SYN-V-038,1242.74,USD,altered,PO-000112,Corporate card,user16,approver07,N,,1,hard_positive,hard,ledger:112;policy:hard_positive,development,1.0.0
+GLB-000242,SYN-V-022,30351.43,USD,complete,PO-000242,ACH,user13,approver07,Y,,1,related_party,standard,ledger:242;policy:related_party,evaluation,1.0.0
+GLB-000484,SYN-V-045,28098.20,USD,complete,PO-000484,Corporate card,user08,user08,N,,1,segregation_of_duties,standard,ledger:484;policy:segregation_of_duties,development,1.0.0
+GLB-000593,SYN-V-008,90458.19,USD,complete,PO-000593,Manual journal,user03,approver07,N,,0,hard_negative,hard,ledger:593;policy:hard_negative,development,1.0.0
+GLB-000507,SYN-V-068,31608.44,USD,complete,PO-000507,Wire,user12,approver12,N,,0,normal,standard,ledger:507;policy:normal,development,1.0.0
+GLB-000292,SYN-V-072,51913.91,USD,complete,PO-000292,Wire,user06,approver05,N,,1,borderline,borderline,ledger:292;policy:borderline,development,1.0.0
+GLB-000494,SYN-V-055,3766.90,USD,complete,PO-000494,ACH,user18,approver12,Y,,1,related_party,standard,ledger:494;policy:related_party,development,1.0.0
+GLB-000002,SYN-V-001,139752.03,USD,complete,PO-000002,ACH,user01,approver01,N,,1,materiality,standard,ledger:2;policy:materiality,development,1.0.0
+GLB-000218,SYN-V-071,26286.10,USD,complete,PO-000218,Corporate card,user08,user08,N,,1,segregation_of_duties,standard,ledger:218;policy:segregation_of_duties,development,1.0.0
+GLB-000109,SYN-V-035,128738.10,USD,complete,PO-000109,Manual journal,user13,approver04,N,,0,hard_negative,hard,ledger:109;policy:hard_negative,development,1.0.0
+GLB-000476,SYN-V-037,629.49,USD,altered,PO-000476,Corporate card,user00,approver07,N,,1,hard_positive,hard,ledger:476;policy:hard_positive,development,1.0.0
+GLB-000025,SYN-V-024,121510.98,USD,complete,PO-000025,Manual journal,user05,approver11,N,,0,hard_negative,hard,ledger:25;policy:hard_negative,development,1.0.0
+GLB-000377,SYN-V-011,138193.09,USD,complete,PO-000377,Manual journal,user15,approver12,N,,0,hard_negative,hard,ledger:377;policy:hard_negative,development,1.0.0
+GLB-000088,SYN-V-014,44378.90,USD,complete,PO-000088,ACH,user11,approver09,Y,,1,related_party,standard,ledger:88;policy:related_party,development,1.0.0
+GLB-000121,SYN-V-047,151265.09,USD,complete,PO-000121,Manual journal,user06,approver03,N,,0,hard_negative,hard,ledger:121;policy:hard_negative,development,1.0.0
+GLB-000535,SYN-V-023,27768.51,USD,complete,PO-000535,Corporate card,user02,approver01,N,,0,normal,standard,ledger:535;policy:normal,development,1.0.0
+GLB-000158,SYN-V-011,9281.89,USD,complete,PO-000158,Corporate card,user05,approver01,Y,,1,related_party,standard,ledger:158;policy:related_party,development,1.0.0
+GLB-000289,SYN-V-069,161958.50,USD,complete,PO-000289,Manual journal,user03,approver02,N,,0,hard_negative,hard,ledger:289;policy:hard_negative,development,1.0.0
+GLB-000082,SYN-V-008,47579.35,USD,complete,PO-000082,Corporate card,user05,approver03,N,,1,borderline,borderline,ledger:82;policy:borderline,development,1.0.0
+GLB-000492,SYN-V-053,111260.01,USD,complete,PO-000492,Wire,user16,approver10,N,,1,materiality,standard,ledger:492;policy:materiality,development,1.0.0
+GLB-000042,SYN-V-041,1173.60,USD,altered,PO-000042,Wire,user03,approver02,N,,1,hard_positive,hard,ledger:42;policy:hard_positive,development,1.0.0
+GLB-000110,SYN-V-036,52202.10,USD,complete,PO-000110,ACH,user14,approver05,N,,1,borderline,borderline,ledger:110;policy:borderline,development,1.0.0
+GLB-000420,SYN-V-054,343.38,USD,altered,PO-000420,Wire,user01,approver03,N,,1,hard_positive,hard,ledger:420;policy:hard_positive,development,1.0.0
+GLB-000361,SYN-V-068,140907.00,USD,complete,PO-000361,Manual journal,user18,approver09,N,,0,hard_negative,hard,ledger:361;policy:hard_negative,development,1.0.0
+GLB-000353,SYN-V-060,77632.53,USD,complete,PO-000353,Manual journal,user10,approver01,N,,0,hard_negative,hard,ledger:353;policy:hard_negative,development,1.0.0
+GLB-000211,SYN-V-064,9734.80,USD,complete,PO-000211,Corporate card,user01,approver02,N,,0,normal,standard,ledger:211;policy:normal,evaluation,1.0.0
+GLB-000091,SYN-V-017,12391.15,USD,complete,PO-000091,Corporate card,user14,approver12,N,,0,normal,standard,ledger:91;policy:normal,evaluation,1.0.0
+GLB-000562,SYN-V-050,175695.65,USD,complete,PO-000562,ACH,user10,approver02,N,,1,materiality,standard,ledger:562;policy:materiality,development,1.0.0
+GLB-000194,SYN-V-047,52305.02,USD,complete,PO-000194,Corporate card,user03,approver11,N,,1,borderline,borderline,ledger:194;policy:borderline,development,1.0.0
+GLB-000316,SYN-V-023,6292.97,USD,complete,PO-000316,Corporate card,user11,user11,N,,1,segregation_of_duties,standard,ledger:316;policy:segregation_of_duties,development,1.0.0
+GLB-000204,SYN-V-057,24716.62,USD,complete,PO-000204,Corporate card,user13,user13,N,,1,segregation_of_duties,standard,ledger:204;policy:segregation_of_duties,development,1.0.0
+GLB-000551,SYN-V-039,23641.59,USD,complete,PO-000551,Wire,user18,approver04,N,,0,normal,standard,ledger:551;policy:normal,evaluation,1.0.0
+GLB-000198,SYN-V-051,185518.85,USD,complete,PO-000198,ACH,user07,approver02,N,,1,materiality,standard,ledger:198;policy:materiality,development,1.0.0
+GLB-000196,SYN-V-049,403.07,USD,altered,PO-000196,Corporate card,user05,approver00,N,,1,hard_positive,hard,ledger:196;policy:hard_positive,development,1.0.0
+GLB-000119,SYN-V-045,40211.86,USD,complete,PO-000119,ACH,user04,approver01,N,,0,normal,standard,ledger:119;policy:normal,development,1.0.0
+GLB-000403,SYN-V-037,1344.22,USD,complete,PO-000403,ACH,user03,approver12,N,,0,normal,standard,ledger:403;policy:normal,development,1.0.0
+GLB-000415,SYN-V-049,27231.26,USD,complete,PO-000415,ACH,user15,approver11,N,,0,normal,standard,ledger:415;policy:normal,development,1.0.0
+GLB-000269,SYN-V-049,103025.19,USD,complete,PO-000269,Manual journal,user02,approver08,N,,0,hard_negative,hard,ledger:269;policy:hard_negative,development,1.0.0
+GLB-000079,SYN-V-005,5067.56,USD,complete,PO-000079,Wire,user02,approver00,N,,0,normal,standard,ledger:79;policy:normal,development,1.0.0
+GLB-000428,SYN-V-062,6996.64,USD,complete,PO-000428,ACH,user09,user09,N,,1,segregation_of_duties,standard,ledger:428;policy:segregation_of_duties,development,1.0.0
+GLB-000343,SYN-V-050,18627.69,USD,complete,PO-000343,Corporate card,user00,approver04,N,,0,normal,standard,ledger:343;policy:normal,development,1.0.0
+GLB-000175,SYN-V-028,28249.68,USD,complete,PO-000175,Wire,user03,approver05,N,,0,normal,standard,ledger:175;policy:normal,development,1.0.0
+GLB-000500,SYN-V-061,20474.07,USD,complete,PO-000500,Wire,user05,approver05,N,GLB-000499,1,duplicate,standard,ledger:500;policy:duplicate,development,1.0.0
+GLB-000044,SYN-V-043,77942.31,USD,complete,PO-000044,Wire,user05,approver04,N,,1,materiality,standard,ledger:44;policy:materiality,development,1.0.0
+GLB-000220,SYN-V-000,14628.15,USD,complete,PO-000220,Corporate card,user10,approver11,N,GLB-000219,1,duplicate,standard,ledger:220;policy:duplicate,development,1.0.0
+GLB-000436,SYN-V-070,117646.04,USD,complete,PO-000436,ACH,user17,approver06,N,,1,materiality,standard,ledger:436;policy:materiality,development,1.0.0
+GLB-000023,SYN-V-022,34141.30,USD,complete,PO-000023,Wire,user03,approver09,N,,0,normal,standard,ledger:23;policy:normal,development,1.0.0
+GLB-000049,SYN-V-048,173595.35,USD,complete,PO-000049,Manual journal,user10,approver09,N,,0,hard_negative,hard,ledger:49;policy:hard_negative,development,1.0.0
+GLB-000127,SYN-V-053,23908.61,USD,complete,PO-000127,Wire,user12,approver09,N,,0,normal,standard,ledger:127;policy:normal,development,1.0.0
+GLB-000582,SYN-V-070,39920.34,USD,complete,PO-000582,Wire,user11,user11,N,,1,segregation_of_duties,standard,ledger:582;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000111,SYN-V-037,9392.52,USD,complete,PO-000111,Corporate card,user15,approver06,N,,0,normal,standard,ledger:111;policy:normal,evaluation,1.0.0
+GLB-000410,SYN-V-044,31309.40,USD,complete,PO-000410,ACH,user10,approver06,Y,,1,related_party,standard,ledger:410;policy:related_party,development,1.0.0
+GLB-000007,SYN-V-006,6619.80,USD,complete,PO-000007,ACH,user06,approver06,N,,0,normal,standard,ledger:7;policy:normal,evaluation,1.0.0
+GLB-000235,SYN-V-015,30479.41,USD,complete,PO-000235,Corporate card,user06,approver00,N,,0,normal,standard,ledger:235;policy:normal,evaluation,1.0.0
+GLB-000513,SYN-V-001,89220.90,USD,complete,PO-000513,Manual journal,user18,approver05,N,,0,hard_negative,hard,ledger:513;policy:hard_negative,evaluation,1.0.0
+GLB-000172,SYN-V-025,43735.46,USD,complete,PO-000172,Corporate card,user00,approver02,Y,,1,related_party,standard,ledger:172;policy:related_party,evaluation,1.0.0
+GLB-000467,SYN-V-028,31290.98,USD,complete,PO-000467,Wire,user10,approver11,N,,0,normal,standard,ledger:467;policy:normal,development,1.0.0
+GLB-000118,SYN-V-044,44074.52,USD,missing_invoice,,Corporate card,user03,approver00,N,,1,document_gap,standard,ledger:118;policy:document_gap,development,1.0.0
+GLB-000180,SYN-V-033,47902.27,USD,complete,PO-000180,ACH,user08,approver10,N,,1,borderline,borderline,ledger:180;policy:borderline,development,1.0.0
+GLB-000326,SYN-V-033,43974.64,USD,complete,PO-000326,Wire,user02,approver00,Y,,1,related_party,standard,ledger:326;policy:related_party,development,1.0.0
+GLB-000096,SYN-V-022,49923.76,USD,complete,PO-000096,Wire,user00,approver04,N,,1,borderline,borderline,ledger:96;policy:borderline,development,1.0.0
+GLB-000043,SYN-V-042,24072.86,USD,complete,PO-000043,ACH,user04,approver03,N,,0,normal,standard,ledger:43;policy:normal,development,1.0.0
+GLB-000406,SYN-V-040,392.33,USD,altered,PO-000406,Corporate card,user06,approver02,N,,1,hard_positive,hard,ledger:406;policy:hard_positive,development,1.0.0
+GLB-000330,SYN-V-037,13627.77,USD,complete,PO-000330,Wire,user06,user06,N,,1,segregation_of_duties,standard,ledger:330;policy:segregation_of_duties,development,1.0.0
+GLB-000349,SYN-V-056,65590.13,USD,complete,PO-000349,Manual journal,user06,approver10,N,,0,hard_negative,hard,ledger:349;policy:hard_negative,evaluation,1.0.0
+GLB-000149,SYN-V-002,138102.64,USD,complete,PO-000149,Manual journal,user15,approver05,N,,0,hard_negative,hard,ledger:149;policy:hard_negative,development,1.0.0
+GLB-000152,SYN-V-005,51673.29,USD,complete,PO-000152,Corporate card,user18,approver08,N,,1,borderline,borderline,ledger:152;policy:borderline,development,1.0.0
+GLB-000512,SYN-V-000,43136.45,USD,complete,PO-000512,ACH,user17,user17,N,,1,segregation_of_duties,standard,ledger:512;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000342,SYN-V-049,20929.55,USD,missing_invoice,,Wire,user18,approver03,N,,1,document_gap,standard,ledger:342;policy:document_gap,development,1.0.0
+GLB-000514,SYN-V-002,43602.85,USD,complete,PO-000514,ACH,user00,approver06,N,GLB-000513,1,duplicate,standard,ledger:514;policy:duplicate,evaluation,1.0.0
+GLB-000268,SYN-V-048,165311.17,USD,complete,PO-000268,Corporate card,user01,approver07,N,,1,materiality,standard,ledger:268;policy:materiality,evaluation,1.0.0
+GLB-000214,SYN-V-067,42618.80,USD,complete,PO-000214,ACH,user04,approver05,Y,,1,related_party,standard,ledger:214;policy:related_party,development,1.0.0
+GLB-000036,SYN-V-035,20443.73,USD,complete,PO-000036,ACH,user16,user16,N,,1,segregation_of_duties,standard,ledger:36;policy:segregation_of_duties,development,1.0.0
+GLB-000005,SYN-V-004,106813.94,USD,complete,PO-000005,Manual journal,user04,approver04,N,,0,hard_negative,hard,ledger:5;policy:hard_negative,development,1.0.0
+GLB-000228,SYN-V-008,39820.87,USD,complete,PO-000228,Wire,user18,approver06,Y,,1,related_party,standard,ledger:228;policy:related_party,evaluation,1.0.0
+GLB-000248,SYN-V-028,11643.81,USD,complete,PO-000248,ACH,user00,approver00,N,GLB-000247,1,duplicate,standard,ledger:248;policy:duplicate,development,1.0.0
+GLB-000281,SYN-V-061,80671.67,USD,complete,PO-000281,Manual journal,user14,approver07,N,,0,hard_negative,hard,ledger:281;policy:hard_negative,evaluation,1.0.0
+GLB-000130,SYN-V-056,39516.97,USD,complete,PO-000130,Corporate card,user15,approver12,Y,,1,related_party,standard,ledger:130;policy:related_party,development,1.0.0
+GLB-000168,SYN-V-021,712.71,USD,altered,PO-000168,Wire,user15,approver11,N,,1,hard_positive,hard,ledger:168;policy:hard_positive,development,1.0.0
+GLB-000061,SYN-V-060,172153.20,USD,complete,PO-000061,Manual journal,user03,approver08,N,,0,hard_negative,hard,ledger:61;policy:hard_negative,evaluation,1.0.0
+GLB-000463,SYN-V-024,22925.77,USD,complete,PO-000463,Wire,user06,approver07,N,,0,normal,standard,ledger:463;policy:normal,evaluation,1.0.0
+GLB-000421,SYN-V-055,135386.37,USD,complete,PO-000421,Manual journal,user02,approver04,N,,0,hard_negative,hard,ledger:421;policy:hard_negative,development,1.0.0
+GLB-000124,SYN-V-050,50806.42,USD,complete,PO-000124,Corporate card,user09,approver06,N,,1,borderline,borderline,ledger:124;policy:borderline,development,1.0.0
+GLB-000526,SYN-V-014,19826.96,USD,complete,PO-000526,ACH,user12,user12,N,,1,segregation_of_duties,standard,ledger:526;policy:segregation_of_duties,development,1.0.0
+GLB-000267,SYN-V-047,30203.62,USD,complete,PO-000267,Corporate card,user00,approver06,N,,0,normal,standard,ledger:267;policy:normal,evaluation,1.0.0
+GLB-000314,SYN-V-021,5314.57,USD,missing_invoice,,Wire,user09,approver01,N,,1,document_gap,standard,ledger:314;policy:document_gap,development,1.0.0
+GLB-000223,SYN-V-003,14751.83,USD,complete,PO-000223,Corporate card,user13,approver01,N,,0,normal,standard,ledger:223;policy:normal,evaluation,1.0.0
+GLB-000328,SYN-V-035,27396.59,USD,missing_invoice,,Wire,user04,approver02,N,,1,document_gap,standard,ledger:328;policy:document_gap,development,1.0.0
+GLB-000113,SYN-V-039,121111.21,USD,complete,PO-000113,Manual journal,user17,approver08,N,,0,hard_negative,hard,ledger:113;policy:hard_negative,development,1.0.0
+GLB-000255,SYN-V-035,13249.53,USD,complete,PO-000255,ACH,user07,approver07,N,,0,normal,standard,ledger:255;policy:normal,development,1.0.0
+GLB-000548,SYN-V-036,193819.65,USD,complete,PO-000548,Wire,user15,approver01,N,,1,materiality,standard,ledger:548;policy:materiality,development,1.0.0
+GLB-000583,SYN-V-071,6736.87,USD,complete,PO-000583,Wire,user12,approver10,N,,0,normal,standard,ledger:583;policy:normal,development,1.0.0
+GLB-000511,SYN-V-072,35686.23,USD,complete,PO-000511,Corporate card,user16,approver03,N,,0,normal,standard,ledger:511;policy:normal,development,1.0.0
+GLB-000203,SYN-V-056,42051.60,USD,complete,PO-000203,ACH,user12,approver07,N,,0,normal,standard,ledger:203;policy:normal,development,1.0.0
+GLB-000442,SYN-V-003,3329.53,USD,complete,PO-000442,Wire,user04,user04,N,,1,segregation_of_duties,standard,ledger:442;policy:segregation_of_duties,development,1.0.0
+GLB-000243,SYN-V-023,39279.99,USD,complete,PO-000243,Corporate card,user14,approver08,N,,0,normal,standard,ledger:243;policy:normal,development,1.0.0
+GLB-000340,SYN-V-047,36153.10,USD,complete,PO-000340,ACH,user16,approver01,Y,,1,related_party,standard,ledger:340;policy:related_party,evaluation,1.0.0
+GLB-000505,SYN-V-066,140884.03,USD,complete,PO-000505,Manual journal,user10,approver10,N,,0,hard_negative,hard,ledger:505;policy:hard_negative,development,1.0.0
+GLB-000004,SYN-V-003,25568.03,USD,complete,PO-000004,Corporate card,user03,approver03,Y,,1,related_party,standard,ledger:4;policy:related_party,development,1.0.0
+GLB-000324,SYN-V-031,106740.20,USD,complete,PO-000324,Corporate card,user00,approver11,N,,1,materiality,standard,ledger:324;policy:materiality,development,1.0.0
+GLB-000452,SYN-V-013,43207.25,USD,complete,PO-000452,Wire,user14,approver09,Y,,1,related_party,standard,ledger:452;policy:related_party,evaluation,1.0.0
+GLB-000374,SYN-V-008,42914.77,USD,complete,PO-000374,Corporate card,user12,approver09,N,GLB-000373,1,duplicate,standard,ledger:374;policy:duplicate,development,1.0.0
+GLB-000258,SYN-V-038,12019.44,USD,missing_invoice,,Corporate card,user10,approver10,N,,1,document_gap,standard,ledger:258;policy:document_gap,development,1.0.0
+GLB-000146,SYN-V-072,15075.68,USD,missing_invoice,,Wire,user12,approver02,N,,1,document_gap,standard,ledger:146;policy:document_gap,development,1.0.0
+GLB-000516,SYN-V-004,50878.25,USD,complete,PO-000516,ACH,user02,approver08,N,,1,borderline,borderline,ledger:516;policy:borderline,development,1.0.0
+GLB-000050,SYN-V-049,21242.91,USD,complete,PO-000050,ACH,user11,user11,N,,1,segregation_of_duties,standard,ledger:50;policy:segregation_of_duties,development,1.0.0
+GLB-000011,SYN-V-010,11784.58,USD,complete,PO-000011,Wire,user10,approver10,N,,0,normal,standard,ledger:11;policy:normal,evaluation,1.0.0
+GLB-000135,SYN-V-061,36504.54,USD,complete,PO-000135,ACH,user01,approver04,N,,0,normal,standard,ledger:135;policy:normal,development,1.0.0
+GLB-000538,SYN-V-026,3162.02,USD,missing_invoice,,Corporate card,user05,approver04,N,,1,document_gap,standard,ledger:538;policy:document_gap,evaluation,1.0.0
+GLB-000192,SYN-V-045,4155.11,USD,complete,PO-000192,ACH,user01,approver09,N,GLB-000191,1,duplicate,standard,ledger:192;policy:duplicate,development,1.0.0
+GLB-000064,SYN-V-063,13359.93,USD,complete,PO-000064,ACH,user06,user06,N,,1,segregation_of_duties,standard,ledger:64;policy:segregation_of_duties,development,1.0.0
+GLB-000068,SYN-V-067,52179.28,USD,complete,PO-000068,Corporate card,user10,approver02,N,,1,borderline,borderline,ledger:68;policy:borderline,development,1.0.0
+GLB-000232,SYN-V-012,12294.21,USD,complete,PO-000232,Wire,user03,user03,N,,1,segregation_of_duties,standard,ledger:232;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000510,SYN-V-071,10092.67,USD,missing_invoice,,Corporate card,user15,approver02,N,,1,document_gap,standard,ledger:510;policy:document_gap,development,1.0.0
+GLB-000217,SYN-V-070,121622.51,USD,complete,PO-000217,Manual journal,user07,approver08,N,,0,hard_negative,hard,ledger:217;policy:hard_negative,evaluation,1.0.0
+GLB-000520,SYN-V-008,131701.64,USD,complete,PO-000520,Wire,user06,approver12,N,,1,materiality,standard,ledger:520;policy:materiality,development,1.0.0
+GLB-000552,SYN-V-040,17402.20,USD,missing_invoice,,ACH,user00,approver05,N,,1,document_gap,standard,ledger:552;policy:document_gap,evaluation,1.0.0
+GLB-000444,SYN-V-005,40144.69,USD,complete,PO-000444,ACH,user06,approver01,N,GLB-000443,1,duplicate,standard,ledger:444;policy:duplicate,development,1.0.0
+GLB-000120,SYN-V-046,44777.42,USD,complete,PO-000120,Corporate card,user05,user05,N,,1,segregation_of_duties,standard,ledger:120;policy:segregation_of_duties,development,1.0.0
+GLB-000030,SYN-V-029,60578.41,USD,complete,PO-000030,Corporate card,user10,approver03,N,,1,materiality,standard,ledger:30;policy:materiality,development,1.0.0
+GLB-000397,SYN-V-031,179343.89,USD,complete,PO-000397,Manual journal,user16,approver06,N,,0,hard_negative,hard,ledger:397;policy:hard_negative,development,1.0.0
+GLB-000009,SYN-V-008,125791.41,USD,complete,PO-000009,Manual journal,user08,approver08,N,,0,hard_negative,hard,ledger:9;policy:hard_negative,development,1.0.0
+GLB-000279,SYN-V-059,3840.90,USD,complete,PO-000279,ACH,user12,approver05,N,,0,normal,standard,ledger:279;policy:normal,development,1.0.0
+GLB-000222,SYN-V-002,52238.29,USD,complete,PO-000222,ACH,user12,approver00,N,,1,borderline,borderline,ledger:222;policy:borderline,development,1.0.0
+GLB-000240,SYN-V-020,181973.51,USD,complete,PO-000240,Wire,user11,approver05,N,,1,materiality,standard,ledger:240;policy:materiality,development,1.0.0
+GLB-000272,SYN-V-052,29628.83,USD,missing_invoice,,ACH,user05,approver11,N,,1,document_gap,standard,ledger:272;policy:document_gap,development,1.0.0
+GLB-000354,SYN-V-061,20505.65,USD,complete,PO-000354,Corporate card,user11,approver02,Y,,1,related_party,standard,ledger:354;policy:related_party,development,1.0.0
+GLB-000447,SYN-V-008,25636.48,USD,complete,PO-000447,ACH,user09,approver04,N,,0,normal,standard,ledger:447;policy:normal,development,1.0.0
+GLB-000216,SYN-V-069,15402.11,USD,missing_invoice,,Corporate card,user06,approver07,N,,1,document_gap,standard,ledger:216;policy:document_gap,development,1.0.0
+GLB-000176,SYN-V-029,30276.69,USD,complete,PO-000176,Wire,user04,user04,N,,1,segregation_of_duties,standard,ledger:176;policy:segregation_of_duties,development,1.0.0
+GLB-000481,SYN-V-042,177040.29,USD,complete,PO-000481,Manual journal,user05,approver12,N,,0,hard_negative,hard,ledger:481;policy:hard_negative,development,1.0.0
+GLB-000215,SYN-V-068,5967.42,USD,complete,PO-000215,Corporate card,user05,approver06,N,,0,normal,standard,ledger:215;policy:normal,development,1.0.0
+GLB-000563,SYN-V-051,7626.98,USD,complete,PO-000563,ACH,user11,approver03,N,,0,normal,standard,ledger:563;policy:normal,development,1.0.0
+GLB-000438,SYN-V-072,29330.70,USD,complete,PO-000438,Wire,user00,approver08,Y,,1,related_party,standard,ledger:438;policy:related_party,evaluation,1.0.0
+GLB-000433,SYN-V-067,87431.82,USD,complete,PO-000433,Manual journal,user14,approver03,N,,0,hard_negative,hard,ledger:433;policy:hard_negative,development,1.0.0
+GLB-000434,SYN-V-068,1913.10,USD,altered,PO-000434,Corporate card,user15,approver04,N,,1,hard_positive,hard,ledger:434;policy:hard_positive,development,1.0.0
+GLB-000210,SYN-V-063,1513.71,USD,altered,PO-000210,Wire,user00,approver01,N,,1,hard_positive,hard,ledger:210;policy:hard_positive,development,1.0.0
+GLB-000339,SYN-V-046,31634.39,USD,complete,PO-000339,Wire,user15,approver00,N,,0,normal,standard,ledger:339;policy:normal,development,1.0.0
+GLB-000045,SYN-V-044,140381.89,USD,complete,PO-000045,Manual journal,user06,approver05,N,,0,hard_negative,hard,ledger:45;policy:hard_negative,development,1.0.0
+GLB-000458,SYN-V-019,31492.83,USD,complete,PO-000458,Wire,user01,approver02,N,GLB-000457,1,duplicate,standard,ledger:458;policy:duplicate,evaluation,1.0.0
+GLB-000308,SYN-V-015,1902.47,USD,altered,PO-000308,Wire,user03,approver08,N,,1,hard_positive,hard,ledger:308;policy:hard_positive,development,1.0.0
+GLB-000302,SYN-V-009,7385.67,USD,complete,PO-000302,Wire,user16,user16,N,,1,segregation_of_duties,standard,ledger:302;policy:segregation_of_duties,development,1.0.0
+GLB-000164,SYN-V-017,27263.44,USD,complete,PO-000164,ACH,user11,approver07,N,GLB-000163,1,duplicate,standard,ledger:164;policy:duplicate,evaluation,1.0.0
+GLB-000571,SYN-V-059,24067.62,USD,complete,PO-000571,Corporate card,user00,approver11,N,,0,normal,standard,ledger:571;policy:normal,development,1.0.0
+GLB-000488,SYN-V-049,49445.15,USD,complete,PO-000488,Corporate card,user12,approver06,N,,1,borderline,borderline,ledger:488;policy:borderline,evaluation,1.0.0
+GLB-000200,SYN-V-053,6815.23,USD,complete,PO-000200,Wire,user09,approver04,Y,,1,related_party,standard,ledger:200;policy:related_party,development,1.0.0
+GLB-000266,SYN-V-046,1330.85,USD,altered,PO-000266,Wire,user18,approver05,N,,1,hard_positive,hard,ledger:266;policy:hard_positive,development,1.0.0
+GLB-000509,SYN-V-070,86083.17,USD,complete,PO-000509,Manual journal,user14,approver01,N,,0,hard_negative,hard,ledger:509;policy:hard_negative,evaluation,1.0.0
+GLB-000574,SYN-V-062,1974.68,USD,altered,PO-000574,ACH,user03,approver01,N,,1,hard_positive,hard,ledger:574;policy:hard_positive,development,1.0.0
+GLB-000388,SYN-V-022,1967.05,USD,complete,PO-000388,Corporate card,user07,approver10,N,GLB-000387,1,duplicate,standard,ledger:388;policy:duplicate,development,1.0.0
+GLB-000424,SYN-V-058,2268.18,USD,complete,PO-000424,ACH,user05,approver07,Y,,1,related_party,standard,ledger:424;policy:related_party,evaluation,1.0.0
+GLB-000182,SYN-V-035,1116.10,USD,altered,PO-000182,ACH,user10,approver12,N,,1,hard_positive,hard,ledger:182;policy:hard_positive,evaluation,1.0.0
+GLB-000366,SYN-V-000,106153.61,USD,complete,PO-000366,Corporate card,user04,approver01,N,,1,materiality,standard,ledger:366;policy:materiality,development,1.0.0
+GLB-000102,SYN-V-028,29526.93,USD,complete,PO-000102,ACH,user06,approver10,Y,,1,related_party,standard,ledger:102;policy:related_party,development,1.0.0
+GLB-000224,SYN-V-004,531.61,USD,altered,PO-000224,Corporate card,user14,approver02,N,,1,hard_positive,hard,ledger:224;policy:hard_positive,development,1.0.0
+GLB-000567,SYN-V-055,39985.51,USD,complete,PO-000567,ACH,user15,approver07,N,,0,normal,standard,ledger:567;policy:normal,development,1.0.0
+GLB-000431,SYN-V-065,294.33,USD,complete,PO-000431,Corporate card,user12,approver01,N,,0,normal,standard,ledger:431;policy:normal,development,1.0.0
+GLB-000173,SYN-V-026,175518.15,USD,complete,PO-000173,Manual journal,user01,approver03,N,,0,hard_negative,hard,ledger:173;policy:hard_negative,development,1.0.0
+GLB-000310,SYN-V-017,177310.89,USD,complete,PO-000310,Wire,user05,approver10,N,,1,materiality,standard,ledger:310;policy:materiality,development,1.0.0
+GLB-000188,SYN-V-041,34622.73,USD,missing_invoice,,Wire,user16,approver05,N,,1,document_gap,standard,ledger:188;policy:document_gap,development,1.0.0
+GLB-000565,SYN-V-053,117904.30,USD,complete,PO-000565,Manual journal,user13,approver05,N,,0,hard_negative,hard,ledger:565;policy:hard_negative,development,1.0.0
+GLB-000162,SYN-V-015,29272.43,USD,complete,PO-000162,Wire,user09,user09,N,,1,segregation_of_duties,standard,ledger:162;policy:segregation_of_duties,development,1.0.0
+GLB-000384,SYN-V-018,30821.65,USD,missing_invoice,,ACH,user03,approver06,N,,1,document_gap,standard,ledger:384;policy:document_gap,development,1.0.0
+GLB-000569,SYN-V-057,131518.85,USD,complete,PO-000569,Manual journal,user17,approver09,N,,0,hard_negative,hard,ledger:569;policy:hard_negative,development,1.0.0
+GLB-000483,SYN-V-044,30818.17,USD,complete,PO-000483,ACH,user07,approver01,N,,0,normal,standard,ledger:483;policy:normal,development,1.0.0
+GLB-000544,SYN-V-032,50258.19,USD,complete,PO-000544,Corporate card,user11,approver10,N,,1,borderline,borderline,ledger:544;policy:borderline,development,1.0.0
+GLB-000282,SYN-V-062,137807.96,USD,complete,PO-000282,Corporate card,user15,approver08,N,,1,materiality,standard,ledger:282;policy:materiality,development,1.0.0
+GLB-000580,SYN-V-068,18109.38,USD,missing_invoice,,ACH,user09,approver07,N,,1,document_gap,standard,ledger:580;policy:document_gap,evaluation,1.0.0
+GLB-000321,SYN-V-028,103647.47,USD,complete,PO-000321,Manual journal,user16,approver08,N,,0,hard_negative,hard,ledger:321;policy:hard_negative,development,1.0.0
+GLB-000487,SYN-V-048,40408.00,USD,complete,PO-000487,Corporate card,user11,approver05,N,,0,normal,standard,ledger:487;policy:normal,development,1.0.0
+GLB-000480,SYN-V-041,25187.11,USD,complete,PO-000480,Corporate card,user04,approver11,Y,,1,related_party,standard,ledger:480;policy:related_party,development,1.0.0
+GLB-000465,SYN-V-026,74747.14,USD,complete,PO-000465,Manual journal,user08,approver09,N,,0,hard_negative,hard,ledger:465;policy:hard_negative,development,1.0.0
+GLB-000596,SYN-V-011,40906.65,USD,complete,PO-000596,Wire,user06,user06,N,,1,segregation_of_duties,standard,ledger:596;policy:segregation_of_duties,development,1.0.0
+GLB-000008,SYN-V-007,13115.58,USD,complete,PO-000008,ACH,user07,user07,N,,1,segregation_of_duties,standard,ledger:8;policy:segregation_of_duties,development,1.0.0
+GLB-000303,SYN-V-010,14082.90,USD,complete,PO-000303,Corporate card,user17,approver03,N,,0,normal,standard,ledger:303;policy:normal,evaluation,1.0.0
+GLB-000497,SYN-V-058,109987.30,USD,complete,PO-000497,Manual journal,user02,approver02,N,,0,hard_negative,hard,ledger:497;policy:hard_negative,development,1.0.0
+GLB-000003,SYN-V-002,29704.65,USD,complete,PO-000003,Corporate card,user02,approver02,N,,0,normal,standard,ledger:3;policy:normal,development,1.0.0
+GLB-000202,SYN-V-055,15652.14,USD,missing_invoice,,ACH,user11,approver06,N,,1,document_gap,standard,ledger:202;policy:document_gap,development,1.0.0
+GLB-000034,SYN-V-033,19555.11,USD,missing_invoice,,Corporate card,user14,approver07,N,,1,document_gap,standard,ledger:34;policy:document_gap,development,1.0.0
+GLB-000519,SYN-V-007,11980.68,USD,complete,PO-000519,Wire,user05,approver11,N,,0,normal,standard,ledger:519;policy:normal,development,1.0.0
+GLB-000440,SYN-V-001,9504.98,USD,missing_invoice,,ACH,user02,approver10,N,,1,document_gap,standard,ledger:440;policy:document_gap,development,1.0.0
+GLB-000178,SYN-V-031,15465.07,USD,complete,PO-000178,Corporate card,user06,approver08,N,GLB-000177,1,duplicate,standard,ledger:178;policy:duplicate,development,1.0.0
+GLB-000261,SYN-V-041,179203.44,USD,complete,PO-000261,Manual journal,user13,approver00,N,,0,hard_negative,hard,ledger:261;policy:hard_negative,development,1.0.0
+GLB-000546,SYN-V-034,934.83,USD,altered,PO-000546,ACH,user13,approver12,N,,1,hard_positive,hard,ledger:546;policy:hard_positive,development,1.0.0
+GLB-000090,SYN-V-016,8067.12,USD,missing_invoice,,Corporate card,user13,approver11,N,,1,document_gap,standard,ledger:90;policy:document_gap,evaluation,1.0.0
+GLB-000332,SYN-V-039,19434.96,USD,complete,PO-000332,Corporate card,user08,approver06,N,GLB-000331,1,duplicate,standard,ledger:332;policy:duplicate,development,1.0.0
+GLB-000554,SYN-V-042,5547.51,USD,complete,PO-000554,Corporate card,user02,user02,N,,1,segregation_of_duties,standard,ledger:554;policy:segregation_of_duties,development,1.0.0
+GLB-000553,SYN-V-041,114236.06,USD,complete,PO-000553,Manual journal,user01,approver06,N,,0,hard_negative,hard,ledger:553;policy:hard_negative,development,1.0.0
+GLB-000478,SYN-V-039,153159.43,USD,complete,PO-000478,ACH,user02,approver09,N,,1,materiality,standard,ledger:478;policy:materiality,development,1.0.0
+GLB-000537,SYN-V-025,146648.93,USD,complete,PO-000537,Manual journal,user04,approver03,N,,0,hard_negative,hard,ledger:537;policy:hard_negative,evaluation,1.0.0
+GLB-000094,SYN-V-020,26648.24,USD,complete,PO-000094,Corporate card,user17,approver02,N,GLB-000093,1,duplicate,standard,ledger:94;policy:duplicate,development,1.0.0
+GLB-000369,SYN-V-003,138292.23,USD,complete,PO-000369,Manual journal,user07,approver04,N,,0,hard_negative,hard,ledger:369;policy:hard_negative,development,1.0.0
+GLB-000262,SYN-V-042,20143.95,USD,complete,PO-000262,ACH,user14,approver01,N,GLB-000261,1,duplicate,standard,ledger:262;policy:duplicate,development,1.0.0
+GLB-000454,SYN-V-015,28134.55,USD,missing_invoice,,Wire,user16,approver11,N,,1,document_gap,standard,ledger:454;policy:document_gap,development,1.0.0
+GLB-000466,SYN-V-027,1970.82,USD,complete,PO-000466,ACH,user09,approver10,Y,,1,related_party,standard,ledger:466;policy:related_party,development,1.0.0
+GLB-000084,SYN-V-010,966.58,USD,altered,PO-000084,Wire,user07,approver05,N,,1,hard_positive,hard,ledger:84;policy:hard_positive,development,1.0.0
+GLB-000312,SYN-V-019,13445.58,USD,complete,PO-000312,Corporate card,user07,approver12,Y,,1,related_party,standard,ledger:312;policy:related_party,development,1.0.0
+GLB-000099,SYN-V-025,11586.75,USD,complete,PO-000099,Corporate card,user03,approver07,N,,0,normal,standard,ledger:99;policy:normal,development,1.0.0
+GLB-000495,SYN-V-056,19149.87,USD,complete,PO-000495,Wire,user00,approver00,N,,0,normal,standard,ledger:495;policy:normal,development,1.0.0
+GLB-000395,SYN-V-029,36783.54,USD,complete,PO-000395,Wire,user14,approver04,N,,0,normal,standard,ledger:395;policy:normal,development,1.0.0
+GLB-000055,SYN-V-054,33271.28,USD,complete,PO-000055,Corporate card,user16,approver02,N,,0,normal,standard,ledger:55;policy:normal,evaluation,1.0.0
+GLB-000545,SYN-V-033,166007.67,USD,complete,PO-000545,Manual journal,user12,approver11,N,,0,hard_negative,hard,ledger:545;policy:hard_negative,development,1.0.0
+GLB-000250,SYN-V-030,50378.38,USD,complete,PO-000250,Corporate card,user02,approver02,N,,1,borderline,borderline,ledger:250;policy:borderline,development,1.0.0
+GLB-000311,SYN-V-018,37915.29,USD,complete,PO-000311,ACH,user06,approver11,N,,0,normal,standard,ledger:311;policy:normal,development,1.0.0
+GLB-000489,SYN-V-050,177665.44,USD,complete,PO-000489,Manual journal,user13,approver07,N,,0,hard_negative,hard,ledger:489;policy:hard_negative,evaluation,1.0.0
+GLB-000285,SYN-V-065,126498.01,USD,complete,PO-000285,Manual journal,user18,approver11,N,,0,hard_negative,hard,ledger:285;policy:hard_negative,development,1.0.0
+GLB-000530,SYN-V-018,49942.78,USD,complete,PO-000530,Wire,user16,approver09,N,,1,borderline,borderline,ledger:530;policy:borderline,development,1.0.0
+GLB-000381,SYN-V-015,129607.95,USD,complete,PO-000381,Manual journal,user00,approver03,N,,0,hard_negative,hard,ledger:381;policy:hard_negative,development,1.0.0
+GLB-000256,SYN-V-036,34037.51,USD,complete,PO-000256,ACH,user08,approver08,Y,,1,related_party,standard,ledger:256;policy:related_party,development,1.0.0
+GLB-000460,SYN-V-021,49574.03,USD,complete,PO-000460,ACH,user03,approver04,N,,1,borderline,borderline,ledger:460;policy:borderline,development,1.0.0
+GLB-000074,SYN-V-000,7581.80,USD,complete,PO-000074,ACH,user16,approver08,Y,,1,related_party,standard,ledger:74;policy:related_party,development,1.0.0
+GLB-000126,SYN-V-052,223.10,USD,altered,PO-000126,Corporate card,user11,approver08,N,,1,hard_positive,hard,ledger:126;policy:hard_positive,evaluation,1.0.0
+GLB-000026,SYN-V-025,50963.05,USD,complete,PO-000026,Corporate card,user06,approver12,N,,1,borderline,borderline,ledger:26;policy:borderline,development,1.0.0
+GLB-000286,SYN-V-066,28945.40,USD,missing_invoice,,Wire,user00,approver12,N,,1,document_gap,standard,ledger:286;policy:document_gap,development,1.0.0
+GLB-000345,SYN-V-052,140101.26,USD,complete,PO-000345,Manual journal,user02,approver06,N,,0,hard_negative,hard,ledger:345;policy:hard_negative,development,1.0.0
+GLB-000209,SYN-V-062,72813.03,USD,complete,PO-000209,Manual journal,user18,approver00,N,,0,hard_negative,hard,ledger:209;policy:hard_negative,development,1.0.0
+GLB-000427,SYN-V-061,1262.10,USD,complete,PO-000427,ACH,user08,approver10,N,,0,normal,standard,ledger:427;policy:normal,development,1.0.0
+GLB-000105,SYN-V-031,163147.56,USD,complete,PO-000105,Manual journal,user09,approver00,N,,0,hard_negative,hard,ledger:105;policy:hard_negative,development,1.0.0
+GLB-000106,SYN-V-032,44078.74,USD,complete,PO-000106,ACH,user10,user10,N,,1,segregation_of_duties,standard,ledger:106;policy:segregation_of_duties,development,1.0.0
+GLB-000133,SYN-V-059,69517.09,USD,complete,PO-000133,Manual journal,user18,approver02,N,,0,hard_negative,hard,ledger:133;policy:hard_negative,evaluation,1.0.0
+GLB-000017,SYN-V-016,107643.03,USD,complete,PO-000017,Manual journal,user16,approver03,N,,0,hard_negative,hard,ledger:17;policy:hard_negative,development,1.0.0
+GLB-000227,SYN-V-007,36067.58,USD,complete,PO-000227,ACH,user17,approver05,N,,0,normal,standard,ledger:227;policy:normal,development,1.0.0
+GLB-000077,SYN-V-003,163849.24,USD,complete,PO-000077,Manual journal,user00,approver11,N,,0,hard_negative,hard,ledger:77;policy:hard_negative,development,1.0.0
+GLB-000573,SYN-V-061,104050.08,USD,complete,PO-000573,Manual journal,user02,approver00,N,,0,hard_negative,hard,ledger:573;policy:hard_negative,development,1.0.0
+GLB-000449,SYN-V-010,160616.93,USD,complete,PO-000449,Manual journal,user11,approver06,N,,0,hard_negative,hard,ledger:449;policy:hard_negative,evaluation,1.0.0
+GLB-000131,SYN-V-057,12775.28,USD,complete,PO-000131,Corporate card,user16,approver00,N,,0,normal,standard,ledger:131;policy:normal,development,1.0.0
+GLB-000263,SYN-V-043,15242.09,USD,complete,PO-000263,Wire,user15,approver02,N,,0,normal,standard,ledger:263;policy:normal,development,1.0.0
+GLB-000139,SYN-V-065,34777.55,USD,complete,PO-000139,Wire,user05,approver08,N,,0,normal,standard,ledger:139;policy:normal,development,1.0.0
+GLB-000503,SYN-V-064,403.62,USD,complete,PO-000503,ACH,user08,approver08,N,,0,normal,standard,ledger:503;policy:normal,development,1.0.0
+GLB-000191,SYN-V-044,9709.02,USD,complete,PO-000191,Wire,user00,approver08,N,,0,normal,standard,ledger:191;policy:normal,development,1.0.0
+GLB-000249,SYN-V-029,166765.84,USD,complete,PO-000249,Manual journal,user01,approver01,N,,0,hard_negative,hard,ledger:249;policy:hard_negative,development,1.0.0
+GLB-000163,SYN-V-016,11836.64,USD,complete,PO-000163,Wire,user10,approver06,N,,0,normal,standard,ledger:163;policy:normal,development,1.0.0
+GLB-000032,SYN-V-031,43740.16,USD,complete,PO-000032,ACH,user12,approver05,Y,,1,related_party,standard,ledger:32;policy:related_party,development,1.0.0
+GLB-000114,SYN-V-040,96537.71,USD,complete,PO-000114,Corporate card,user18,approver09,N,,1,materiality,standard,ledger:114;policy:materiality,development,1.0.0
+GLB-000225,SYN-V-005,109007.23,USD,complete,PO-000225,Manual journal,user15,approver03,N,,0,hard_negative,hard,ledger:225;policy:hard_negative,development,1.0.0
+GLB-000479,SYN-V-040,699.26,USD,complete,PO-000479,ACH,user03,approver10,N,,0,normal,standard,ledger:479;policy:normal,development,1.0.0
+GLB-000287,SYN-V-067,644.43,USD,complete,PO-000287,Corporate card,user01,approver00,N,,0,normal,standard,ledger:287;policy:normal,evaluation,1.0.0
+GLB-000557,SYN-V-045,71932.64,USD,complete,PO-000557,Manual journal,user05,approver10,N,,0,hard_negative,hard,ledger:557;policy:hard_negative,development,1.0.0
+GLB-000318,SYN-V-025,35403.16,USD,complete,PO-000318,Wire,user13,approver05,N,GLB-000317,1,duplicate,standard,ledger:318;policy:duplicate,development,1.0.0
+GLB-000080,SYN-V-006,9023.44,USD,complete,PO-000080,Corporate card,user03,approver01,N,GLB-000079,1,duplicate,standard,ledger:80;policy:duplicate,development,1.0.0
+GLB-000491,SYN-V-052,4579.12,USD,complete,PO-000491,Corporate card,user15,approver09,N,,0,normal,standard,ledger:491;policy:normal,development,1.0.0
+GLB-000350,SYN-V-057,448.43,USD,altered,PO-000350,Corporate card,user07,approver11,N,,1,hard_positive,hard,ledger:350;policy:hard_positive,development,1.0.0
+GLB-000016,SYN-V-015,142633.69,USD,complete,PO-000016,ACH,user15,approver02,N,,1,materiality,standard,ledger:16;policy:materiality,evaluation,1.0.0
+GLB-000594,SYN-V-009,9691.94,USD,missing_invoice,,ACH,user04,approver08,N,,1,document_gap,standard,ledger:594;policy:document_gap,development,1.0.0
+GLB-000022,SYN-V-021,21398.92,USD,complete,PO-000022,Wire,user02,user02,N,,1,segregation_of_duties,standard,ledger:22;policy:segregation_of_duties,development,1.0.0
+GLB-000422,SYN-V-056,151881.66,USD,complete,PO-000422,Wire,user03,approver05,N,,1,materiality,standard,ledger:422;policy:materiality,development,1.0.0
+GLB-000053,SYN-V-052,67334.69,USD,complete,PO-000053,Manual journal,user14,approver00,N,,0,hard_negative,hard,ledger:53;policy:hard_negative,development,1.0.0
+GLB-000470,SYN-V-031,34266.26,USD,complete,PO-000470,Wire,user13,user13,N,,1,segregation_of_duties,standard,ledger:470;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000186,SYN-V-039,32052.92,USD,complete,PO-000186,Corporate card,user14,approver03,Y,,1,related_party,standard,ledger:186;policy:related_party,development,1.0.0
+GLB-000052,SYN-V-051,15340.58,USD,complete,PO-000052,Wire,user13,approver12,N,GLB-000051,1,duplicate,standard,ledger:52;policy:duplicate,development,1.0.0
+GLB-000532,SYN-V-020,591.02,USD,altered,PO-000532,ACH,user18,approver11,N,,1,hard_positive,hard,ledger:532;policy:hard_positive,evaluation,1.0.0
+GLB-000413,SYN-V-047,152204.58,USD,complete,PO-000413,Manual journal,user13,approver09,N,,0,hard_negative,hard,ledger:413;policy:hard_negative,evaluation,1.0.0
+GLB-000047,SYN-V-046,34378.26,USD,complete,PO-000047,ACH,user08,approver07,N,,0,normal,standard,ledger:47;policy:normal,development,1.0.0
+GLB-000435,SYN-V-069,9963.18,USD,complete,PO-000435,ACH,user16,approver05,N,,0,normal,standard,ledger:435;policy:normal,evaluation,1.0.0
+GLB-000165,SYN-V-018,170282.38,USD,complete,PO-000165,Manual journal,user12,approver08,N,,0,hard_negative,hard,ledger:165;policy:hard_negative,development,1.0.0
+GLB-000412,SYN-V-046,19033.29,USD,missing_invoice,,Wire,user12,approver08,N,,1,document_gap,standard,ledger:412;policy:document_gap,development,1.0.0
+GLB-000219,SYN-V-072,14501.13,USD,complete,PO-000219,Wire,user09,approver10,N,,0,normal,standard,ledger:219;policy:normal,development,1.0.0
+GLB-000159,SYN-V-012,17628.00,USD,complete,PO-000159,Corporate card,user06,approver02,N,,0,normal,standard,ledger:159;policy:normal,development,1.0.0
+GLB-000028,SYN-V-027,1527.09,USD,altered,PO-000028,ACH,user08,approver01,N,,1,hard_positive,hard,ledger:28;policy:hard_positive,development,1.0.0
+GLB-000288,SYN-V-068,1026.64,USD,complete,PO-000288,Corporate card,user02,user02,N,,1,segregation_of_duties,standard,ledger:288;policy:segregation_of_duties,development,1.0.0
+GLB-000365,SYN-V-072,82570.21,USD,complete,PO-000365,Manual journal,user03,approver00,N,,0,hard_negative,hard,ledger:365;policy:hard_negative,development,1.0.0
+GLB-000097,SYN-V-023,120132.37,USD,complete,PO-000097,Manual journal,user01,approver05,N,,0,hard_negative,hard,ledger:97;policy:hard_negative,development,1.0.0
+GLB-000508,SYN-V-069,38452.87,USD,complete,PO-000508,ACH,user13,approver00,Y,,1,related_party,standard,ledger:508;policy:related_party,development,1.0.0
+GLB-000329,SYN-V-036,134951.37,USD,complete,PO-000329,Manual journal,user05,approver03,N,,0,hard_negative,hard,ledger:329;policy:hard_negative,development,1.0.0
+GLB-000300,SYN-V-007,2742.09,USD,missing_invoice,,ACH,user14,approver00,N,,1,document_gap,standard,ledger:300;policy:document_gap,development,1.0.0
+GLB-000107,SYN-V-033,18997.25,USD,complete,PO-000107,Wire,user11,approver02,N,,0,normal,standard,ledger:107;policy:normal,development,1.0.0
+GLB-000070,SYN-V-069,1154.90,USD,altered,PO-000070,Wire,user12,approver04,N,,1,hard_positive,hard,ledger:70;policy:hard_positive,development,1.0.0
+GLB-000322,SYN-V-029,985.95,USD,altered,PO-000322,Corporate card,user17,approver09,N,,1,hard_positive,hard,ledger:322;policy:hard_positive,development,1.0.0
+GLB-000534,SYN-V-022,125253.10,USD,complete,PO-000534,Wire,user01,approver00,N,,1,materiality,standard,ledger:534;policy:materiality,development,1.0.0
+GLB-000539,SYN-V-027,22043.92,USD,complete,PO-000539,ACH,user06,approver05,N,,0,normal,standard,ledger:539;policy:normal,evaluation,1.0.0
+GLB-000371,SYN-V-005,4403.32,USD,complete,PO-000371,Wire,user09,approver06,N,,0,normal,standard,ledger:371;policy:normal,evaluation,1.0.0
+GLB-000360,SYN-V-067,11903.45,USD,complete,PO-000360,ACH,user17,approver08,N,GLB-000359,1,duplicate,standard,ledger:360;policy:duplicate,evaluation,1.0.0
+GLB-000337,SYN-V-044,140978.85,USD,complete,PO-000337,Manual journal,user13,approver11,N,,0,hard_negative,hard,ledger:337;policy:hard_negative,evaluation,1.0.0
+GLB-000579,SYN-V-067,8094.22,USD,complete,PO-000579,ACH,user08,approver06,N,,0,normal,standard,ledger:579;policy:normal,development,1.0.0
+GLB-000237,SYN-V-017,95575.15,USD,complete,PO-000237,Manual journal,user08,approver02,N,,0,hard_negative,hard,ledger:237;policy:hard_negative,development,1.0.0
+GLB-000062,SYN-V-061,22537.00,USD,missing_invoice,,Corporate card,user04,approver09,N,,1,document_gap,standard,ledger:62;policy:document_gap,development,1.0.0
+GLB-000588,SYN-V-003,262.79,USD,altered,PO-000588,ACH,user17,approver02,N,,1,hard_positive,hard,ledger:588;policy:hard_positive,development,1.0.0
+GLB-000521,SYN-V-009,126076.01,USD,complete,PO-000521,Manual journal,user07,approver00,N,,0,hard_negative,hard,ledger:521;policy:hard_negative,development,1.0.0
+GLB-000543,SYN-V-031,36997.09,USD,complete,PO-000543,Wire,user10,approver09,N,,0,normal,standard,ledger:543;policy:normal,development,1.0.0
+GLB-000157,SYN-V-010,138038.66,USD,complete,PO-000157,Manual journal,user04,approver00,N,,0,hard_negative,hard,ledger:157;policy:hard_negative,development,1.0.0
+GLB-000376,SYN-V-010,49665.89,USD,complete,PO-000376,Wire,user14,approver11,N,,1,borderline,borderline,ledger:376;policy:borderline,development,1.0.0
+GLB-000568,SYN-V-056,8333.03,USD,complete,PO-000568,Wire,user16,user16,N,,1,segregation_of_duties,standard,ledger:568;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000364,SYN-V-071,1681.78,USD,altered,PO-000364,ACH,user02,approver12,N,,1,hard_positive,hard,ledger:364;policy:hard_positive,development,1.0.0
+GLB-000275,SYN-V-055,22225.73,USD,complete,PO-000275,Wire,user08,approver01,N,,0,normal,standard,ledger:275;policy:normal,development,1.0.0
+GLB-000086,SYN-V-012,192973.87,USD,complete,PO-000086,Corporate card,user09,approver07,N,,1,materiality,standard,ledger:86;policy:materiality,development,1.0.0
+GLB-000207,SYN-V-060,27075.42,USD,complete,PO-000207,Corporate card,user16,approver11,N,,0,normal,standard,ledger:207;policy:normal,development,1.0.0
+GLB-000236,SYN-V-016,49320.46,USD,complete,PO-000236,Corporate card,user07,approver01,N,,1,borderline,borderline,ledger:236;policy:borderline,development,1.0.0
+GLB-000041,SYN-V-040,167934.77,USD,complete,PO-000041,Manual journal,user02,approver01,N,,0,hard_negative,hard,ledger:41;policy:hard_negative,development,1.0.0
+GLB-000212,SYN-V-065,194353.86,USD,complete,PO-000212,ACH,user02,approver03,N,,1,materiality,standard,ledger:212;policy:materiality,development,1.0.0
+GLB-000067,SYN-V-066,21969.11,USD,complete,PO-000067,ACH,user09,approver01,N,,0,normal,standard,ledger:67;policy:normal,development,1.0.0
+GLB-000358,SYN-V-065,31822.11,USD,complete,PO-000358,Wire,user15,user15,N,,1,segregation_of_duties,standard,ledger:358;policy:segregation_of_duties,development,1.0.0
+GLB-000108,SYN-V-034,1851.68,USD,complete,PO-000108,Corporate card,user12,approver03,N,GLB-000107,1,duplicate,standard,ledger:108;policy:duplicate,development,1.0.0
+GLB-000066,SYN-V-065,10702.92,USD,complete,PO-000066,Wire,user08,approver00,N,GLB-000065,1,duplicate,standard,ledger:66;policy:duplicate,development,1.0.0
+GLB-000367,SYN-V-001,32176.52,USD,complete,PO-000367,ACH,user05,approver02,N,,0,normal,standard,ledger:367;policy:normal,development,1.0.0
+GLB-000280,SYN-V-060,1467.35,USD,altered,PO-000280,Wire,user13,approver06,N,,1,hard_positive,hard,ledger:280;policy:hard_positive,evaluation,1.0.0
+GLB-000297,SYN-V-004,149231.49,USD,complete,PO-000297,Manual journal,user11,approver10,N,,0,hard_negative,hard,ledger:297;policy:hard_negative,development,1.0.0
+GLB-000057,SYN-V-056,139459.64,USD,complete,PO-000057,Manual journal,user18,approver04,N,,0,hard_negative,hard,ledger:57;policy:hard_negative,evaluation,1.0.0
+GLB-000181,SYN-V-034,174445.93,USD,complete,PO-000181,Manual journal,user09,approver11,N,,0,hard_negative,hard,ledger:181;policy:hard_negative,development,1.0.0
+GLB-000586,SYN-V-001,50827.43,USD,complete,PO-000586,Wire,user15,approver00,N,,1,borderline,borderline,ledger:586;policy:borderline,development,1.0.0
+GLB-000253,SYN-V-033,165844.96,USD,complete,PO-000253,Manual journal,user05,approver05,N,,0,hard_negative,hard,ledger:253;policy:hard_negative,evaluation,1.0.0
+GLB-000187,SYN-V-040,28500.56,USD,complete,PO-000187,Corporate card,user15,approver04,N,,0,normal,standard,ledger:187;policy:normal,development,1.0.0
+GLB-000425,SYN-V-059,154473.84,USD,complete,PO-000425,Manual journal,user06,approver08,N,,0,hard_negative,hard,ledger:425;policy:hard_negative,development,1.0.0
+GLB-000177,SYN-V-030,126656.38,USD,complete,PO-000177,Manual journal,user05,approver07,N,,0,hard_negative,hard,ledger:177;policy:hard_negative,development,1.0.0
+GLB-000541,SYN-V-029,74218.47,USD,complete,PO-000541,Manual journal,user08,approver07,N,,0,hard_negative,hard,ledger:541;policy:hard_negative,development,1.0.0
+GLB-000331,SYN-V-038,44282.13,USD,complete,PO-000331,Wire,user07,approver05,N,,0,normal,standard,ledger:331;policy:normal,development,1.0.0
+GLB-000024,SYN-V-023,15476.21,USD,complete,PO-000024,ACH,user04,approver10,N,GLB-000023,1,duplicate,standard,ledger:24;policy:duplicate,evaluation,1.0.0
+GLB-000325,SYN-V-032,76997.66,USD,complete,PO-000325,Manual journal,user01,approver12,N,,0,hard_negative,hard,ledger:325;policy:hard_negative,development,1.0.0
+GLB-000040,SYN-V-039,48534.92,USD,complete,PO-000040,Wire,user01,approver00,N,,1,borderline,borderline,ledger:40;policy:borderline,evaluation,1.0.0
+GLB-000201,SYN-V-054,141502.42,USD,complete,PO-000201,Manual journal,user10,approver05,N,,0,hard_negative,hard,ledger:201;policy:hard_negative,evaluation,1.0.0
+GLB-000155,SYN-V-008,33039.98,USD,complete,PO-000155,Corporate card,user02,approver11,N,,0,normal,standard,ledger:155;policy:normal,development,1.0.0
+GLB-000356,SYN-V-063,21904.79,USD,missing_invoice,,Wire,user13,approver04,N,,1,document_gap,standard,ledger:356;policy:document_gap,development,1.0.0
+GLB-000522,SYN-V-010,24978.74,USD,complete,PO-000522,ACH,user08,approver01,Y,,1,related_party,standard,ledger:522;policy:related_party,development,1.0.0
+GLB-000150,SYN-V-003,42146.52,USD,complete,PO-000150,Corporate card,user16,approver06,N,GLB-000149,1,duplicate,standard,ledger:150;policy:duplicate,development,1.0.0
+GLB-000315,SYN-V-022,20023.92,USD,complete,PO-000315,Corporate card,user10,approver02,N,,0,normal,standard,ledger:315;policy:normal,development,1.0.0
+GLB-000352,SYN-V-059,60012.03,USD,complete,PO-000352,Corporate card,user09,approver00,N,,1,materiality,standard,ledger:352;policy:materiality,evaluation,1.0.0
+GLB-000190,SYN-V-043,27080.60,USD,complete,PO-000190,Corporate card,user18,user18,N,,1,segregation_of_duties,standard,ledger:190;policy:segregation_of_duties,development,1.0.0
+GLB-000033,SYN-V-032,158856.29,USD,complete,PO-000033,Manual journal,user13,approver06,N,,0,hard_negative,hard,ledger:33;policy:hard_negative,development,1.0.0
+GLB-000590,SYN-V-005,72290.63,USD,complete,PO-000590,Wire,user00,approver04,N,,1,materiality,standard,ledger:590;policy:materiality,development,1.0.0
+GLB-000351,SYN-V-058,35191.14,USD,complete,PO-000351,Wire,user08,approver12,N,,0,normal,standard,ledger:351;policy:normal,development,1.0.0
+GLB-000298,SYN-V-005,34639.87,USD,complete,PO-000298,ACH,user12,approver11,Y,,1,related_party,standard,ledger:298;policy:related_party,evaluation,1.0.0
+GLB-000550,SYN-V-038,2166.18,USD,complete,PO-000550,Corporate card,user17,approver03,Y,,1,related_party,standard,ledger:550;policy:related_party,development,1.0.0
+GLB-000344,SYN-V-051,36163.83,USD,complete,PO-000344,ACH,user01,user01,N,,1,segregation_of_duties,standard,ledger:344;policy:segregation_of_duties,development,1.0.0
+GLB-000597,SYN-V-012,93293.63,USD,complete,PO-000597,Manual journal,user07,approver11,N,,0,hard_negative,hard,ledger:597;policy:hard_negative,evaluation,1.0.0
+GLB-000506,SYN-V-067,118571.38,USD,complete,PO-000506,ACH,user11,approver11,N,,1,materiality,standard,ledger:506;policy:materiality,development,1.0.0
+GLB-000404,SYN-V-038,51910.51,USD,complete,PO-000404,Wire,user04,approver00,N,,1,borderline,borderline,ledger:404;policy:borderline,development,1.0.0
+GLB-000103,SYN-V-029,40656.55,USD,complete,PO-000103,ACH,user07,approver11,N,,0,normal,standard,ledger:103;policy:normal,development,1.0.0
+GLB-000213,SYN-V-066,114215.99,USD,complete,PO-000213,Manual journal,user03,approver04,N,,0,hard_negative,hard,ledger:213;policy:hard_negative,development,1.0.0
+GLB-000411,SYN-V-045,2675.46,USD,complete,PO-000411,Corporate card,user11,approver07,N,,0,normal,standard,ledger:411;policy:normal,development,1.0.0
+GLB-000485,SYN-V-046,142043.14,USD,complete,PO-000485,Manual journal,user09,approver03,N,,0,hard_negative,hard,ledger:485;policy:hard_negative,development,1.0.0
+GLB-000171,SYN-V-024,13625.01,USD,complete,PO-000171,Wire,user18,approver01,N,,0,normal,standard,ledger:171;policy:normal,development,1.0.0
+GLB-000372,SYN-V-006,7959.44,USD,complete,PO-000372,Wire,user10,user10,N,,1,segregation_of_duties,standard,ledger:372;policy:segregation_of_duties,development,1.0.0
+GLB-000486,SYN-V-047,3998.27,USD,complete,PO-000486,Wire,user10,approver04,N,GLB-000485,1,duplicate,standard,ledger:486;policy:duplicate,development,1.0.0
+GLB-000336,SYN-V-043,425.56,USD,altered,PO-000336,Wire,user12,approver10,N,,1,hard_positive,hard,ledger:336;policy:hard_positive,development,1.0.0
+GLB-000274,SYN-V-054,19953.12,USD,complete,PO-000274,ACH,user07,user07,N,,1,segregation_of_duties,standard,ledger:274;policy:segregation_of_duties,development,1.0.0
+GLB-000423,SYN-V-057,35039.89,USD,complete,PO-000423,Wire,user04,approver06,N,,0,normal,standard,ledger:423;policy:normal,development,1.0.0
+GLB-000581,SYN-V-069,73847.25,USD,complete,PO-000581,Manual journal,user10,approver08,N,,0,hard_negative,hard,ledger:581;policy:hard_negative,evaluation,1.0.0
+GLB-000160,SYN-V-013,43550.28,USD,missing_invoice,,Corporate card,user07,approver03,N,,1,document_gap,standard,ledger:160;policy:document_gap,evaluation,1.0.0
+GLB-000252,SYN-V-032,1769.30,USD,altered,PO-000252,Wire,user04,approver04,N,,1,hard_positive,hard,ledger:252;policy:hard_positive,development,1.0.0
+GLB-000132,SYN-V-058,31769.52,USD,missing_invoice,,ACH,user17,approver01,N,,1,document_gap,standard,ledger:132;policy:document_gap,development,1.0.0
+GLB-000504,SYN-V-065,1714.79,USD,altered,PO-000504,Corporate card,user09,approver09,N,,1,hard_positive,hard,ledger:504;policy:hard_positive,development,1.0.0
+GLB-000499,SYN-V-060,29675.40,USD,complete,PO-000499,Corporate card,user04,approver04,N,,0,normal,standard,ledger:499;policy:normal,development,1.0.0
+GLB-000185,SYN-V-038,149580.04,USD,complete,PO-000185,Manual journal,user13,approver02,N,,0,hard_negative,hard,ledger:185;policy:hard_negative,development,1.0.0
+GLB-000117,SYN-V-043,167180.96,USD,complete,PO-000117,Manual journal,user02,approver12,N,,0,hard_negative,hard,ledger:117;policy:hard_negative,development,1.0.0
+GLB-000432,SYN-V-066,48209.07,USD,complete,PO-000432,Wire,user13,approver02,N,,1,borderline,borderline,ledger:432;policy:borderline,development,1.0.0
+GLB-000368,SYN-V-002,38247.51,USD,complete,PO-000368,ACH,user06,approver03,Y,,1,related_party,standard,ledger:368;policy:related_party,development,1.0.0
+GLB-000477,SYN-V-038,104237.49,USD,complete,PO-000477,Manual journal,user01,approver08,N,,0,hard_negative,hard,ledger:477;policy:hard_negative,evaluation,1.0.0
+GLB-000313,SYN-V-020,132198.02,USD,complete,PO-000313,Manual journal,user08,approver00,N,,0,hard_negative,hard,ledger:313;policy:hard_negative,evaluation,1.0.0
+GLB-000400,SYN-V-034,21910.86,USD,complete,PO-000400,Corporate card,user00,user00,N,,1,segregation_of_duties,standard,ledger:400;policy:segregation_of_duties,development,1.0.0
+GLB-000075,SYN-V-001,2444.68,USD,complete,PO-000075,Wire,user17,approver09,N,,0,normal,standard,ledger:75;policy:normal,development,1.0.0
+GLB-000469,SYN-V-030,149683.85,USD,complete,PO-000469,Manual journal,user12,approver00,N,,0,hard_negative,hard,ledger:469;policy:hard_negative,development,1.0.0
+GLB-000125,SYN-V-051,128145.64,USD,complete,PO-000125,Manual journal,user10,approver07,N,,0,hard_negative,hard,ledger:125;policy:hard_negative,development,1.0.0
+GLB-000455,SYN-V-016,28132.54,USD,complete,PO-000455,Corporate card,user17,approver12,N,,0,normal,standard,ledger:455;policy:normal,evaluation,1.0.0
+GLB-000473,SYN-V-034,157460.90,USD,complete,PO-000473,Manual journal,user16,approver04,N,,0,hard_negative,hard,ledger:473;policy:hard_negative,development,1.0.0
+GLB-000429,SYN-V-063,106588.70,USD,complete,PO-000429,Manual journal,user10,approver12,N,,0,hard_negative,hard,ledger:429;policy:hard_negative,development,1.0.0
+GLB-000390,SYN-V-024,47878.53,USD,complete,PO-000390,Corporate card,user09,approver12,N,,1,borderline,borderline,ledger:390;policy:borderline,evaluation,1.0.0
+GLB-000468,SYN-V-029,17754.96,USD,missing_invoice,,Wire,user11,approver12,N,,1,document_gap,standard,ledger:468;policy:document_gap,development,1.0.0
+GLB-000291,SYN-V-071,11484.71,USD,complete,PO-000291,Wire,user05,approver04,N,,0,normal,standard,ledger:291;policy:normal,development,1.0.0
+GLB-000246,SYN-V-026,32376.74,USD,complete,PO-000246,Corporate card,user17,user17,N,,1,segregation_of_duties,standard,ledger:246;policy:segregation_of_duties,development,1.0.0
+GLB-000259,SYN-V-039,26888.48,USD,complete,PO-000259,Wire,user11,approver11,N,,0,normal,standard,ledger:259;policy:normal,development,1.0.0
+GLB-000144,SYN-V-070,9095.14,USD,complete,PO-000144,Corporate card,user10,approver00,Y,,1,related_party,standard,ledger:144;policy:related_party,development,1.0.0
+GLB-000233,SYN-V-013,169704.24,USD,complete,PO-000233,Manual journal,user04,approver11,N,,0,hard_negative,hard,ledger:233;policy:hard_negative,development,1.0.0
+GLB-000278,SYN-V-058,49953.35,USD,complete,PO-000278,ACH,user11,approver04,N,,1,borderline,borderline,ledger:278;policy:borderline,development,1.0.0
+GLB-000046,SYN-V-045,17333.06,USD,complete,PO-000046,Corporate card,user07,approver06,Y,,1,related_party,standard,ledger:46;policy:related_party,evaluation,1.0.0
+GLB-000072,SYN-V-071,125862.12,USD,complete,PO-000072,Wire,user14,approver06,N,,1,materiality,standard,ledger:72;policy:materiality,development,1.0.0
+GLB-000195,SYN-V-048,42707.50,USD,complete,PO-000195,ACH,user04,approver12,N,,0,normal,standard,ledger:195;policy:normal,evaluation,1.0.0
+GLB-000029,SYN-V-028,82232.69,USD,complete,PO-000029,Manual journal,user09,approver02,N,,0,hard_negative,hard,ledger:29;policy:hard_negative,development,1.0.0
+GLB-000027,SYN-V-026,13218.21,USD,complete,PO-000027,Corporate card,user07,approver00,N,,0,normal,standard,ledger:27;policy:normal,development,1.0.0
+GLB-000490,SYN-V-051,1392.67,USD,altered,PO-000490,Wire,user14,approver08,N,,1,hard_positive,hard,ledger:490;policy:hard_positive,development,1.0.0
+GLB-000244,SYN-V-024,20607.55,USD,missing_invoice,,ACH,user15,approver09,N,,1,document_gap,standard,ledger:244;policy:document_gap,development,1.0.0
+GLB-000083,SYN-V-009,15310.44,USD,complete,PO-000083,Corporate card,user06,approver04,N,,0,normal,standard,ledger:83;policy:normal,development,1.0.0
+GLB-000151,SYN-V-004,24427.07,USD,complete,PO-000151,Corporate card,user17,approver07,N,,0,normal,standard,ledger:151;policy:normal,evaluation,1.0.0
+GLB-000010,SYN-V-009,33282.05,USD,complete,PO-000010,ACH,user09,approver09,N,GLB-000009,1,duplicate,standard,ledger:10;policy:duplicate,evaluation,1.0.0
+GLB-000457,SYN-V-018,151292.13,USD,complete,PO-000457,Manual journal,user00,approver01,N,,0,hard_negative,hard,ledger:457;policy:hard_negative,evaluation,1.0.0
+GLB-000319,SYN-V-026,1653.32,USD,complete,PO-000319,ACH,user14,approver06,N,,0,normal,standard,ledger:319;policy:normal,development,1.0.0
+GLB-000380,SYN-V-014,129549.40,USD,complete,PO-000380,ACH,user18,approver02,N,,1,materiality,standard,ledger:380;policy:materiality,development,1.0.0
+GLB-000482,SYN-V-043,8554.99,USD,missing_invoice,,ACH,user06,approver00,N,,1,document_gap,standard,ledger:482;policy:document_gap,evaluation,1.0.0
+GLB-000307,SYN-V-014,14659.71,USD,complete,PO-000307,ACH,user02,approver07,N,,0,normal,standard,ledger:307;policy:normal,development,1.0.0
+GLB-000577,SYN-V-065,167585.01,USD,complete,PO-000577,Manual journal,user06,approver04,N,,0,hard_negative,hard,ledger:577;policy:hard_negative,development,1.0.0
+GLB-000296,SYN-V-003,111812.54,USD,complete,PO-000296,Wire,user10,approver09,N,,1,materiality,standard,ledger:296;policy:materiality,development,1.0.0
+GLB-000387,SYN-V-021,6335.71,USD,complete,PO-000387,Wire,user06,approver09,N,,0,normal,standard,ledger:387;policy:normal,development,1.0.0
+GLB-000493,SYN-V-054,114329.53,USD,complete,PO-000493,Manual journal,user17,approver11,N,,0,hard_negative,hard,ledger:493;policy:hard_negative,development,1.0.0
+GLB-000020,SYN-V-019,42253.44,USD,missing_invoice,,Corporate card,user00,approver06,N,,1,document_gap,standard,ledger:20;policy:document_gap,development,1.0.0
+GLB-000407,SYN-V-041,18764.78,USD,complete,PO-000407,Corporate card,user07,approver03,N,,0,normal,standard,ledger:407;policy:normal,evaluation,1.0.0
+GLB-000284,SYN-V-064,43111.04,USD,complete,PO-000284,Corporate card,user17,approver10,Y,,1,related_party,standard,ledger:284;policy:related_party,development,1.0.0
+GLB-000085,SYN-V-011,173379.13,USD,complete,PO-000085,Manual journal,user08,approver06,N,,0,hard_negative,hard,ledger:85;policy:hard_negative,development,1.0.0
+GLB-000060,SYN-V-059,39138.34,USD,complete,PO-000060,Wire,user02,approver07,Y,,1,related_party,standard,ledger:60;policy:related_party,development,1.0.0
+GLB-000591,SYN-V-006,23297.70,USD,complete,PO-000591,Corporate card,user01,approver05,N,,0,normal,standard,ledger:591;policy:normal,development,1.0.0
+GLB-000359,SYN-V-066,20170.10,USD,complete,PO-000359,Corporate card,user16,approver07,N,,0,normal,standard,ledger:359;policy:normal,development,1.0.0
+GLB-000290,SYN-V-070,11194.71,USD,complete,PO-000290,Wire,user04,approver03,N,GLB-000289,1,duplicate,standard,ledger:290;policy:duplicate,development,1.0.0
+GLB-000270,SYN-V-050,26760.83,USD,complete,PO-000270,Corporate card,user03,approver09,Y,,1,related_party,standard,ledger:270;policy:related_party,development,1.0.0
+GLB-000193,SYN-V-046,73052.83,USD,complete,PO-000193,Manual journal,user02,approver10,N,,0,hard_negative,hard,ledger:193;policy:hard_negative,development,1.0.0
+GLB-000598,SYN-V-013,25719.17,USD,complete,PO-000598,ACH,user08,approver12,N,GLB-000597,1,duplicate,standard,ledger:598;policy:duplicate,evaluation,1.0.0
+GLB-000453,SYN-V-014,107053.38,USD,complete,PO-000453,Manual journal,user15,approver10,N,,0,hard_negative,hard,ledger:453;policy:hard_negative,development,1.0.0
+GLB-000472,SYN-V-033,2487.99,USD,complete,PO-000472,Corporate card,user15,approver03,N,GLB-000471,1,duplicate,standard,ledger:472;policy:duplicate,development,1.0.0
+GLB-000419,SYN-V-053,20828.38,USD,complete,PO-000419,ACH,user00,approver02,N,,0,normal,standard,ledger:419;policy:normal,evaluation,1.0.0
+GLB-000183,SYN-V-036,42531.40,USD,complete,PO-000183,ACH,user11,approver00,N,,0,normal,standard,ledger:183;policy:normal,development,1.0.0
+GLB-000148,SYN-V-001,43802.20,USD,complete,PO-000148,Wire,user14,user14,N,,1,segregation_of_duties,standard,ledger:148;policy:segregation_of_duties,development,1.0.0
+GLB-000142,SYN-V-068,132204.88,USD,complete,PO-000142,Wire,user08,approver11,N,,1,materiality,standard,ledger:142;policy:materiality,development,1.0.0
+GLB-000128,SYN-V-054,147115.22,USD,complete,PO-000128,ACH,user13,approver10,N,,1,materiality,standard,ledger:128;policy:materiality,development,1.0.0
+GLB-000059,SYN-V-058,431.90,USD,complete,PO-000059,Wire,user01,approver06,N,,0,normal,standard,ledger:59;policy:normal,development,1.0.0
+GLB-000251,SYN-V-031,21652.11,USD,complete,PO-000251,Corporate card,user03,approver03,N,,0,normal,standard,ledger:251;policy:normal,development,1.0.0
+GLB-000199,SYN-V-052,35212.33,USD,complete,PO-000199,Wire,user08,approver03,N,,0,normal,standard,ledger:199;policy:normal,development,1.0.0
+GLB-000385,SYN-V-019,117902.32,USD,complete,PO-000385,Manual journal,user04,approver07,N,,0,hard_negative,hard,ledger:385;policy:hard_negative,development,1.0.0
+GLB-000396,SYN-V-030,26673.32,USD,complete,PO-000396,ACH,user15,approver05,Y,,1,related_party,standard,ledger:396;policy:related_party,evaluation,1.0.0
+GLB-000529,SYN-V-017,120153.19,USD,complete,PO-000529,Manual journal,user15,approver08,N,,0,hard_negative,hard,ledger:529;policy:hard_negative,development,1.0.0
+GLB-000439,SYN-V-000,823.84,USD,complete,PO-000439,ACH,user01,approver09,N,,0,normal,standard,ledger:439;policy:normal,development,1.0.0
+GLB-000038,SYN-V-037,34680.71,USD,complete,PO-000038,ACH,user18,approver11,N,GLB-000037,1,duplicate,standard,ledger:38;policy:duplicate,development,1.0.0
+GLB-000575,SYN-V-063,15892.40,USD,complete,PO-000575,ACH,user04,approver02,N,,0,normal,standard,ledger:575;policy:normal,development,1.0.0
+GLB-000309,SYN-V-016,84627.97,USD,complete,PO-000309,Manual journal,user04,approver09,N,,0,hard_negative,hard,ledger:309;policy:hard_negative,development,1.0.0
+GLB-000462,SYN-V-023,907.44,USD,altered,PO-000462,Wire,user05,approver06,N,,1,hard_positive,hard,ledger:462;policy:hard_positive,evaluation,1.0.0
+GLB-000100,SYN-V-026,93475.13,USD,complete,PO-000100,Corporate card,user04,approver08,N,,1,materiality,standard,ledger:100;policy:materiality,development,1.0.0
+GLB-000063,SYN-V-062,4174.50,USD,complete,PO-000063,Corporate card,user05,approver10,N,,0,normal,standard,ledger:63;policy:normal,development,1.0.0
+GLB-000327,SYN-V-034,32695.33,USD,complete,PO-000327,Wire,user03,approver01,N,,0,normal,standard,ledger:327;policy:normal,development,1.0.0
+GLB-000129,SYN-V-055,140061.66,USD,complete,PO-000129,Manual journal,user14,approver11,N,,0,hard_negative,hard,ledger:129;policy:hard_negative,development,1.0.0
+GLB-000134,SYN-V-060,31521.18,USD,complete,PO-000134,Wire,user00,user00,N,,1,segregation_of_duties,standard,ledger:134;policy:segregation_of_duties,development,1.0.0
+GLB-000089,SYN-V-015,60796.53,USD,complete,PO-000089,Manual journal,user12,approver10,N,,0,hard_negative,hard,ledger:89;policy:hard_negative,evaluation,1.0.0
+GLB-000051,SYN-V-050,8083.64,USD,complete,PO-000051,Wire,user12,approver11,N,,0,normal,standard,ledger:51;policy:normal,development,1.0.0
+GLB-000245,SYN-V-025,77759.25,USD,complete,PO-000245,Manual journal,user16,approver10,N,,0,hard_negative,hard,ledger:245;policy:hard_negative,development,1.0.0
+GLB-000523,SYN-V-011,9873.98,USD,complete,PO-000523,ACH,user09,approver02,N,,0,normal,standard,ledger:523;policy:normal,evaluation,1.0.0
+GLB-000156,SYN-V-009,101237.98,USD,complete,PO-000156,Wire,user03,approver12,N,,1,materiality,standard,ledger:156;policy:materiality,evaluation,1.0.0
+GLB-000035,SYN-V-034,37763.61,USD,complete,PO-000035,ACH,user15,approver08,N,,0,normal,standard,ledger:35;policy:normal,development,1.0.0
+GLB-000137,SYN-V-063,95576.07,USD,complete,PO-000137,Manual journal,user03,approver06,N,,0,hard_negative,hard,ledger:137;policy:hard_negative,development,1.0.0
+GLB-000443,SYN-V-004,13984.46,USD,complete,PO-000443,Corporate card,user05,approver00,N,,0,normal,standard,ledger:443;policy:normal,development,1.0.0
+GLB-000145,SYN-V-071,174047.33,USD,complete,PO-000145,Manual journal,user11,approver01,N,,0,hard_negative,hard,ledger:145;policy:hard_negative,evaluation,1.0.0
+GLB-000174,SYN-V-027,13703.90,USD,missing_invoice,,Wire,user02,approver04,N,,1,document_gap,standard,ledger:174;policy:document_gap,development,1.0.0
+GLB-000221,SYN-V-001,142339.83,USD,complete,PO-000221,Manual journal,user11,approver12,N,,0,hard_negative,hard,ledger:221;policy:hard_negative,development,1.0.0
+GLB-000169,SYN-V-022,136600.30,USD,complete,PO-000169,Manual journal,user16,approver12,N,,0,hard_negative,hard,ledger:169;policy:hard_negative,development,1.0.0
+GLB-000197,SYN-V-050,175369.58,USD,complete,PO-000197,Manual journal,user06,approver01,N,,0,hard_negative,hard,ledger:197;policy:hard_negative,development,1.0.0
+GLB-000153,SYN-V-006,64874.29,USD,complete,PO-000153,Manual journal,user00,approver09,N,,0,hard_negative,hard,ledger:153;policy:hard_negative,development,1.0.0
+GLB-000116,SYN-V-042,1387.33,USD,complete,PO-000116,Wire,user01,approver11,Y,,1,related_party,standard,ledger:116;policy:related_party,development,1.0.0
+GLB-000136,SYN-V-062,31921.05,USD,complete,PO-000136,ACH,user02,approver05,N,GLB-000135,1,duplicate,standard,ledger:136;policy:duplicate,development,1.0.0
+GLB-000414,SYN-V-048,8156.50,USD,complete,PO-000414,ACH,user14,user14,N,,1,segregation_of_duties,standard,ledger:414;policy:segregation_of_duties,development,1.0.0
+GLB-000161,SYN-V-014,90293.13,USD,complete,PO-000161,Manual journal,user08,approver04,N,,0,hard_negative,hard,ledger:161;policy:hard_negative,development,1.0.0
+GLB-000092,SYN-V-018,40019.42,USD,complete,PO-000092,Corporate card,user15,user15,N,,1,segregation_of_duties,standard,ledger:92;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000306,SYN-V-013,47999.34,USD,complete,PO-000306,Corporate card,user01,approver06,N,,1,borderline,borderline,ledger:306;policy:borderline,development,1.0.0
+GLB-000054,SYN-V-053,48933.65,USD,complete,PO-000054,Wire,user15,approver01,N,,1,borderline,borderline,ledger:54;policy:borderline,development,1.0.0
+GLB-000536,SYN-V-024,18417.15,USD,complete,PO-000536,ACH,user03,approver02,Y,,1,related_party,standard,ledger:536;policy:related_party,development,1.0.0
+GLB-000587,SYN-V-002,10284.97,USD,complete,PO-000587,Corporate card,user16,approver01,N,,0,normal,standard,ledger:587;policy:normal,development,1.0.0
+GLB-000346,SYN-V-053,23220.80,USD,complete,PO-000346,Wire,user03,approver07,N,GLB-000345,1,duplicate,standard,ledger:346;policy:duplicate,development,1.0.0
+GLB-000104,SYN-V-030,23608.62,USD,missing_invoice,,ACH,user08,approver12,N,,1,document_gap,standard,ledger:104;policy:document_gap,development,1.0.0
+GLB-000184,SYN-V-037,68461.65,USD,complete,PO-000184,Wire,user12,approver01,N,,1,materiality,standard,ledger:184;policy:materiality,development,1.0.0
+GLB-000276,SYN-V-056,43385.69,USD,complete,PO-000276,ACH,user09,approver02,N,GLB-000275,1,duplicate,standard,ledger:276;policy:duplicate,development,1.0.0
+GLB-000501,SYN-V-062,79061.12,USD,complete,PO-000501,Manual journal,user06,approver06,N,,0,hard_negative,hard,ledger:501;policy:hard_negative,development,1.0.0
+GLB-000558,SYN-V-046,52277.48,USD,complete,PO-000558,ACH,user06,approver11,N,,1,borderline,borderline,ledger:558;policy:borderline,development,1.0.0
+GLB-000584,SYN-V-072,4644.57,USD,complete,PO-000584,ACH,user13,approver11,N,GLB-000583,1,duplicate,standard,ledger:584;policy:duplicate,evaluation,1.0.0
+GLB-000566,SYN-V-054,5173.38,USD,missing_invoice,,Corporate card,user14,approver06,N,,1,document_gap,standard,ledger:566;policy:document_gap,development,1.0.0
+GLB-000037,SYN-V-036,89810.05,USD,complete,PO-000037,Manual journal,user17,approver10,N,,0,hard_negative,hard,ledger:37;policy:hard_negative,development,1.0.0
+GLB-000402,SYN-V-036,1901.20,USD,complete,PO-000402,Wire,user02,approver11,N,GLB-000401,1,duplicate,standard,ledger:402;policy:duplicate,development,1.0.0
+GLB-000069,SYN-V-068,144184.26,USD,complete,PO-000069,Manual journal,user11,approver03,N,,0,hard_negative,hard,ledger:69;policy:hard_negative,development,1.0.0
+GLB-000408,SYN-V-042,136534.77,USD,complete,PO-000408,Wire,user08,approver04,N,,1,materiality,standard,ledger:408;policy:materiality,development,1.0.0
+GLB-000076,SYN-V-002,11549.19,USD,missing_invoice,,Corporate card,user18,approver10,N,,1,document_gap,standard,ledger:76;policy:document_gap,development,1.0.0
+GLB-000389,SYN-V-023,128852.85,USD,complete,PO-000389,Manual journal,user08,approver11,N,,0,hard_negative,hard,ledger:389;policy:hard_negative,evaluation,1.0.0
+GLB-000019,SYN-V-018,43692.49,USD,complete,PO-000019,Wire,user18,approver05,N,,0,normal,standard,ledger:19;policy:normal,development,1.0.0
+GLB-000229,SYN-V-009,179657.83,USD,complete,PO-000229,Manual journal,user00,approver07,N,,0,hard_negative,hard,ledger:229;policy:hard_negative,development,1.0.0
+GLB-000320,SYN-V-027,50496.06,USD,complete,PO-000320,Corporate card,user15,approver07,N,,1,borderline,borderline,ledger:320;policy:borderline,development,1.0.0
+GLB-000264,SYN-V-044,51843.77,USD,complete,PO-000264,ACH,user16,approver03,N,,1,borderline,borderline,ledger:264;policy:borderline,development,1.0.0
+GLB-000392,SYN-V-026,1271.16,USD,altered,PO-000392,ACH,user11,approver01,N,,1,hard_positive,hard,ledger:392;policy:hard_positive,development,1.0.0
+GLB-000304,SYN-V-011,31256.72,USD,complete,PO-000304,Corporate card,user18,approver04,N,GLB-000303,1,duplicate,standard,ledger:304;policy:duplicate,development,1.0.0
+GLB-000299,SYN-V-006,3728.67,USD,complete,PO-000299,Corporate card,user13,approver12,N,,0,normal,standard,ledger:299;policy:normal,development,1.0.0
+GLB-000277,SYN-V-057,118993.36,USD,complete,PO-000277,Manual journal,user10,approver03,N,,0,hard_negative,hard,ledger:277;policy:hard_negative,development,1.0.0
+GLB-000273,SYN-V-053,68722.11,USD,complete,PO-000273,Manual journal,user06,approver12,N,,0,hard_negative,hard,ledger:273;policy:hard_negative,development,1.0.0
+GLB-000559,SYN-V-047,20792.57,USD,complete,PO-000559,ACH,user07,approver12,N,,0,normal,standard,ledger:559;policy:normal,development,1.0.0
+GLB-000464,SYN-V-025,111235.32,USD,complete,PO-000464,ACH,user07,approver08,N,,1,materiality,standard,ledger:464;policy:materiality,development,1.0.0
+GLB-000547,SYN-V-035,7667.68,USD,complete,PO-000547,Wire,user14,approver00,N,,0,normal,standard,ledger:547;policy:normal,development,1.0.0
+GLB-000441,SYN-V-002,121210.91,USD,complete,PO-000441,Manual journal,user03,approver11,N,,0,hard_negative,hard,ledger:441;policy:hard_negative,development,1.0.0
+GLB-000576,SYN-V-064,97478.78,USD,complete,PO-000576,Wire,user05,approver03,N,,1,materiality,standard,ledger:576;policy:materiality,evaluation,1.0.0
+GLB-000561,SYN-V-049,143445.63,USD,complete,PO-000561,Manual journal,user09,approver01,N,,0,hard_negative,hard,ledger:561;policy:hard_negative,development,1.0.0
+GLB-000437,SYN-V-071,124817.62,USD,complete,PO-000437,Manual journal,user18,approver07,N,,0,hard_negative,hard,ledger:437;policy:hard_negative,development,1.0.0
+GLB-000398,SYN-V-032,35620.12,USD,missing_invoice,,ACH,user17,approver07,N,,1,document_gap,standard,ledger:398;policy:document_gap,development,1.0.0
+GLB-000549,SYN-V-037,83945.64,USD,complete,PO-000549,Manual journal,user16,approver02,N,,0,hard_negative,hard,ledger:549;policy:hard_negative,development,1.0.0
+GLB-000073,SYN-V-072,68738.58,USD,complete,PO-000073,Manual journal,user15,approver07,N,,0,hard_negative,hard,ledger:73;policy:hard_negative,evaluation,1.0.0
+GLB-000450,SYN-V-011,111457.88,USD,complete,PO-000450,ACH,user12,approver07,N,,1,materiality,standard,ledger:450;policy:materiality,development,1.0.0
+GLB-000271,SYN-V-051,25888.02,USD,complete,PO-000271,Corporate card,user04,approver10,N,,0,normal,standard,ledger:271;policy:normal,development,1.0.0
+GLB-000471,SYN-V-032,39628.74,USD,complete,PO-000471,Wire,user14,approver02,N,,0,normal,standard,ledger:471;policy:normal,development,1.0.0
+GLB-000498,SYN-V-059,25250.87,USD,complete,PO-000498,ACH,user03,user03,N,,1,segregation_of_duties,standard,ledger:498;policy:segregation_of_duties,development,1.0.0
+GLB-000101,SYN-V-027,176342.89,USD,complete,PO-000101,Manual journal,user05,approver09,N,,0,hard_negative,hard,ledger:101;policy:hard_negative,development,1.0.0
+GLB-000589,SYN-V-004,69778.24,USD,complete,PO-000589,Manual journal,user18,approver03,N,,0,hard_negative,hard,ledger:589;policy:hard_negative,development,1.0.0
+GLB-000056,SYN-V-055,742.86,USD,altered,PO-000056,Corporate card,user17,approver03,N,,1,hard_positive,hard,ledger:56;policy:hard_positive,evaluation,1.0.0
+GLB-000451,SYN-V-012,42741.88,USD,complete,PO-000451,Wire,user13,approver08,N,,0,normal,standard,ledger:451;policy:normal,development,1.0.0
+GLB-000386,SYN-V-020,22300.87,USD,complete,PO-000386,Wire,user05,user05,N,,1,segregation_of_duties,standard,ledger:386;policy:segregation_of_duties,evaluation,1.0.0
+GLB-000556,SYN-V-044,21809.05,USD,complete,PO-000556,ACH,user04,approver09,N,GLB-000555,1,duplicate,standard,ledger:556;policy:duplicate,evaluation,1.0.0
+GLB-000015,SYN-V-014,19568.13,USD,complete,PO-000015,Corporate card,user14,approver01,N,,0,normal,standard,ledger:15;policy:normal,development,1.0.0
+GLB-000525,SYN-V-013,86741.93,USD,complete,PO-000525,Manual journal,user11,approver04,N,,0,hard_negative,hard,ledger:525;policy:hard_negative,development,1.0.0
+GLB-000123,SYN-V-049,29945.58,USD,complete,PO-000123,Wire,user08,approver05,N,,0,normal,standard,ledger:123;policy:normal,development,1.0.0
+GLB-000570,SYN-V-058,12852.89,USD,complete,PO-000570,ACH,user18,approver10,N,GLB-000569,1,duplicate,standard,ledger:570;policy:duplicate,development,1.0.0
+GLB-000461,SYN-V-022,147894.19,USD,complete,PO-000461,Manual journal,user04,approver05,N,,0,hard_negative,hard,ledger:461;policy:hard_negative,development,1.0.0
+GLB-000409,SYN-V-043,64455.38,USD,complete,PO-000409,Manual journal,user09,approver05,N,,0,hard_negative,hard,ledger:409;policy:hard_negative,development,1.0.0
+GLB-000006,SYN-V-005,34836.87,USD,missing_invoice,,ACH,user05,approver05,N,,1,document_gap,standard,ledger:6;policy:document_gap,evaluation,1.0.0
+GLB-000564,SYN-V-052,3862.15,USD,complete,PO-000564,Wire,user12,approver04,Y,,1,related_party,standard,ledger:564;policy:related_party,development,1.0.0
+GLB-000241,SYN-V-021,173915.40,USD,complete,PO-000241,Manual journal,user12,approver06,N,,0,hard_negative,hard,ledger:241;policy:hard_negative,evaluation,1.0.0
+GLB-000373,SYN-V-007,84589.52,USD,complete,PO-000373,Manual journal,user11,approver08,N,,0,hard_negative,hard,ledger:373;policy:hard_negative,development,1.0.0
+GLB-000531,SYN-V-019,44320.31,USD,complete,PO-000531,Corporate card,user17,approver10,N,,0,normal,standard,ledger:531;policy:normal,development,1.0.0
+GLB-000382,SYN-V-016,23794.65,USD,complete,PO-000382,ACH,user01,approver04,Y,,1,related_party,standard,ledger:382;policy:related_party,evaluation,1.0.0
+GLB-000143,SYN-V-069,32323.06,USD,complete,PO-000143,ACH,user09,approver12,N,,0,normal,standard,ledger:143;policy:normal,development,1.0.0
+GLB-000189,SYN-V-042,152543.09,USD,complete,PO-000189,Manual journal,user17,approver06,N,,0,hard_negative,hard,ledger:189;policy:hard_negative,development,1.0.0
+GLB-000071,SYN-V-070,41185.95,USD,complete,PO-000071,Corporate card,user13,approver05,N,,0,normal,standard,ledger:71;policy:normal,development,1.0.0
+GLB-000226,SYN-V-006,83005.87,USD,complete,PO-000226,ACH,user16,approver04,N,,1,materiality,standard,ledger:226;policy:materiality,development,1.0.0
+GLB-000239,SYN-V-019,35518.96,USD,complete,PO-000239,Wire,user10,approver04,N,,0,normal,standard,ledger:239;policy:normal,development,1.0.0
+GLB-000517,SYN-V-005,159477.98,USD,complete,PO-000517,Manual journal,user03,approver09,N,,0,hard_negative,hard,ledger:517;policy:hard_negative,development,1.0.0
+GLB-000093,SYN-V-019,121251.78,USD,complete,PO-000093,Manual journal,user16,approver01,N,,0,hard_negative,hard,ledger:93;policy:hard_negative,development,1.0.0
+GLB-000585,SYN-V-000,142763.42,USD,complete,PO-000585,Manual journal,user14,approver12,N,,0,hard_negative,hard,ledger:585;policy:hard_negative,evaluation,1.0.0
+GLB-000355,SYN-V-062,28943.24,USD,complete,PO-000355,Wire,user12,approver03,N,,0,normal,standard,ledger:355;policy:normal,development,1.0.0
+GLB-000401,SYN-V-035,167446.90,USD,complete,PO-000401,Manual journal,user01,approver10,N,,0,hard_negative,hard,ledger:401;policy:hard_negative,development,1.0.0
+GLB-000065,SYN-V-064,156691.61,USD,complete,PO-000065,Manual journal,user07,approver12,N,,0,hard_negative,hard,ledger:65;policy:hard_negative,evaluation,1.0.0
+GLB-000014,SYN-V-013,1886.69,USD,altered,PO-000014,Corporate card,user13,approver00,N,,1,hard_positive,hard,ledger:14;policy:hard_positive,development,1.0.0
+GLB-000445,SYN-V-006,135998.05,USD,complete,PO-000445,Manual journal,user07,approver02,N,,0,hard_negative,hard,ledger:445;policy:hard_negative,evaluation,1.0.0
+GLB-000335,SYN-V-042,6441.49,USD,complete,PO-000335,Wire,user11,approver09,N,,0,normal,standard,ledger:335;policy:normal,evaluation,1.0.0
+GLB-000362,SYN-V-069,52309.13,USD,complete,PO-000362,ACH,user00,approver10,N,,1,borderline,borderline,ledger:362;policy:borderline,evaluation,1.0.0
+GLB-000140,SYN-V-066,638.45,USD,altered,PO-000140,Wire,user06,approver09,N,,1,hard_positive,hard,ledger:140;policy:hard_positive,development,1.0.0
+GLB-000416,SYN-V-050,44512.98,USD,complete,PO-000416,Wire,user16,approver12,N,GLB-000415,1,duplicate,standard,ledger:416;policy:duplicate,development,1.0.0
+GLB-000021,SYN-V-020,72447.16,USD,complete,PO-000021,Manual journal,user01,approver07,N,,0,hard_negative,hard,ledger:21;policy:hard_negative,evaluation,1.0.0
+GLB-000363,SYN-V-070,10754.31,USD,complete,PO-000363,ACH,user01,approver11,N,,0,normal,standard,ledger:363;policy:normal,development,1.0.0
+GLB-000578,SYN-V-066,18638.52,USD,complete,PO-000578,Wire,user07,approver05,Y,,1,related_party,standard,ledger:578;policy:related_party,development,1.0.0
+GLB-000341,SYN-V-048,75565.34,USD,complete,PO-000341,Manual journal,user17,approver02,N,,0,hard_negative,hard,ledger:341;policy:hard_negative,development,1.0.0
+GLB-000540,SYN-V-028,12484.41,USD,complete,PO-000540,Wire,user07,user07,N,,1,segregation_of_duties,standard,ledger:540;policy:segregation_of_duties,development,1.0.0
+GLB-000179,SYN-V-032,29180.59,USD,complete,PO-000179,ACH,user07,approver09,N,,0,normal,standard,ledger:179;policy:normal,development,1.0.0
+GLB-000095,SYN-V-021,17449.25,USD,complete,PO-000095,Corporate card,user18,approver03,N,,0,normal,standard,ledger:95;policy:normal,evaluation,1.0.0
+GLB-000031,SYN-V-030,30633.65,USD,complete,PO-000031,Wire,user11,approver04,N,,0,normal,standard,ledger:31;policy:normal,development,1.0.0
+GLB-000257,SYN-V-037,68635.19,USD,complete,PO-000257,Manual journal,user09,approver09,N,,0,hard_negative,hard,ledger:257;policy:hard_negative,development,1.0.0
+GLB-000595,SYN-V-010,42045.67,USD,complete,PO-000595,Corporate card,user05,approver09,N,,0,normal,standard,ledger:595;policy:normal,evaluation,1.0.0
+GLB-000393,SYN-V-027,123307.62,USD,complete,PO-000393,Manual journal,user12,approver02,N,,0,hard_negative,hard,ledger:393;policy:hard_negative,development,1.0.0
+GLB-000301,SYN-V-008,152596.61,USD,complete,PO-000301,Manual journal,user15,approver01,N,,0,hard_negative,hard,ledger:301;policy:hard_negative,evaluation,1.0.0
+GLB-000572,SYN-V-060,50437.08,USD,complete,PO-000572,ACH,user01,approver12,N,,1,borderline,borderline,ledger:572;policy:borderline,development,1.0.0
+GLB-000294,SYN-V-001,1648.21,USD,altered,PO-000294,ACH,user08,approver07,N,,1,hard_positive,hard,ledger:294;policy:hard_positive,development,1.0.0
+GLB-000524,SYN-V-012,21711.90,USD,missing_invoice,,ACH,user10,approver03,N,,1,document_gap,standard,ledger:524;policy:document_gap,development,1.0.0
+GLB-000247,SYN-V-027,4462.51,USD,complete,PO-000247,ACH,user18,approver12,N,,0,normal,standard,ledger:247;policy:normal,development,1.0.0
+GLB-000379,SYN-V-013,13864.19,USD,complete,PO-000379,ACH,user17,approver01,N,,0,normal,standard,ledger:379;policy:normal,development,1.0.0
+GLB-000599,SYN-V-014,37017.48,USD,complete,PO-000599,Corporate card,user09,approver00,N,,0,normal,standard,ledger:599;policy:normal,development,1.0.0
+GLB-000383,SYN-V-017,29709.73,USD,complete,PO-000383,ACH,user02,approver05,N,,0,normal,standard,ledger:383;policy:normal,evaluation,1.0.0
+GLB-000012,SYN-V-011,47701.48,USD,complete,PO-000012,ACH,user11,approver11,N,,1,borderline,borderline,ledger:12;policy:borderline,development,1.0.0

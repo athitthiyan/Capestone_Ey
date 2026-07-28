@@ -1,0 +1,1 @@
+{"method":"rule_baseline","provider":"none","model":"deterministic-rules-v1","temperature":0.0,"max_tokens":1,"retrieval_enabled":false,"challenger_enabled":false,"defender_enabled":false,"verifier_enabled":false,"debate_rounds":0,"confidence_threshold":0.5,"prompt_version":"rules-v1","dataset_version":"1.0.0","split_seed":20260728,"timeout_seconds":5,"retries":0}

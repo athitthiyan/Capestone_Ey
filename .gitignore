@@ -7,6 +7,14 @@ load-tests/reports/*.json
 
 # Local SQLite journal files
 *.db-journal
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+Backend/experiments/runs/*
+!Backend/experiments/runs/.gitkeep
 
 # Local pnpm cache/store noise. Existing tracked files remain tracked.
 .pnpm-store/

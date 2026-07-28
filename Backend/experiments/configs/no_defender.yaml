@@ -1,0 +1,1 @@
+{"method":"no_defender","provider":"environment","model":"configured-routing","temperature":0.0,"max_tokens":4000,"retrieval_enabled":true,"challenger_enabled":true,"defender_enabled":false,"verifier_enabled":true,"debate_rounds":0,"confidence_threshold":0.5,"prompt_version":"crew-v1","dataset_version":"1.0.0","split_seed":20260728,"timeout_seconds":180,"retries":1}

@@ -1,0 +1,4 @@
+Assess whether every conclusion claim is supported by supplied evidence. Do not use or request
+the classification ground-truth label. Return score 0.0 (unsupported/contradicted), 0.5
+(partially supported), or 1.0 (fully supported), plus concise auditable reasoning. This is a
+model-assisted judgment requiring human review.

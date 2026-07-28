@@ -1,0 +1,3 @@
+Assess whether each cited source directly supports its associated claim. Do not use or request
+the classification ground-truth label. Return score 0.0 (incorrect), 0.5 (partial), or 1.0
+(direct and sufficient), plus concise auditable reasoning. Require human review.
