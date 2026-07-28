@@ -1,0 +1,79 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve image names
+        id: images
+        run: |
+          REPOSITORY_LC="${GITHUB_REPOSITORY,,}"
+          echo "backend_image=${REGISTRY}/${REPOSITORY_LC}-backend:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "ui_image=${REGISTRY}/${REPOSITORY_LC}-ui:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify published images
+        env:
+          GHCR_DEPLOY_USER: ${{ secrets.GHCR_DEPLOY_USER || github.actor }}
+          GHCR_DEPLOY_TOKEN: ${{ secrets.GHCR_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
+          BACKEND_IMAGE: ${{ steps.images.outputs.backend_image }}
+          UI_IMAGE: ${{ steps.images.outputs.ui_image }}
+        run: |
+          echo "$GHCR_DEPLOY_TOKEN" | docker login ghcr.io -u "$GHCR_DEPLOY_USER" --password-stdin
+          docker manifest inspect "$BACKEND_IMAGE" > /dev/null
+          docker manifest inspect "$UI_IMAGE" > /dev/null
+
+      - name: Prepare SSH
+        env:
+          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          PROD_HOST: ${{ secrets.PROD_HOST }}
+          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
+        run: |
+          test -n "$PROD_SSH_KEY"
+          test -n "$PROD_HOST"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/prod_key
+          chmod 600 ~/.ssh/prod_key
+          ssh-keyscan -p "$PROD_PORT" "$PROD_HOST" >> ~/.ssh/known_hosts
+
+      - name: Copy production compose file
+        env:
+          PROD_USER: ${{ secrets.PROD_USER }}
+          PROD_HOST: ${{ secrets.PROD_HOST }}
+          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
+          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
+        run: |
+          ssh -i ~/.ssh/prod_key -p "$PROD_PORT" "$PROD_USER@$PROD_HOST" "mkdir -p $PROD_DEPLOY_PATH"
+          scp -i ~/.ssh/prod_key -P "$PROD_PORT" docker-compose.production.yml "$PROD_USER@$PROD_HOST:$PROD_DEPLOY_PATH/docker-compose.production.yml"
+
+      - name: Pull images, migrate, and restart
+        env:
+          PROD_USER: ${{ secrets.PROD_USER }}
+          PROD_HOST: ${{ secrets.PROD_HOST }}
+          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
+          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
+          GHCR_DEPLOY_USER: ${{ secrets.GHCR_DEPLOY_USER || github.actor }}
+          GHCR_DEPLOY_TOKEN: ${{ secrets.GHCR_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
+          BACKEND_IMAGE: ${{ steps.images.outputs.backend_image }}
+          UI_IMAGE: ${{ steps.images.outputs.ui_image }}
+        run: |
+          ssh -i ~/.ssh/prod_key -p "$PROD_PORT" "$PROD_USER@$PROD_HOST" \
+            "cd $PROD_DEPLOY_PATH \
+            && echo '$GHCR_DEPLOY_TOKEN' | docker login ghcr.io -u '$GHCR_DEPLOY_USER' --password-stdin \
+            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml pull \
+            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml run --rm migrate \
+            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml up -d --remove-orphans"

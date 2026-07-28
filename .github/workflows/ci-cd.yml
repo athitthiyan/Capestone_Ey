@@ -66,7 +66,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install research test dependencies
-        run: python -m pip install pytest==8.3.4
+        run: python -m pip install pytest==8.3.4 pytest-asyncio==0.25.0
       - name: Generate benchmark and credential-free experiment
         run: |
           python scripts/generate_benchmark_dataset.py
@@ -76,7 +76,9 @@ jobs:
       - name: Validate research artifacts
         run: python scripts/check_research_artifacts.py
       - name: Run research pipeline tests
-        run: python -m pytest tests/test_research_pipeline.py -q
+        # These tests are deliberately dependency-light. Do not load the
+        # backend-wide conftest, which imports FastAPI and database fixtures.
+        run: python -m pytest --noconftest tests/test_research_pipeline.py -q
 
   security:
     name: Secret scan
@@ -88,24 +90,6 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  docker-validation:
-    name: Docker build validation (PR only)
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
-        with:
-          context: Backend
-          file: Backend/Dockerfile
-          push: false
-      - uses: docker/build-push-action@v6
-        with:
-          context: UI
-          file: UI/Dockerfile
-          push: false
 
   frontend:
     name: Frontend checks
@@ -143,12 +127,11 @@ jobs:
         run: pnpm build
 
   docker:
-    name: Build and publish images
+    name: Build and publish/validate images
     runs-on: ubuntu-latest
     needs: [backend, frontend, research, security]
     if: >-
       always() &&
-      github.event_name != 'pull_request' &&
       needs.backend.result == 'success' &&
       needs.frontend.result == 'success' &&
       needs.research.result == 'success' &&
@@ -173,30 +156,31 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push backend image
+      - name: Build backend image
         uses: docker/build-push-action@v6
         with:
           context: Backend
           file: Backend/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ steps.images.outputs.backend_image }}
             ${{ steps.images.outputs.backend_latest }}
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
-      - name: Build and push UI image
+      - name: Build UI image
         uses: docker/build-push-action@v6
         with:
           context: UI
           file: UI/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=${{ env.NEXT_PUBLIC_API_BASE_URL }}
             NEXT_PUBLIC_API_TOKEN=${{ secrets.NEXT_PUBLIC_API_TOKEN }}
@@ -207,54 +191,3 @@ jobs:
             ${{ steps.images.outputs.ui_latest }}
           cache-from: type=gha,scope=ui
           cache-to: type=gha,mode=max,scope=ui
-
-  deploy-production:
-    name: Deploy production
-    runs-on: ubuntu-latest
-    needs: docker
-    if: github.event_name == 'workflow_dispatch'
-    environment: production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Prepare SSH
-        env:
-          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
-        run: |
-          test -n "$PROD_SSH_KEY"
-          test -n "$PROD_HOST"
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/prod_key
-          chmod 600 ~/.ssh/prod_key
-          ssh-keyscan -p "$PROD_PORT" "$PROD_HOST" >> ~/.ssh/known_hosts
-
-      - name: Copy production compose file
-        env:
-          PROD_USER: ${{ secrets.PROD_USER }}
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
-          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
-        run: |
-          ssh -i ~/.ssh/prod_key -p "$PROD_PORT" "$PROD_USER@$PROD_HOST" "mkdir -p $PROD_DEPLOY_PATH"
-          scp -i ~/.ssh/prod_key -P "$PROD_PORT" docker-compose.production.yml "$PROD_USER@$PROD_HOST:$PROD_DEPLOY_PATH/docker-compose.production.yml"
-
-      - name: Pull images, migrate, and restart
-        env:
-          PROD_USER: ${{ secrets.PROD_USER }}
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_PORT: ${{ secrets.PROD_PORT || '22' }}
-          PROD_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH || '~/gl-guardian' }}
-          GHCR_DEPLOY_USER: ${{ secrets.GHCR_DEPLOY_USER || github.actor }}
-          GHCR_DEPLOY_TOKEN: ${{ secrets.GHCR_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
-          BACKEND_IMAGE: ${{ needs.docker.outputs.backend_image }}
-          UI_IMAGE: ${{ needs.docker.outputs.ui_image }}
-        run: |
-          ssh -i ~/.ssh/prod_key -p "$PROD_PORT" "$PROD_USER@$PROD_HOST" \
-            "cd $PROD_DEPLOY_PATH \
-            && echo '$GHCR_DEPLOY_TOKEN' | docker login ghcr.io -u '$GHCR_DEPLOY_USER' --password-stdin \
-            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml pull \
-            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml run --rm migrate \
-            && BACKEND_IMAGE='$BACKEND_IMAGE' UI_IMAGE='$UI_IMAGE' docker compose --env-file .env.production -f docker-compose.production.yml up -d --remove-orphans"
