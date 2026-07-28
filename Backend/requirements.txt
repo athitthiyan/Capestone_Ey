@@ -1,5 +1,6 @@
 # Core FastAPI & Web
 fastapi==0.115.6
+anyio==4.6.2.post1
 uvicorn[standard]==0.34.0
 python-multipart==0.0.18
 python-dotenv==1.0.1
@@ -27,6 +28,7 @@ flower==2.0.1
 langgraph==0.2.60
 langchain==0.3.25
 langchain-core==0.3.63
+langchain-community==0.3.24
 langchain-anthropic==0.3.1
 anthropic==0.42.0
 
@@ -58,3 +60,4 @@ langsmith==0.2.10
 # Utils
 tenacity==9.0.0
 requests==2.32.3
+packaging==24.2

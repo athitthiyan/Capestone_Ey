@@ -33,6 +33,8 @@ class ExperimentConfig:
 
 def load_config(path: Path) -> ExperimentConfig:
     # JSON is valid YAML 1.2 and avoids a runtime PyYAML dependency.
-    config = ExperimentConfig(**json.loads(path.read_text(encoding="utf-8")))
+    # Keys prefixed with "_" are documentation notes and are not part of the frozen config.
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    config = ExperimentConfig(**{k: v for k, v in raw.items() if not k.startswith("_")})
     config.validate()
     return config

@@ -101,55 +101,112 @@ The six preregistered hypotheses test specificity, the Verifier, RAG, debate cos
 difficult-case performance, and calibration. Variables, tests, acceptance criteria, and
 confounders are defined in [the research protocol](Docs/RESEARCH_PROTOCOL.md).
 
-### Dataset and split
+### Two benchmarks, and why both
 
-Benchmark v1 contains 600 generated transactions: 300 positive and 300 negative synthetic
-audit-risk labels, including normal, hard-negative, hard-positive, borderline, materiality,
-related-party, document-gap, segregation-of-duty, and duplicate cases. Seed `20260728` produces
-484 development and 116 frozen evaluation rows (56 positive, 60 negative), with SHA-256
-`b9c5db808d6c4b8c8d8c144d0e34f00c67e0c35c10eb401e707ed3ac863908f0`.
-Research-only labels, categories, difficulty, and split are excluded from method inputs. See the
-[data card](Backend/datasets/DATA_CARD.md). These labels are not confirmed real-world fraud.
+| | `uci_audit_v1` | `gl_synthetic_v1` |
+|---|---|---|
+| Labels | **Real** post-audit findings | Generator ground truth |
+| Source | [UCI Audit Data, dataset 475](https://archive.ics.uci.edu/dataset/475/audit+data) — 776 firms examined by a government external-audit office | Generated corpus |
+| Held-out cases | **346** (146 positive / 200 negative) | 116 (56 / 60) |
+| Role | Primary. External validity on real labels. | Secondary. Control conditions the real data cannot express — explicit duplicate pairs, segregation-of-duty breaches, document gaps. |
 
-### Measured results
+The real benchmark is the primary one because it has a property that makes the research
+question sharp. The archive records each firm at two stages: the **pre-audit screen** and the
+**post-audit finding**. The screen's flags are strictly nested inside the findings — no firm the
+audit found risky was missed by the screen — so on the held-out split the incumbent screen has
+**recall 1.000 and specificity 0.670**, and 66 firms were flagged and then cleared by a human
+auditor. Those 66 are real hard negatives, and the operational question is exactly:
 
-| Method | Accuracy | Precision | Recall | Specificity | F1 | Balanced accuracy | Groundedness | Citation correctness |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Rule baseline | 0.7155 | 0.6386 | 0.9464 | 0.5000 | 0.7626 | 0.7232 | Not run | Not run |
-| Single LLM | Not run | Not run | Not run | Not run | Not run | Not run | Not run | Not run |
-| Full multi-agent | Not run | Not run | Not run | Not run | Not run | Not run | Not run | Not run |
+> can adversarial reasoning clear more of them without losing a single true positive?
 
-The executed rule confusion matrix is `TP=53, FP=30, FN=3, TN=30`; MCC is 0.4945, ROC-AUC
-0.7232, PR-AUC 0.9811, Brier score 0.1959, and ECE 0.0534. The unusually high PR-AUC reflects
-scenario-generated confidence ordering and must not be generalized to real audit data. Generated
-results, bootstrap uncertainty, category slices, calibration data, failures, and the reproducible
-SVG are under [`Backend/experiments/results`](Backend/experiments/results/RESEARCH_REPORT.md).
+Leakage control matters here and is enforced in code. `Risk` is a threshold on `Audit_Risk`,
+which is computed from the audit office's own scoring intermediates, so all 16 of those columns
+are dropped; the build asserts their presence in the archive and fails loudly if a future
+revision adds another. See the [real-data card](Backend/datasets/DATA_CARD_UCI_AUDIT.md) and the
+[synthetic data card](Backend/datasets/DATA_CARD.md). Labels, category, difficulty and split are
+excluded from model input by construction — `BenchmarkCase.model_view()` is the only path a
+runner has to a case, and a test asserts the label cannot appear in a rendered prompt.
 
-### Agentic evaluation, groundedness, and citations
+### Measured results — `uci_audit_v1` (real labels, 346 held-out cases)
 
-Frozen configurations cover rules, single LLM, full crew, no Challenger, no Verifier, no RAG,
-no Defender, no evidence retrieval, and one/two debate rounds. Dry-run validation does not create
-research metrics. Live agentic results remain Not run because credentials and complete normalized
-outputs are unavailable. Human annotation and agreement are also Not run. Operational dashboard
-proxies are not benchmark truth.
+| Method | Accuracy [95% CI] | Precision | Recall | Specificity [95% CI] | F1 | MCC |
+|---|---|---:|---:|---|---:|---:|
+| `rule_baseline` (incumbent screen) | 0.809 [0.769, 0.850] | 0.689 | **1.000** | 0.670 [0.604, 0.735] | 0.816 | 0.679 |
+| `logistic_reference` *(supervised ceiling)* | 0.962 [0.942, 0.983] | 0.946 | 0.966 | 0.960 [0.930, 0.985] | 0.956 | 0.923 |
+| `tree_reference` *(supervised ceiling)* | 0.957 [0.934, 0.977] | 0.971 | 0.925 | 0.980 [0.959, 0.995] | 0.947 | 0.911 |
+| `single_llm` | Not run | Not run | Not run | Not run | Not run | Not run |
+| `full_multi_agent` | Not run | Not run | Not run | Not run | Not run | Not run |
+| ablations (`no_challenger`, `no_defender`, `no_verifier`, `no_rag`, `one_debate_round`) | Not run | | | | | |
 
-### Ablations and failure cases
+Read the two reference rows carefully: they are **fitted on the development split** and see
+labels the LLM conditions never do. They are not competitors — they are a ceiling that says how
+much signal the nine recorded fields contain at all, and they are reported precisely so this
+project cannot claim credit for reasoning where a logistic regression on six numbers already
+suffices. The honest headline is that on this dataset the tabular ceiling is high (0.962), so the
+interesting margin for an agent system is not raw accuracy but **specificity on the 66 real hard
+negatives, evidential groundedness, and cost per case**.
 
-The generated failure report contains 33 rule errors: 30 false positives and 3 false negatives.
-Hard negatives expose the cost of naïvely flagging legitimate high-value/manual journals;
-borderline cases account for the missed positives. No ablation result is claimed.
+The incumbent screen's confusion matrix is `TP=146, FP=66, FN=0, TN=134`. Its F1 of 0.816 is
+*not* evidence that it works well — it never misses, and pays for that with 66 false positives.
+Both supervised references beat it at Holm-corrected p < 1e-9 (exact McNemar, family of 2).
+
+Intervals are percentile bootstrap over 2,000 case-level resamples; resampling whole cases keeps
+label, prediction and score aligned. Generated artifacts — per-category and per-difficulty
+slices, calibration, paired tests, every failure case — are under
+[`Backend/experiments/results/uci_audit_v1/`](Backend/experiments/results/uci_audit_v1/RESULTS.md)
+and are regenerated, never hand-edited.
+
+### What is still Not run, and why
+
+The LLM and multi-agent conditions have no results because **no valid provider credential is
+present in this checkout**. Everything needed to produce them exists and is tested: live
+Anthropic and OpenAI adapters, the debate orchestration with real role toggles, a cost guard, a
+content-addressed response cache, and a runner that records a parse failure as an error row
+rather than guessing a prediction. One command fills the table:
+
+```bash
+cd Backend
+export ANTHROPIC_API_KEY=...            # or set it in Backend/.env
+python scripts/run_experiment_matrix.py --benchmark uci_audit_v1 --all --max-cost-usd 25
+python scripts/score_evidence_quality.py --benchmark uci_audit_v1 --max-cost-usd 5
+python scripts/analyze_results.py --benchmark uci_audit_v1
+```
+
+A dry run prices the full matrix at **$22.84** on `claude-haiku-4-5` (346 cases × 10 conditions,
+9,096 model calls). Nothing is imputed in the meantime: unrun conditions read `Not run`, and a
+run that covers only part of the held-out set is reported as `incomplete` and refused a score, so
+no method can improve its numbers by dropping the cases it found hard.
+
+### Evidence quality and label adjudication
+
+Groundedness and citation correctness are scored by **two independent judges on different
+models**, label-blind and method-blind, against a three-point rubric. Agreement is reported as
+percentage agreement and quadratic-weighted Cohen's kappa; items where the judges differ by more
+than one rubric step are written to `adjudication_queue.csv` for a human decision rather than
+averaged away.
+
+For the synthetic benchmark, `scripts/adjudicate_labels.py` produces a second, independent label
+track: two models re-annotate every evaluation case under the written rubric without seeing the
+existing label, and the gap between generator labels and independent judgement is itself a
+reported number. On the real benchmark the same script measures auditor–model agreement but
+never overrides the real findings.
 
 ### Reproduce
 
 ```bash
 cd Backend
-python scripts/generate_benchmark_dataset.py
-python scripts/run_all_experiments.py --dry-run
-python scripts/run_rule_baseline.py
-python scripts/generate_research_report.py
-python scripts/check_research_artifacts.py
-python -m pytest tests/test_research_pipeline.py -q
+python scripts/build_uci_audit_benchmark.py --verify-only   # committed data == fresh build
+python scripts/build_gl_evidence_corpus.py --verify-only
+python scripts/run_experiment_matrix.py --benchmark uci_audit_v1 --dry-run
+python scripts/run_experiment_matrix.py --benchmark uci_audit_v1 \
+    --methods rule_baseline logistic_reference tree_reference
+python scripts/analyze_results.py --benchmark uci_audit_v1
+python -m pytest tests/test_experiment_pipeline.py -q                # 85 tests
 ```
+
+The raw UCI archive is vendored at `Backend/datasets/raw/` with its SHA-256 pinned, so the
+benchmark rebuilds byte-identically with no network access. The split is content-addressed —
+`sha256(salt + case_id)`, no RNG state — so it is the same on any checkout.
 
 Do not hand-edit generated results or infer missing values. See
 [reproduction instructions](Docs/EXPERIMENT_REPRODUCTION.md),

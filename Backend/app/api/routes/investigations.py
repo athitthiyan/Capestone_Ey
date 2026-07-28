@@ -74,14 +74,14 @@ async def _run_investigation_inline(investigation_id: str) -> None:
     try:
         result = await InvestigationExecutor(db).execute_investigation(investigation_id)
         if isinstance(result, dict) and result.get("status") != "failed":
-            _score_investigation_ragas_inline(investigation_id)
+            await _score_investigation_ragas_inline(investigation_id)
     except Exception as exc:  # noqa: BLE001
         logger.error(f"Inline investigation {investigation_id} failed: {exc}", exc_info=True)
     finally:
         db.close()
 
 
-def _score_investigation_ragas_inline(investigation_id: str) -> None:
+async def _score_investigation_ragas_inline(investigation_id: str) -> None:
     """Run RAGAS scoring synchronously (no broker) — mirrors the Celery hook in
     celery_app.execute_investigation_task for environments with no Redis/Celery.
     Never allowed to affect the investigation pipeline's own success/failure.
@@ -92,7 +92,7 @@ def _score_investigation_ragas_inline(investigation_id: str) -> None:
         # .run() executes the task body directly in-process, bypassing the
         # broker entirely - appropriate here since this whole path only
         # exists because no broker is available.
-        score_investigation_ragas_task.run(investigation_id)
+        await asyncio.to_thread(score_investigation_ragas_task.run, investigation_id)
     except Exception as exc:  # noqa: BLE001
         logger.warning(f"Inline RAGAS scoring failed for {investigation_id}: {exc}")
 

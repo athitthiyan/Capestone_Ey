@@ -1,0 +1,117 @@
+{
+  "artifacts": {
+    "csv_sha256": "3b2881fe3d85eab1d7da394c9ed10f05c0ffcf6c1ce2630e63b0b2caef80e6cb",
+    "evidence_documents": 5432,
+    "evidence_sha256": "d9e766cfabdbaae735e32966cf88a1195091ddbb8f66abdd0b93761c3891e22a"
+  },
+  "builder_version": "1.0.0",
+  "dataset_version": "uci-audit-v1",
+  "difficulty_thresholds": {
+    "para_a_high": 2.05,
+    "para_a_low": 0.71
+  },
+  "distributions": {
+    "difficulty": {
+      "borderline": 114,
+      "easy": 247,
+      "hard": 181,
+      "standard": 234
+    },
+    "evaluation_difficulty": {
+      "borderline": 47,
+      "easy": 115,
+      "hard": 66,
+      "standard": 118
+    },
+    "evaluation_risk_category": {
+      "cleared_after_flag": 66,
+      "historical_record": 19,
+      "misstatement_value": 50,
+      "not_flagged": 134,
+      "planned_para_discrepancy": 10,
+      "unplanned_para_discrepancy": 67
+    },
+    "risk_category": {
+      "cleared_after_flag": 181,
+      "historical_record": 49,
+      "misstatement_value": 112,
+      "not_flagged": 290,
+      "planned_para_discrepancy": 28,
+      "unplanned_para_discrepancy": 116
+    }
+  },
+  "imputation": {
+    "affected_ids": [
+      "UCIA-0642"
+    ],
+    "column": "money_value_cr",
+    "strategy": "median of observed values",
+    "value": 0.09
+  },
+  "leakage_control": {
+    "dropped_columns": [
+      "Audit_Risk",
+      "CONTROL_RISK",
+      "Detection_Risk",
+      "Inherent_Risk",
+      "PROB",
+      "Prob",
+      "RiSk_E",
+      "Risk_A",
+      "Risk_B",
+      "Risk_C",
+      "Risk_D",
+      "Risk_F",
+      "Score",
+      "Score_A",
+      "Score_B",
+      "Score_MV"
+    ],
+    "reason": "Risk is a threshold on Audit_Risk, which is computed from these columns; retaining any of them would leak the label.",
+    "retained_evidence_columns": [
+      "Sector_score",
+      "LOCATION_ID",
+      "PARA_A",
+      "PARA_B",
+      "TOTAL",
+      "numbers",
+      "Money_Value",
+      "District_Loss",
+      "History"
+    ]
+  },
+  "provenance": {
+    "archive_sha256": "4d9f4dc4c398995505c88a903ce0b5e5c70516e5bcd6b3ba03c8f7a8db57a142",
+    "citation": "Hooda, N., Bawa, S., & Rana, P. S. (2018). Fraudulent Firm Classification: A Case Study of an External Audit. Applied Artificial Intelligence, 32(1), 48-64.",
+    "label_column": "audit_risk.csv:Risk",
+    "labels": "real post-audit findings recorded by a government external-audit office",
+    "licence": "CC BY 4.0",
+    "name": "UCI Audit Data (dataset 475)",
+    "screen_column": "trial.csv:Risk",
+    "url": "https://archive.ics.uci.edu/dataset/475/audit+data"
+  },
+  "records": {
+    "development": 430,
+    "development_negative": 271,
+    "development_positive": 159,
+    "evaluation": 346,
+    "evaluation_flagged_by_screen": 212,
+    "evaluation_hard_negatives": 66,
+    "evaluation_negative": 200,
+    "evaluation_positive": 146,
+    "total": 776
+  },
+  "reference_baselines": {
+    "prior_screen_on_full_set": {
+      "note": "The deployed screen never misses a positive but clears only part of the negatives; improving specificity without losing recall is the operational target.",
+      "recall": 1.0,
+      "specificity": 0.615711
+    }
+  },
+  "split": {
+    "evaluation_fraction_target": 0.45,
+    "method": "sha256(salt + transaction_id) bucketed, content-addressed",
+    "rng_used": false,
+    "salt": "skeptic-engine-uci-audit-v1"
+  }
+}

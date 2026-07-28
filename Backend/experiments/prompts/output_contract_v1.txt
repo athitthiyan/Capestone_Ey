@@ -1,0 +1,15 @@
+Respond with a single JSON object and nothing else. Schema:
+
+{
+  "prediction": 0 or 1,
+  "confidence": number in [0, 1],
+  "explanation": "two to four sentences justifying the verdict",
+  "citations": ["evidence_id", ...]
+}
+
+Rules for the response:
+- "prediction" is 1 when the case should be escalated as a fraud-risk finding, 0 when it should be cleared.
+- "confidence" is your probability that the true label is 1. Use the full range; do not default to 0.5.
+- Every factual claim in "explanation" must be supported by an evidence document you cite.
+- "citations" may only contain evidence IDs from the EVIDENCE block. Never invent an ID.
+- If the evidence is insufficient, say so in "explanation", lower "confidence", and still commit to a prediction.

@@ -44,7 +44,12 @@ def classification_metrics(labels: list[int], predictions: list[int], scores: li
     fn = sum(y == 1 and p == 0 for y, p in zip(labels, predictions))
     precision, recall = _safe(tp, tp + fp), _safe(tp, tp + fn)
     specificity = _safe(tn, tn + fp)
-    f1 = _safe(2 * (precision or 0) * (recall or 0), (precision or 0) + (recall or 0))
+    # F1 from the confusion matrix directly. Deriving it from precision and recall makes
+    # it undefined whenever a method predicts no positives, which is exactly the
+    # degenerate case the evaluation needs to score rather than skip: a method that
+    # never escalates has F1 0, not "unknown". It is undefined only when the slice
+    # contains no positive labels and no positive predictions at all.
+    f1 = _safe(2 * tp, 2 * tp + fp + fn)
     denominator = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     result = {
         "n": len(labels), "accuracy": (tp + tn) / len(labels), "precision": precision,

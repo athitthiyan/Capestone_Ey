@@ -1,1 +1,19 @@
-{"method":"no_evidence_retrieval","provider":"environment","model":"configured-routing","temperature":0.0,"max_tokens":4000,"retrieval_enabled":false,"challenger_enabled":true,"defender_enabled":true,"verifier_enabled":true,"debate_rounds":2,"confidence_threshold":0.5,"prompt_version":"crew-v1","dataset_version":"1.0.0","split_seed":20260728,"timeout_seconds":180,"retries":1}
+{
+  "_alias_note": "Legacy filename retained for older run directories; identical to no_rag.yaml. Use no_rag.yaml.",
+  "challenger_enabled": true,
+  "confidence_threshold": 0.5,
+  "dataset_version": "uci-audit-v1",
+  "debate_rounds": 2,
+  "defender_enabled": true,
+  "max_tokens": 1200,
+  "method": "no_rag",
+  "model": "claude-haiku-4-5-20251001",
+  "prompt_version": "crew-v1",
+  "provider": "anthropic",
+  "retries": 3,
+  "retrieval_enabled": false,
+  "split_seed": 20260728,
+  "temperature": 0.0,
+  "timeout_seconds": 120,
+  "verifier_enabled": true
+}

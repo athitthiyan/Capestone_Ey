@@ -1,0 +1,12 @@
+method,status,n,accuracy,accuracy_lo,accuracy_hi,precision,recall,specificity,specificity_lo,specificity_hi,f1,balanced_accuracy,mcc,roc_auc,brier_score,expected_calibration_error,mean_groundedness,mean_citation_correctness,mean_latency_ms,p95_latency_ms,mean_cost_usd,failure_rate
+rule_baseline,complete,346,0.809249,0.768786,0.849711,0.688679,1.000000,0.670000,0.604167,0.735000,0.815642,0.835000,0.679275,0.975942,0.113654,0.199037,,,0.010262,0.030721,0.000000,0.000000
+logistic_reference,complete,346,0.962428,0.942197,0.982659,0.946309,0.965753,0.960000,0.930348,0.985075,0.955932,0.962877,0.923338,0.995000,0.025950,0.015079,,,0.006334,0.008440,0.000000,0.000000
+tree_reference,complete,346,0.956647,0.933526,0.976879,0.971223,0.924658,0.980000,0.958974,0.995261,0.947368,0.952329,0.911346,0.988938,0.034058,0.009544,,,0.006927,0.008076,0.000000,0.000000
+single_llm,not_run,,,,,,,,,,,,,,,,,,,,,
+full_multi_agent,not_run,,,,,,,,,,,,,,,,,,,,,
+no_challenger,not_run,,,,,,,,,,,,,,,,,,,,,
+no_defender,not_run,,,,,,,,,,,,,,,,,,,,,
+no_verifier,not_run,,,,,,,,,,,,,,,,,,,,,
+no_rag,not_run,,,,,,,,,,,,,,,,,,,,,
+one_debate_round,not_run,,,,,,,,,,,,,,,,,,,,,
+two_debate_rounds,not_run,,,,,,,,,,,,,,,,,,,,,

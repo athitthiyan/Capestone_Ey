@@ -1,1 +1,18 @@
-{"method":"rule_baseline","provider":"none","model":"deterministic-rules-v1","temperature":0.0,"max_tokens":1,"retrieval_enabled":false,"challenger_enabled":false,"defender_enabled":false,"verifier_enabled":false,"debate_rounds":0,"confidence_threshold":0.5,"prompt_version":"rules-v1","dataset_version":"1.0.0","split_seed":20260728,"timeout_seconds":5,"retries":0}
+{
+  "challenger_enabled": false,
+  "confidence_threshold": 0.5,
+  "dataset_version": "uci-audit-v1",
+  "debate_rounds": 0,
+  "defender_enabled": false,
+  "max_tokens": 1,
+  "method": "rule_baseline",
+  "model": "deterministic",
+  "prompt_version": "screen-v1",
+  "provider": "none",
+  "retries": 0,
+  "retrieval_enabled": false,
+  "split_seed": 20260728,
+  "temperature": 0.0,
+  "timeout_seconds": 5,
+  "verifier_enabled": false
+}

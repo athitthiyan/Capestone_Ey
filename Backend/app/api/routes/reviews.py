@@ -1,5 +1,6 @@
 """Human review queue + decision routes."""
 
+import asyncio
 import logging
 from datetime import datetime
 
@@ -210,7 +211,7 @@ def _apply_ground_truth(investigation: Investigation, payload: ReviewActionReque
     return True
 
 
-def _trigger_ragas_scoring(investigation_id: str) -> None:
+async def _trigger_ragas_scoring(investigation_id: str) -> None:
     """Fire RAGAS judge scoring after a ground truth is set; never let scoring
     affect the request. Mirrors the Celery-or-inline fallback used for the
     main investigation pipeline (app/api/routes/investigations.py) so this
@@ -223,7 +224,10 @@ def _trigger_ragas_scoring(investigation_id: str) -> None:
         if _celery_broker_available():
             score_investigation_ragas_task.delay(investigation_id)
         else:
-            score_investigation_ragas_task.run(investigation_id)
+            # The task uses asyncio.run() for RAGAS. Execute the inline fallback
+            # off the FastAPI event-loop thread to avoid nested-loop corruption
+            # (notably when RAGAS imports nest_asyncio).
+            await asyncio.to_thread(score_investigation_ragas_task.run, investigation_id)
     except Exception as exc:  # noqa: BLE001
         logger.warning("Could not run RAGAS scoring for %s: %s", investigation_id, exc)
 
@@ -243,13 +247,18 @@ async def approve(
     ground_truth_set = _apply_ground_truth(investigation, payload)
     _close_pending_queue(db, investigation_id, "approved", actor, payload.comment)
     db.commit()
+    response_status = investigation.status.value
     await _log_review(investigation_id, "case_approved", actor, {"comment": payload.comment})
     if ground_truth_set:
-        _trigger_ragas_scoring(investigation_id)
+        # Release the request's connection before the inline Celery fallback opens
+        # its own scoring session. This prevents SQLite test/dev deadlocks and
+        # reduces pool pressure in production; no response field needs the session.
+        db.close()
+        await _trigger_ragas_scoring(investigation_id)
     return ReviewActionResponse(
         investigation_id=investigation_id,
         action="approve",
-        status=investigation.status.value,
+        status=response_status,
         message="Case approved and closed",
     )
 
@@ -269,13 +278,15 @@ async def reject(
     ground_truth_set = _apply_ground_truth(investigation, payload)
     _close_pending_queue(db, investigation_id, "rejected", actor, payload.comment)
     db.commit()
+    response_status = investigation.status.value
     await _log_review(investigation_id, "case_rejected", actor, {"comment": payload.comment})
     if ground_truth_set:
-        _trigger_ragas_scoring(investigation_id)
+        db.close()
+        await _trigger_ragas_scoring(investigation_id)
     return ReviewActionResponse(
         investigation_id=investigation_id,
         action="reject",
-        status=investigation.status.value,
+        status=response_status,
         message="Case rejected and closed",
     )
 

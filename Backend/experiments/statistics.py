@@ -39,6 +39,62 @@ def permutation_mean_difference(first: list[float], second: list[float], *, seed
     return {"mean_difference": observed, "p_value": (extreme + 1) / (samples + 1), "samples": samples, "seed": seed}
 
 
+def bootstrap_metric_ci(labels: list[int], predictions: list[int], scores: list[float] | None,
+                        metric: Callable[[list[int], list[int], list[float] | None], float | None],
+                        *, seed: int = 20260728, samples: int = 2000) -> dict:
+    """Percentile CI for a classification metric by resampling *cases*, not values.
+
+    Resampling whole cases keeps label, prediction and score aligned, which a naive
+    bootstrap over a metric's output cannot do. Draws where the metric is undefined
+    (for example precision on a resample with no predicted positives) are discarded and
+    counted, so a wide interval built on few valid draws is visible rather than implied.
+    """
+    if not labels or not (len(labels) == len(predictions)):
+        raise ValueError("paired non-empty labels and predictions are required")
+    if scores is not None and len(scores) != len(labels):
+        raise ValueError("scores must align with labels")
+    point = metric(labels, predictions, scores)
+    rng = random.Random(seed)
+    n = len(labels)
+    draws: list[float] = []
+    for _ in range(samples):
+        index = [rng.randrange(n) for _ in range(n)]
+        value = metric([labels[i] for i in index], [predictions[i] for i in index],
+                       [scores[i] for i in index] if scores is not None else None)
+        if value is not None:
+            draws.append(value)
+    if not draws:
+        return {"estimate": point, "lower": None, "upper": None, "samples": samples,
+                "valid_samples": 0, "seed": seed}
+    draws.sort()
+    return {"estimate": point,
+            "lower": draws[int(.025 * len(draws))],
+            "upper": draws[min(len(draws) - 1, int(.975 * len(draws)))],
+            "samples": samples, "valid_samples": len(draws), "seed": seed}
+
+
+def holm_bonferroni(p_values: dict[str, float], alpha: float = 0.05) -> dict[str, dict]:
+    """Holm step-down correction over a family of comparisons.
+
+    The ablation table is a family of paired tests against one reference, so uncorrected
+    p-values would overstate significance. Holm controls the family-wise error rate while
+    being uniformly more powerful than Bonferroni.
+    """
+    if not p_values:
+        return {}
+    ordered = sorted(p_values.items(), key=lambda item: item[1])
+    m = len(ordered)
+    output: dict[str, dict] = {}
+    running_max = 0.0
+    for rank, (name, p) in enumerate(ordered):
+        adjusted = min(1.0, (m - rank) * p)
+        running_max = max(running_max, adjusted)   # enforce monotonicity
+        output[name] = {"p_value": p, "p_adjusted": running_max,
+                        "significant": running_max <= alpha, "rank": rank + 1,
+                        "family_size": m, "alpha": alpha}
+    return output
+
+
 def stratified_bootstrap_ci(values: list[float], strata: list[str], *, seed: int = 20260728,
                             samples: int = 2000) -> dict:
     if not values or len(values) != len(strata):

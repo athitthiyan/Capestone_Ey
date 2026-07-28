@@ -1,0 +1,30 @@
+{
+  "comparisons": {
+    "logistic_reference": {
+      "alpha": 0.05,
+      "discordant_first_only": 5,
+      "discordant_second_only": 58,
+      "family_size": 2,
+      "p_adjusted": 3.3247016251181094e-12,
+      "p_value": 1.6623508125590547e-12,
+      "rank": 1,
+      "significant": true,
+      "test": "exact two-sided McNemar/binomial"
+    },
+    "tree_reference": {
+      "alpha": 0.05,
+      "discordant_first_only": 11,
+      "discordant_second_only": 62,
+      "family_size": 2,
+      "p_adjusted": 9.089007009078587e-10,
+      "p_value": 9.089007009078587e-10,
+      "rank": 2,
+      "significant": true,
+      "test": "exact two-sided McNemar/binomial"
+    }
+  },
+  "correction": "Holm-Bonferroni, family-wise alpha 0.05",
+  "family_size": 2,
+  "interpretation": "discordant_first_only counts cases the reference got right and the method got wrong; discordant_second_only is the reverse",
+  "reference": "rule_baseline"
+}

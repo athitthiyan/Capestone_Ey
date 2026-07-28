@@ -1,0 +1,95 @@
+method,transaction_id,gold_label,prediction,error_type,confidence,category,difficulty,run_error,citations,explanation
+logistic_reference,UCIA-0091,0,1,false_positive,0.562367,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.5624
+logistic_reference,UCIA-0254,0,1,false_positive,0.586674,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.5867
+logistic_reference,UCIA-0275,0,1,false_positive,0.94824,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.9482
+logistic_reference,UCIA-0292,0,1,false_positive,0.66173,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.6617
+logistic_reference,UCIA-0296,1,0,false_negative,0.321851,misstatement_value,standard,,,logistic regression fitted on the development split; p(risk)=0.3219
+logistic_reference,UCIA-0369,1,0,false_negative,0.146438,misstatement_value,standard,,,logistic regression fitted on the development split; p(risk)=0.1464
+logistic_reference,UCIA-0379,0,1,false_positive,0.620092,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.6201
+logistic_reference,UCIA-0463,0,1,false_positive,0.738527,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.7385
+logistic_reference,UCIA-0555,1,0,false_negative,0.014751,misstatement_value,standard,,,logistic regression fitted on the development split; p(risk)=0.0148
+logistic_reference,UCIA-0601,1,0,false_negative,0.203185,misstatement_value,borderline,,,logistic regression fitted on the development split; p(risk)=0.2032
+logistic_reference,UCIA-0610,0,1,false_positive,0.529845,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.5298
+logistic_reference,UCIA-0611,0,1,false_positive,0.564811,cleared_after_flag,hard,,,logistic regression fitted on the development split; p(risk)=0.5648
+logistic_reference,UCIA-0690,1,0,false_negative,0.338444,unplanned_para_discrepancy,standard,,,logistic regression fitted on the development split; p(risk)=0.3384
+rule_baseline,UCIA-0009,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0009:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0018,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0018:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0021,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0021:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0079,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0079:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0091,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0091:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0185,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0185:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0187,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0187:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0201,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0201:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0215,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0215:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0232,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0232:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0234,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0234:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0248,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0248:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0249,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0249:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0250,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0250:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0254,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0254:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0256,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0256:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0260,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0260:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0275,0,1,false_positive,0.6,cleared_after_flag,hard,,UCIA-0275:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0292,0,1,false_positive,0.5333333333333333,cleared_after_flag,hard,,UCIA-0292:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0295,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0295:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0305,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0305:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0321,0,1,false_positive,0.4666666666666666,cleared_after_flag,hard,,UCIA-0321:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0352,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0352:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0354,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0354:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0371,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0371:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0377,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0377:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0379,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0379:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0380,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0380:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0381,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0381:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0384,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0384:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0406,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0406:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0408,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0408:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0429,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0429:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0430,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0430:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0441,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0441:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0442,0,1,false_positive,0.4666666666666666,cleared_after_flag,hard,,UCIA-0442:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0444,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0444:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0448,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0448:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0451,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0451:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0461,0,1,false_positive,0.39999999999999997,cleared_after_flag,hard,,UCIA-0461:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0463,0,1,false_positive,0.5,cleared_after_flag,hard,,UCIA-0463:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0475,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0475:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0550,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0550:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0585,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0585:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0588,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0588:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0610,0,1,false_positive,0.5666666666666667,cleared_after_flag,hard,,UCIA-0610:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0611,0,1,false_positive,0.5666666666666667,cleared_after_flag,hard,,UCIA-0611:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0628,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0628:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0629,0,1,false_positive,0.5333333333333333,cleared_after_flag,hard,,UCIA-0629:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0640,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0640:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0643,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0643:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0649,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0649:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0653,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0653:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0656,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0656:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0668,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0668:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0672,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0672:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0676,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0676:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0677,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0677:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0689,0,1,false_positive,0.5333333333333333,cleared_after_flag,hard,,UCIA-0689:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0721,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0721:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0722,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0722:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0725,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0725:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0743,0,1,false_positive,0.43333333333333335,cleared_after_flag,hard,,UCIA-0743:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0750,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0750:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0751,0,1,false_positive,0.3666666666666667,cleared_after_flag,hard,,UCIA-0751:prior-screen,pre-audit screen flagged the case
+rule_baseline,UCIA-0764,0,1,false_positive,0.5666666666666667,cleared_after_flag,hard,,UCIA-0764:prior-screen,pre-audit screen flagged the case
+tree_reference,UCIA-0070,1,0,false_negative,0.285714,misstatement_value,standard,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0079,0,1,false_positive,1.0,cleared_after_flag,hard,,,depth-3 decision tree fitted on the development split; p(risk)=1.0000
+tree_reference,UCIA-0091,0,1,false_positive,0.947368,cleared_after_flag,hard,,,depth-3 decision tree fitted on the development split; p(risk)=0.9474
+tree_reference,UCIA-0170,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0254,0,1,false_positive,0.947368,cleared_after_flag,hard,,,depth-3 decision tree fitted on the development split; p(risk)=0.9474
+tree_reference,UCIA-0284,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0290,1,0,false_negative,0.285714,misstatement_value,standard,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0296,1,0,false_negative,0.285714,misstatement_value,standard,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0365,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0368,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0369,1,0,false_negative,0.285714,misstatement_value,standard,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0379,0,1,false_positive,0.947368,cleared_after_flag,hard,,,depth-3 decision tree fitted on the development split; p(risk)=0.9474
+tree_reference,UCIA-0555,1,0,false_negative,0.285714,misstatement_value,standard,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0601,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
+tree_reference,UCIA-0745,1,0,false_negative,0.285714,misstatement_value,borderline,,,depth-3 decision tree fitted on the development split; p(risk)=0.2857
